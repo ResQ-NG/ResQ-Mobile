@@ -1,4 +1,6 @@
-import { View, Image, StyleSheet, DimensionValue } from 'react-native'
+import { View, StyleSheet, DimensionValue } from 'react-native'
+import Animated, { useAnimatedStyle, withRepeat, withTiming } from 'react-native-reanimated';
+import { useEffect } from 'react';
 
 
 interface IOnboardingImageProps {
@@ -14,9 +16,27 @@ export default function OnboardingImage({ height, OnboardingImageIndex}: IOnboar
 
     const imageSource = OnboardingImages[OnboardingImageIndex] ?? OnboardingImages[0];
 
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                {
+                    scale: withRepeat(
+                        withTiming(1.1, { duration: 3000 }),
+                        -1,
+                        true
+                    )
+                }
+            ]
+        };
+    });
+
     return (
         <View style={[styles.container, { height }]}>
-            <Image source={imageSource} style={styles.image} resizeMode="cover"/>
+            <Animated.Image
+                source={imageSource}
+                style={[styles.image, animatedStyle]}
+                resizeMode="cover"
+            />
         </View>
     )
 }
