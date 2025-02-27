@@ -9,7 +9,7 @@ export default function OnboardingImage({ height, OnboardingImageIndex}: IOnboar
     const OnboardingImages = [
         require("@/assets/images/welcome-1.png"),
         require("@/assets/images/welcome-2.png"),
-        // require("@/assets/images/welcome-3.png")
+        require("@/assets/images/welcome-3.png")
     ];
 
     const imageSource = OnboardingImages[OnboardingImageIndex] ?? OnboardingImages[0];
