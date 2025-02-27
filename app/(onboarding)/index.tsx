@@ -11,8 +11,8 @@ export default function WelcomeOnboardingScreen() {
     <View style={styles.container}>
         <OnboardingImage height="68%" OnboardingImageIndex={0} />
         <OnboardingBody
-            headingText="Your Guardian In Crisis"
-            bodyText="We swiftly connect you to emergency services, providing immediate aid and support when you need it most – because every second counts."
+            headingText="Your Safety, Our Priority"
+            bodyText="When seconds matter most, ResQ is there. Our AI-powered emergency response system provides instant help and protection, giving you peace of mind wherever life takes you."
             onContinue={() => router.push('/onboarding-two')}
         />
     </View>

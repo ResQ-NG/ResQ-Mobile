@@ -9,8 +9,8 @@ export default function OnboardingThreeScreen() {
     <View style={styles.container}>
         <OnboardingImage height="68%" OnboardingImageIndex={2} />
         <OnboardingBody
-            headingText="Building a safer world, one incident at a time"
-            bodyText="We swiftly connect you to emergency services, providing immediate aid and support when you need it most – because every second counts."
+            headingText="Your Voice. Your Safety. Your Power"
+            bodyText="No one should feel helpless. No one should be unheard. ResQ is more than an app—it’s a movement to make safety accessible for everyone."
 
         />
     </View>

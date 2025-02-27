@@ -48,7 +48,8 @@ const styles = StyleSheet.create({
     headingText: {
         ...Typography.h1,
         color: Colors.brandConstants.primaryWhite,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        textAlign: "center"
     },
     paragraphText: {
             ...Typography.paragraph,
