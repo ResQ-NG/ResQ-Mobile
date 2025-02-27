@@ -3,14 +3,22 @@ import { View, Image, StyleSheet, DimensionValue } from 'react-native'
 
 interface ISplashImageProps {
     height: DimensionValue;
-    src: string;
+    splashImageIndex: number;
 }
-export default function SplashImage({ height, src}: ISplashImageProps) {
-  return (
-    <View style={[styles.container, { height }]}>
-        <Image source={require("@/assets/images/welcome-1.png")} style={styles.image} resizeMode="cover"/>
-    </View>
-  )
+export default function SplashImage({ height, splashImageIndex}: ISplashImageProps) {
+    const splashImages = [
+        require("@/assets/images/welcome-1.png"),
+        // require("@/assets/images/welcome-2.png"),
+        // require("@/assets/images/welcome-3.png")
+    ];
+
+    const imageSource = splashImages[splashImageIndex] ?? splashImages[0];
+
+    return (
+        <View style={[styles.container, { height }]}>
+            <Image source={imageSource} style={styles.image} resizeMode="cover"/>
+        </View>
+    )
 }
 
 
