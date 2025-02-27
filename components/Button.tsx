@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity, StyleSheet, TouchableOpacityProps } from 'react-native'
+import { Text, TouchableOpacity, StyleSheet, TouchableOpacityProps, GestureResponderEvent } from 'react-native'
 import React from 'react'
 import { Colors } from '@/constants/Colors'
 import { Typography } from '@/constants/Typography'
+import * as Haptics from 'expo-haptics'
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -9,15 +10,23 @@ interface ButtonProps extends TouchableOpacityProps {
   fullWidth?: boolean;
   disabled?: boolean;
 }
-
 export default function Button({
   title,
   variant = 'primary',
   fullWidth = false,
   disabled = false,
   style,
+  onPress,
   ...props
 }: ButtonProps) {
+
+  const handlePress = async (event: GestureResponderEvent) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (onPress) {
+      onPress(event);
+    }
+  };
+
   return (
     <TouchableOpacity
       style={[
@@ -29,6 +38,7 @@ export default function Button({
         style
       ]}
       disabled={disabled}
+      onPress={handlePress}
       {...props}
     >
       <Text style={[

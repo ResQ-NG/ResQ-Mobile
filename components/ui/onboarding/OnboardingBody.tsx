@@ -6,13 +6,14 @@ import { Colors } from '@/constants/Colors';
 
 
 
-interface ISplashBody {
+interface IOnboardingBody {
     headingText: string;
-    bodyText: string
+    bodyText: string;
+    onContinue?: () => void;
 }
 
-export default function SplashBody(
-    {headingText, bodyText} :ISplashBody
+export default function OnboardingBody(
+    {headingText, bodyText, onContinue} :IOnboardingBody
 ) {
   return (
     <View style={styles.splashBox}>
@@ -20,7 +21,12 @@ export default function SplashBody(
         <Text style={styles.paragraphText}>
             {bodyText}
         </Text>
-        <Button title="Continue" style={{marginTop: 10}} fullWidth/>
+        <Button
+            title="Continue"
+            style={{marginTop: 10}}
+            fullWidth
+            onPress={onContinue}
+        />
     </View>
   )
 }

@@ -1,18 +1,18 @@
 import { View, Image, StyleSheet, DimensionValue } from 'react-native'
 
 
-interface ISplashImageProps {
+interface IOnboardingImageProps {
     height: DimensionValue;
-    splashImageIndex: number;
+    OnboardingImageIndex: number;
 }
-export default function SplashImage({ height, splashImageIndex}: ISplashImageProps) {
-    const splashImages = [
+export default function OnboardingImage({ height, OnboardingImageIndex}: IOnboardingImageProps) {
+    const OnboardingImages = [
         require("@/assets/images/welcome-1.png"),
-        // require("@/assets/images/welcome-2.png"),
+        require("@/assets/images/welcome-2.png"),
         // require("@/assets/images/welcome-3.png")
     ];
 
-    const imageSource = splashImages[splashImageIndex] ?? splashImages[0];
+    const imageSource = OnboardingImages[OnboardingImageIndex] ?? OnboardingImages[0];
 
     return (
         <View style={[styles.container, { height }]}>
