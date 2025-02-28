@@ -1,12 +1,12 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native'
+import { View, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import React from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { ThemedView } from '@/components/ThemedView'
 import { ThemedText } from '@/components/ThemedText'
-import { useThemeColor } from '@/hooks/useThemeColor'
 import Button from '@/components/Button'
 import { Colors } from '@/constants/Colors'
 import Logo from '@/components/ui/Logo'
+import { CustomInput } from '@/components/Input'
 
 type FormData = {
   email: string;
@@ -21,98 +21,92 @@ export default function AuthLoginScreen() {
     }
   });
 
-  const inputBackgroundColor = useThemeColor({}, 'background');
-  const placeholderColor = useThemeColor({}, 'text');
-  const borderColor = useThemeColor({}, 'icon');
-
   const onSubmit = (data: FormData) => {
     console.log(data);
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedView style={styles.formContainer}>
-        <Logo />
-        <ThemedText type="title" style={styles.title}>Welcome Back</ThemedText>
-        <ThemedText type="default" style={styles.subtitle}>Sign in to continue</ThemedText>
-        <Controller
-          control={control}
-          rules={{
-            required: 'Email is required',
-            pattern: {
-              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-              message: 'Invalid email address'
-            }
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={[styles.input, { backgroundColor: inputBackgroundColor, color: placeholderColor, borderColor }]}
-              placeholder="Email"
-              placeholderTextColor={placeholderColor}
-              onChangeText={onChange}
-              value={value}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          )}
-          name="email"
-        />
-        {errors.email && <ThemedText style={styles.errorText}>{errors.email.message}</ThemedText>}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ThemedView style={styles.container}>
+        <ThemedView style={styles.formContainer}>
+          <Logo />
+          <ThemedText type="title" style={styles.title}>Welcome Back</ThemedText>
+          <ThemedText type="default" style={styles.subtitle}>Sign in to continue</ThemedText>
+          <Controller
+            control={control}
+            rules={{
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Invalid email address'
+              }
+            }}
+            render={({ field: { onChange, value } }) => (
+              <CustomInput
+                placeholder="Email"
+                onChangeText={onChange}
+                value={value}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                error={errors.email?.message}
+              />
+            )}
+            name="email"
+          />
 
-        <Controller
-          control={control}
-          rules={{
-            required: 'Password is required',
-            minLength: {
-              value: 6,
-              message: 'Password must be at least 6 characters'
-            }
-          }}
-          render={({ field: { onChange, value } }) => (
-            <TextInput
-              style={[styles.input, { backgroundColor: inputBackgroundColor, color: placeholderColor, borderColor }]}
-              placeholder="Password"
-              placeholderTextColor={placeholderColor}
-              onChangeText={onChange}
-              value={value}
-              secureTextEntry
-            />
-          )}
-          name="password"
-        />
-        {errors.password && <ThemedText style={styles.errorText}>{errors.password.message}</ThemedText>}
+          <Controller
+            control={control}
+            rules={{
+              required: 'Password is required',
+              minLength: {
+                value: 6,
+                message: 'Password must be at least 6 characters'
+              }
+            }}
+            render={({ field: { onChange, value } }) => (
+              <CustomInput
+                placeholder="Password"
+                onChangeText={onChange}
+                value={value}
+                type="password"
+                error={errors.password?.message}
+              />
+            )}
+            name="password"
+          />
 
-        <Button
-          title="Sign in"
-          onPress={handleSubmit(onSubmit)}
-          style={styles.loginButton}
-        />
+          <Button
+            title="Sign in"
+            onPress={handleSubmit(onSubmit)}
+            style={styles.loginButton}
+          />
 
-        <TouchableOpacity style={styles.forgotPassword}>
-          <ThemedText style={styles.forgotPasswordText}>Forgot Password?</ThemedText>
-        </TouchableOpacity>
-
-        <View style={styles.dividerContainer}>
-          <View style={styles.divider} />
-          <ThemedText style={styles.dividerText}>OR</ThemedText>
-          <View style={styles.divider} />
-        </View>
-
-        <Button
-          title="Continue as Guest"
-          onPress={() => {}}
-          variant="secondary"
-          style={styles.guestButton}
-        />
-
-        <View style={styles.signupContainer}>
-          <ThemedText style={styles.signupText}>Don't have an account? </ThemedText>
-          <TouchableOpacity>
-            <ThemedText type="link">Sign up</ThemedText>
+          <TouchableOpacity style={styles.forgotPassword}>
+            <ThemedText style={styles.forgotPasswordText}>Forgot Password?</ThemedText>
           </TouchableOpacity>
-        </View>
+
+          <View style={styles.dividerContainer}>
+            <View style={styles.divider} />
+            <ThemedText style={styles.dividerText}>OR</ThemedText>
+            <View style={styles.divider} />
+          </View>
+
+          <Button
+            title="Continue as Guest"
+            onPress={() => {}}
+            variant="secondary"
+            style={styles.guestButton}
+          />
+
+          <View style={styles.signupContainer}>
+            <ThemedText style={styles.signupText}>Don't have an account? </ThemedText>
+            <TouchableOpacity>
+              <ThemedText type="link">Sign up</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </ThemedView>
       </ThemedView>
-    </ThemedView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -140,14 +134,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     opacity: 0.8
   },
-  input: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    fontFamily: 'Poppins-Regular',
-    fontSize: 16,
-    borderWidth: 1,
-  },
   loginButton: {
     marginTop: 8,
     marginBottom: 16,
@@ -166,13 +152,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-Regular',
     opacity: 0.8
-  },
-  errorText: {
-    color: Colors.brandConstants.primaryRed,
-    fontSize: 12,
-    marginBottom: 12,
-    marginTop: -8,
-    fontFamily: 'Poppins-Regular'
   },
   dividerContainer: {
     flexDirection: 'row',
