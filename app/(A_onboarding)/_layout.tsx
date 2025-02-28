@@ -12,6 +12,7 @@ export default function OnboardingLayout() {
             }}>
             <Stack.Screen name="index" />
             <Stack.Screen name="onboarding-two" />
+            <Stack.Screen name="onboarding-three" />
         </Stack>
     )
 }

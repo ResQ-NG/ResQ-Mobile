@@ -59,7 +59,7 @@ export const CustomInput = ({
             {
               backgroundColor: inputBackgroundColor,
               color: placeholderColor,
-              borderColor,
+              borderColor: 'rgba(0, 0, 0, 0.1)',
               paddingLeft: leftIcon ? 40 : 16,
               paddingRight: (type === 'password' || rightIcon) ? 40 : 16,
             }

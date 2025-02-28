@@ -6,30 +6,35 @@ import { ThemedText } from '@/components/ThemedText'
 import Button from '@/components/Button'
 import Logo from '@/components/ui/Logo'
 import { CustomInput } from '@/components/Input'
-import { LoginFormData } from '@/types/form-input'
-import { Link } from 'expo-router'
+import { useRouter } from 'expo-router'
+import { SignupFormData } from '@/types/form-input'
 
 
 
-export default function AuthLoginScreen() {
-  const { control, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+export default function CreateAccountScreen() {
+  const router = useRouter()
+  const { control, handleSubmit, watch, formState: { errors } } = useForm<SignupFormData>({
     defaultValues: {
       email: '',
-      password: ''
+      password: '',
+      confirmPassword: ''
     }
-  });
+  })
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log(data);
-  };
+  const password = watch('password')
+
+  const onSubmit = (data: SignupFormData) => {
+    console.log(data)
+  }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <ThemedView style={styles.container}>
         <ThemedView style={styles.formContainer}>
           <Logo />
-          <ThemedText type="title" style={styles.title}>Welcome Back</ThemedText>
-          <ThemedText type="default" style={styles.subtitle}>Sign in to continue</ThemedText>
+          <ThemedText type="title" style={styles.title}>Create Account</ThemedText>
+          <ThemedText type="default" style={styles.subtitle}>Sign up to get started</ThemedText>
+
           <Controller
             control={control}
             rules={{
@@ -73,39 +78,40 @@ export default function AuthLoginScreen() {
             name="password"
           />
 
+          <Controller
+            control={control}
+            rules={{
+              required: 'Please confirm your password',
+              validate: value => value === password || 'Passwords do not match'
+            }}
+            render={({ field: { onChange, value } }) => (
+              <CustomInput
+                placeholder="Confirm Password"
+                onChangeText={onChange}
+                value={value}
+                type="password"
+                error={errors.confirmPassword?.message}
+              />
+            )}
+            name="confirmPassword"
+          />
+
           <Button
-            title="Sign in"
+            title="Create Account"
             onPress={handleSubmit(onSubmit)}
-            style={styles.loginButton}
+            style={styles.signupButton}
           />
 
-          <TouchableOpacity style={styles.forgotPassword}>
-            <ThemedText style={styles.forgotPasswordText}>Forgot Password?</ThemedText>
-          </TouchableOpacity>
-
-          <View style={styles.dividerContainer}>
-            <View style={styles.divider} />
-            <ThemedText style={styles.dividerText}>OR</ThemedText>
-            <View style={styles.divider} />
-          </View>
-
-          <Button
-            title="Continue as Guest"
-            onPress={() => {}}
-            variant="secondary"
-            style={styles.guestButton}
-          />
-
-          <View style={styles.signupContainer}>
-            <ThemedText style={styles.signupText}>Don't have an account? </ThemedText>
-            <TouchableOpacity>
-              <ThemedText type="link"><Link href="/(auth)/create-account">Sign up</Link></ThemedText>
+          <View style={styles.loginContainer}>
+            <ThemedText style={styles.loginText}>Already have an account? </ThemedText>
+            <TouchableOpacity onPress={() => router.back()}>
+              <ThemedText type="link">Sign in</ThemedText>
             </TouchableOpacity>
           </View>
         </ThemedView>
       </ThemedView>
     </TouchableWithoutFeedback>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -132,50 +138,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     opacity: 0.8
   },
-  loginButton: {
+  signupButton: {
     marginTop: 8,
-    marginBottom: 16,
-    height: 52
-  },
-  loginButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    fontFamily: 'Poppins-Bold'
-  },
-  forgotPassword: {
-    alignItems: 'center',
-    marginBottom: 24
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    fontFamily: 'Poppins-Regular',
-    opacity: 0.8
-  },
-  dividerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24
-  },
-  divider: {
-    flex: 1,
-    height: 1,
-    backgroundColor: 'rgba(0,0,0,0.1)'
-  },
-  dividerText: {
-    marginHorizontal: 16,
-    fontSize: 14,
-    opacity: 0.6
-  },
-  guestButton: {
     marginBottom: 24,
     height: 52
   },
-  signupContainer: {
+  loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center'
   },
-  signupText: {
+  loginText: {
     fontSize: 14
   }
 })

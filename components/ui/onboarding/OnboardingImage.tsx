@@ -1,6 +1,6 @@
 import { View, StyleSheet, DimensionValue } from 'react-native'
 import Animated, { useAnimatedStyle, withRepeat, withTiming } from 'react-native-reanimated';
-import { useEffect } from 'react';
+
 
 
 interface IOnboardingImageProps {
@@ -37,6 +37,17 @@ export default function OnboardingImage({ height, OnboardingImageIndex}: IOnboar
                 style={[styles.image, animatedStyle]}
                 resizeMode="cover"
             />
+            <View style={styles.indicatorContainer}>
+                {OnboardingImages.map((_, index) => (
+                    <View
+                        key={index}
+                        style={[
+                            styles.indicator,
+                            index === OnboardingImageIndex && styles.activeIndicator
+                        ]}
+                    />
+                ))}
+            </View>
         </View>
     )
 }
@@ -44,12 +55,31 @@ export default function OnboardingImage({ height, OnboardingImageIndex}: IOnboar
 
 const styles = StyleSheet.create({
     container: {
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        position: 'relative'
     },
     image: {
-      width: '100%',
-      height: '100%',
+        width: '100%',
+        height: '100%',
+    },
+    indicatorContainer: {
+        position: 'absolute',
+        bottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 8
+    },
+    indicator: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: 'rgba(255,255,255,0.5)'
+    },
+    activeIndicator: {
+        backgroundColor: '#fff',
+        width: 24
     }
-  });
+});
