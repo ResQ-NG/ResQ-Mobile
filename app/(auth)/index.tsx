@@ -91,7 +91,7 @@ const router = useRouter()
 
           <Button
             title="Continue as Guest"
-            onPress={() => {router.push("/permission")}}
+            onPress={() => {router.replace("/permission")}}
             variant="secondary"
             style={styles.guestButton}
           />

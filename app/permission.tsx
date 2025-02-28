@@ -1,5 +1,5 @@
 import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import Button from '@/components/Button';
@@ -10,6 +10,7 @@ import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 
 export default function PermissionScreen() {
+  const router = useRouter();
   const {
     cameraPermission,
     microphonePermission,
@@ -52,6 +53,11 @@ export default function PermissionScreen() {
     } catch (error) {
       console.error('Error requesting gallery permission:', error);
     }
+  }
+
+  const handleNavigateToMain = () => {
+    router.replace('/(main)');
+
   }
 
   return (
@@ -116,12 +122,11 @@ export default function PermissionScreen() {
 
         <View style={[styles.buttonContainer, {backgroundColor: backgroundTheme}]}>
           {allPermissionsGranted ? (
-            <Link href="/(main)" asChild>
-              <Button
-                title="Continue to App"
-                style={styles.button}
-              />
-            </Link>
+            <Button
+              onPress={handleNavigateToMain}
+              title="Continue to App"
+              style={styles.button}
+            />
           ) : (
             <Button
               onPress={requestPermissions}

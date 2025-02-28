@@ -42,6 +42,7 @@ export default function RootLayout() {
         <Stack.Screen name="permission" options={{ headerShown: false, presentation: 'modal' }} />
         <Stack.Screen name="(auth)" options={{headerShown: false}} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(main)" options={{headerShown: false, presentation: "card" }}/>
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
