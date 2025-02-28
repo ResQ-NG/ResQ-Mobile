@@ -21,6 +21,8 @@ export default function Button({
 }: ButtonProps) {
 
   const handlePress = async (event: GestureResponderEvent) => {
+    event.persist();
+
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (onPress) {
       onPress(event);

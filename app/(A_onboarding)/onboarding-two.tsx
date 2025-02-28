@@ -12,7 +12,7 @@ export default function OnboardingTwoScreen() {
         <OnboardingBody
             headingText="Building a safer world, one incident at a time"
             bodyText="We swiftly connect you to emergency services, providing immediate aid and support when you need it most – because every second counts."
-            onContinue={() => router.push("/onboarding-three")}
+            onContinue={() => router.push("/(A_onboarding)/onboarding-three")}
         />
     </View>
   )

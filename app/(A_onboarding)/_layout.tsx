@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router';
 
-export default function AuthLayout() {
+
+export default function OnboardingLayout() {
     return (
         <Stack
             screenOptions={{
@@ -10,8 +11,7 @@ export default function AuthLayout() {
                 }
             }}>
             <Stack.Screen name="index" />
-            {/* <Stack.Screen name="register" />
-            <Stack.Screen name="forgot-password" /> */}
+            <Stack.Screen name="onboarding-two" />
         </Stack>
-    );
+    )
 }
