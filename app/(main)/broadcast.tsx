@@ -3,11 +3,11 @@ import React from 'react'
 import { ThemedText } from '@/components/ThemedText'
 import { ThemedView } from '@/components/ThemedView'
 
-export default function WatchMeScreen() {
+export default function BroadCastScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ThemedView style={styles.content}>
-        <ThemedText style={styles.title}>Watch Me</ThemedText>
+        <ThemedText style={styles.title}>Broad cast</ThemedText>
       </ThemedView>
     </SafeAreaView>
   )
