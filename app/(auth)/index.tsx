@@ -8,7 +8,7 @@ import Logo from '@/components/ui/Logo'
 import { CustomInput } from '@/components/Input'
 import { LoginFormData } from '@/types/form-input'
 import { Link } from 'expo-router'
-
+import { useRouter } from 'expo-router'
 
 
 export default function AuthLoginScreen() {
@@ -18,7 +18,7 @@ export default function AuthLoginScreen() {
       password: ''
     }
   });
-
+const router = useRouter()
   const onSubmit = (data: LoginFormData) => {
     console.log(data);
   };
@@ -91,7 +91,7 @@ export default function AuthLoginScreen() {
 
           <Button
             title="Continue as Guest"
-            onPress={() => {}}
+            onPress={() => {router.push("/permission")}}
             variant="secondary"
             style={styles.guestButton}
           />
