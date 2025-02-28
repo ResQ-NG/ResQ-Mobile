@@ -38,11 +38,6 @@ const TabLabel = ({ focused, label, fontSize = 12 }: TabLabelProps) => (
 
 const tabScreenConfig = [
     {
-        name: "emergency-broadcasts",
-        iconName: "alert-circle",
-        label: "Broadcasts"
-    },
-    {
         name: "status-updates",
         iconName: "document-text",
         label: "Reports"
