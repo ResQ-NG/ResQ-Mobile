@@ -107,7 +107,8 @@ export default function CameraMainComponent({ controlArea, cameraMode, setCamera
                         style={styles.camera}
                         facing={facing}
                         mode={cameraMode as CameraMode}
-                        flashMode={flashMode}
+                        mute={isMuted}
+                        flash={flashMode}
                     >
                         <HeaderControls />
                         {controlArea}
