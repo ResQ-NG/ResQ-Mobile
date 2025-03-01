@@ -1,20 +1,19 @@
 import { StyleSheet, View, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
-import { CameraView, CameraType } from 'expo-camera';
+import { CameraView, CameraType, CameraMode } from 'expo-camera';
 import { useCheckPermission } from '@/hooks/useCheckPermission';
 import { useRouter } from 'expo-router';
 import { GestureHandlerRootView, TapGestureHandler, State, GestureHandlerStateChangeEvent } from 'react-native-gesture-handler';
 import {  MaterialCommunityIcons } from '@expo/vector-icons';
 import { HeaderControls } from './HeaderControl';
-import { MediaControlArea } from './MediaControlArea';
-
 
 interface ICameraMainComponentProps {
-    controlArea: React.JSX.Element
+    controlArea: React.JSX.Element;
+    cameraMode: 'photo' | 'video';
+    setCameraMode: (mode: 'photo' | 'video') => void;
 }
 
-
-export default function CameraMainComponent( { controlArea }: ICameraMainComponentProps) {
+export default function CameraMainComponent({ controlArea, cameraMode, setCameraMode }: ICameraMainComponentProps) {
     const [facing, setFacing] = useState<CameraType>('back');
     const [isMuted, setIsMuted] = useState(false);
     const [flashMode, setFlashMode] = useState<'off' | 'on'>('off');
@@ -56,49 +55,46 @@ export default function CameraMainComponent( { controlArea }: ICameraMainCompone
         }
     };
 
+    const ControlsArea = () => {
+        return (
+            <View style={styles.cameraControlsSection}>
+                <TouchableOpacity
+                    style={styles.controlButton}
+                    onPress={toggleMute}
+                >
+                    <MaterialCommunityIcons
+                        name={isMuted ? "microphone-off" : "microphone"}
+                        size={24}
+                        color="white"
+                    />
+                </TouchableOpacity>
 
+                <TouchableOpacity
+                    style={styles.controlButton}
+                    onPress={toggleFlash}
+                >
+                    <MaterialCommunityIcons
+                        name={flashMode === 'on' ? "flash" : "flash-off"}
+                        size={24}
+                        color="white"
+                    />
+                </TouchableOpacity>
 
-const ControlsArea = () => {
+                <TouchableOpacity
+                    style={styles.controlButton}
+                    onPress={toggleCameraFacing}
+                >
+                    <MaterialCommunityIcons
+                        name="camera-flip"
+                        size={24}
+                        color="white"
+                    />
+                </TouchableOpacity>
+            </View>
+        )
+    }
+
     return (
-        <View style={styles.cameraControlsSection}>
-            <TouchableOpacity
-                style={styles.controlButton}
-                onPress={toggleMute}
-            >
-                <MaterialCommunityIcons
-                    name={isMuted ? "microphone-off" : "microphone"}
-                    size={24}
-                    color="white"
-                />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                style={styles.controlButton}
-                onPress={toggleFlash}
-            >
-                <MaterialCommunityIcons
-                    name={flashMode === 'on' ? "flash" : "flash-off"}
-                    size={24}
-                    color="white"
-                />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                style={styles.controlButton}
-                onPress={toggleCameraFacing}
-            >
-                <MaterialCommunityIcons
-                    name="camera-flip"
-                    size={24}
-                    color="white"
-                />
-            </TouchableOpacity>
-        </View>
-    )
-}
-
-
-  return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <TapGestureHandler
                 onHandlerStateChange={handleSingleTap}
@@ -110,7 +106,7 @@ const ControlsArea = () => {
                     <CameraView
                         style={styles.camera}
                         facing={facing}
-                        audio={!isMuted}
+                        mode={cameraMode as CameraMode}
                         flashMode={flashMode}
                     >
                         <HeaderControls />
@@ -120,65 +116,62 @@ const ControlsArea = () => {
                 </TapGestureHandler>
             </TapGestureHandler>
         </GestureHandlerRootView>
-  )
+    )
 }
 
-
-
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  message: {
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: 'flex-end',
-    alignItems: 'center',
-  },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  controlButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.1)',
-  },
-  captureButtonInner: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'white',
-  },
-  cameraControlsSection: {
-    position: "absolute",
-    right: 10,
-    top: "50%",
-    transform: [{translateY: -100}],
-    paddingHorizontal: 7,
-    paddingVertical: 15,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 20,
-    borderRadius: 30,
-  }
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    message: {
+        textAlign: 'center',
+        paddingBottom: 10,
+    },
+    camera: {
+        flex: 1,
+    },
+    buttonContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: 'transparent',
+        margin: 64,
+    },
+    button: {
+        flex: 1,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+    },
+    text: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: 'white',
+    },
+    controlButton: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.1)',
+    },
+    captureButtonInner: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'white',
+    },
+    cameraControlsSection: {
+        position: "absolute",
+        right: 10,
+        top: "50%",
+        transform: [{translateY: -100}],
+        paddingHorizontal: 7,
+        paddingVertical: 15,
+        backgroundColor: "rgba(0,0,0,0.4)",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 20,
+        borderRadius: 30,
+    }
 });

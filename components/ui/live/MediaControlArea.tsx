@@ -1,18 +1,38 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons"
-import React from "react";
-import { GestureResponderEvent, TouchableOpacity, View, StyleSheet } from "react-native"
+import React, { useState, useEffect } from "react";
+import { GestureResponderEvent, TouchableOpacity, View, StyleSheet, Animated } from "react-native"
 
 type MediaPlayerType = 'text' | 'voice' | 'camera' | null;
+type CameraModeType = 'photo' | 'video';
 
 interface IMediaControlAreaProps {
     activeMediaPlayer: MediaPlayerType;
     setActiveMediaPlayer: (type: MediaPlayerType) => void;
+    cameraMode: CameraModeType;
+    setCameraMode: (mode: CameraModeType) => void;
 }
 
 export const MediaControlArea = ({
     activeMediaPlayer,
-    setActiveMediaPlayer
+    setActiveMediaPlayer,
+    cameraMode,
+    setCameraMode
 }: IMediaControlAreaProps) => {
+    const [isRecording, setIsRecording] = useState(false);
+    const recordingProgress = new Animated.Value(0);
+
+    useEffect(() => {
+        if (isRecording) {
+            Animated.timing(recordingProgress, {
+                toValue: 1,
+                duration: 30000, // 30 seconds recording limit
+                useNativeDriver: false
+            }).start();
+        } else {
+            recordingProgress.setValue(0);
+        }
+    }, [isRecording]);
+
     function handleTextMessage(event: GestureResponderEvent): void {
         setActiveMediaPlayer('text');
     }
@@ -72,8 +92,33 @@ export const MediaControlArea = ({
                             <MaterialCommunityIcons name="message-text" size={24} color="white" />
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.captureButton, styles.activeButton]}>
-                            <View style={styles.captureButtonInner} />
+                        <TouchableOpacity
+                            style={[styles.captureButton, styles.activeButton]}
+                            onPressIn={() => {
+                                setCameraMode('video');
+                                setIsRecording(true);
+                            }}
+                            onPressOut={() => {
+                                setCameraMode('photo');
+                                setIsRecording(false);
+                            }}
+                        >
+                            <View style={[
+                                styles.captureButtonInner,
+                                cameraMode === 'video' && styles.videoButtonInner
+                            ]}>
+                                {cameraMode === 'video' && (
+                                    <Animated.View style={[
+                                        styles.recordingIndicator,
+                                        {
+                                            opacity: recordingProgress.interpolate({
+                                                inputRange: [0, 1],
+                                                outputRange: [0.3, 0.8]
+                                            })
+                                        }
+                                    ]} />
+                                )}
+                            </View>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.controlButton} onPress={toggleAudioRecording}>
@@ -137,5 +182,22 @@ const styles = StyleSheet.create({
         height: 60,
         borderRadius: 30,
         backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    videoButtonInner: {
+        width: 30,
+        height: 30,
+        borderRadius: 8,
+        backgroundColor: '#ff4444',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    recordingIndicator: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        borderRadius: 8,
+        backgroundColor: '#ff0000',
     }
 });

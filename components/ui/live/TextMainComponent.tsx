@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
         padding: 15,
         borderRadius: 12,
         backgroundColor: 'rgba(128,128,128,0.1)',
-        minHeight: 150,
+        minHeight: 250,
         maxHeight: 300,
         borderWidth: 1,
         borderColor: 'rgba(128,128,128,0.2)',
