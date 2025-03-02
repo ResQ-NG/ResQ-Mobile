@@ -10,22 +10,25 @@ interface IMediaControlAreaProps {
     setActiveMediaPlayer: (type: MediaPlayerType) => void;
     cameraMode: CameraModeType;
     setCameraMode: (mode: CameraModeType) => void;
+    isRecording?: boolean;
+    setIsRecording?: (isRecording: boolean) => void;
 }
 
 export const MediaControlArea = ({
     activeMediaPlayer,
     setActiveMediaPlayer,
     cameraMode,
-    setCameraMode
+    setCameraMode,
+    isRecording = false,
+    setIsRecording = () => {}
 }: IMediaControlAreaProps) => {
-    const [isRecording, setIsRecording] = useState(false);
     const recordingProgress = new Animated.Value(0);
 
     useEffect(() => {
         if (isRecording) {
             Animated.timing(recordingProgress, {
                 toValue: 1,
-                duration: 30000, // 30 seconds recording limit
+                duration: 1000,
                 useNativeDriver: false
             }).start();
         } else {
@@ -33,12 +36,38 @@ export const MediaControlArea = ({
         }
     }, [isRecording]);
 
+    function handleCameraAction(): void {
+        if (cameraMode === 'photo') {
+            // Take photo
+            console.log('Taking photo');
+        } else if (cameraMode === 'video') {
+            if (isRecording) {
+                // Stop recording
+                setIsRecording(false);
+                setCameraMode('photo');
+                console.log('Stopping video recording');
+            } else {
+                // Start recording
+                setIsRecording(true);
+                console.log('Starting video recording');
+            }
+        }
+    }
+
+    function disableRecording(): void {
+        setIsRecording(false);
+        setCameraMode("photo")
+    }
+
     function handleTextMessage(event: GestureResponderEvent): void {
         setActiveMediaPlayer('text');
+        disableRecording()
     }
+
 
     function toggleAudioRecording(event: GestureResponderEvent): void {
         setActiveMediaPlayer('voice');
+        disableRecording()
     }
 
     const renderMediaControls = () => {
@@ -69,7 +98,9 @@ export const MediaControlArea = ({
                     <>
                         <TouchableOpacity
                             style={styles.controlButton}
-                            onPress={() => setActiveMediaPlayer('camera')}
+                            onPress={() =>
+                                setActiveMediaPlayer('camera')
+                            }
                         >
                             <MaterialCommunityIcons name="video" size={24} color="white" />
                         </TouchableOpacity>
@@ -94,14 +125,13 @@ export const MediaControlArea = ({
 
                         <TouchableOpacity
                             style={[styles.captureButton, styles.activeButton]}
-                            onPressIn={() => {
-                                setCameraMode('video');
-                                setIsRecording(true);
+                            onLongPress={() => {
+                                if (!isRecording) {
+                                    setCameraMode('video');
+                                    setIsRecording(true);
+                                }
                             }}
-                            onPressOut={() => {
-                                setCameraMode('photo');
-                                setIsRecording(false);
-                            }}
+                            onPress={handleCameraAction}
                         >
                             <View style={[
                                 styles.captureButtonInner,

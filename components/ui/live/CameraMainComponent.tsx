@@ -1,4 +1,4 @@
-import { StyleSheet, View, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, TouchableOpacity, Text } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { CameraView, CameraType, CameraMode } from 'expo-camera';
 import { useCheckPermission } from '@/hooks/useCheckPermission';
@@ -11,15 +11,29 @@ interface ICameraMainComponentProps {
     controlArea: React.JSX.Element;
     cameraMode: 'photo' | 'video';
     setCameraMode: (mode: 'photo' | 'video') => void;
+    isRecording?: boolean;
+    recordingDuration?: number;
+    onCapture?: () => void; // Callback for taking photo
+    onStartRecording?: () => void; // Callback for starting video recording
+    onStopRecording?: () => void; // Callback for stopping video recording
 }
 
-export default function CameraMainComponent({ controlArea, cameraMode, setCameraMode }: ICameraMainComponentProps) {
+export default function CameraMainComponent({
+    controlArea,
+    cameraMode, 
+    isRecording = false,
+    recordingDuration = 0,
+    onCapture,
+    onStartRecording,
+    onStopRecording
+}: ICameraMainComponentProps) {
     const [facing, setFacing] = useState<CameraType>('back');
     const [isMuted, setIsMuted] = useState(false);
-    const [flashMode, setFlashMode] = useState<'off' | 'on'>('off');
+    const [flashMode, setFlashMode] = useState<boolean>(false);
     const { cameraPermission } = useCheckPermission()
     const router = useRouter()
     const doubleTapRef = useRef(null);
+    const cameraRef = useRef<CameraView>(null);
 
     function toggleCameraFacing() {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
@@ -30,8 +44,28 @@ export default function CameraMainComponent({ controlArea, cameraMode, setCamera
     }
 
     function toggleFlash() {
-        setFlashMode(current => current === 'off' ? 'on' : 'off');
+        setFlashMode(current => current === false ? true : false);
     }
+
+    const handleCapture = async () => {
+        if (!cameraRef.current) return;
+
+        if (cameraMode === 'photo') {
+            if (onCapture) {
+                onCapture();
+            }
+        } else {
+            if (isRecording) {
+                if (onStopRecording) {
+                    onStopRecording();
+                }
+            } else {
+                if (onStartRecording) {
+                    onStartRecording();
+                }
+            }
+        }
+    };
 
     useEffect(() => {
         const checkPermission = async () => {
@@ -74,7 +108,7 @@ export default function CameraMainComponent({ controlArea, cameraMode, setCamera
                     onPress={toggleFlash}
                 >
                     <MaterialCommunityIcons
-                        name={flashMode === 'on' ? "flash" : "flash-off"}
+                        name={flashMode === true ? "flash" : "flash-off"}
                         size={24}
                         color="white"
                     />
@@ -104,13 +138,24 @@ export default function CameraMainComponent({ controlArea, cameraMode, setCamera
                     numberOfTaps={2}
                     ref={doubleTapRef}>
                     <CameraView
+                        ref={cameraRef}
                         style={styles.camera}
                         facing={facing}
                         mode={cameraMode as CameraMode}
                         mute={isMuted}
-                        flash={flashMode}
+                        enableTorch={flashMode}
                     >
                         <HeaderControls />
+                        {isRecording && <View style={styles.recordingIndicator}>
+                            <View style={styles.recordingDot} />
+                            <View style={styles.recordingTimer}>
+                                {recordingDuration !== undefined && (
+                                    <Text style={styles.recordingTimerText}>
+                                        {Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}
+                                    </Text>
+                                )}
+                            </View>
+                        </View>}
                         {controlArea}
                         <ControlsArea />
                     </CameraView>
@@ -174,5 +219,31 @@ const styles = StyleSheet.create({
         alignItems: "center",
         gap: 20,
         borderRadius: 30,
+    },
+    recordingIndicator: {
+        position: 'absolute',
+        top: 100,
+        left: 20,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255, 0, 0, 0.3)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        gap: 8,
+    },
+    recordingDot: {
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#ff0000',
+    },
+    recordingTimer: {
+        minWidth: 40,
+    },
+    recordingTimerText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '600',
     }
 });
