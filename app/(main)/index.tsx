@@ -1,9 +1,6 @@
 import { StyleSheet, View } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { CameraView } from 'expo-camera'
-
-import { GestureDetector, Gesture, GestureHandlerRootView } from 'react-native-gesture-handler'
-import { router } from 'expo-router'
 import CameraMainComponent from '@/components/ui/live/CameraMainComponent';
 import { MediaControlArea } from '@/components/ui/live/MediaControlArea';
 import AudioRecordMainComponent from '@/components/ui/live/AudioRecordMainComponent';
@@ -51,17 +48,6 @@ export default function CameraScreen() {
         };
     }, [isRecording]);
 
-    const swipeGesture = Gesture.Pan()
-        .onEnd((event) => {
-            if (event.velocityY < -500) {
-                router.push({
-                    pathname: "/preview-media",
-                    params: {
-                        mediaContents: JSON.stringify(mediaContents)
-                    }
-                });
-            }
-        });
 
     const mediaControlArea = <MediaControlArea
         // Media player props
@@ -81,8 +67,6 @@ export default function CameraScreen() {
     />;
 
     return (
-        <GestureHandlerRootView>
-        <GestureDetector gesture={swipeGesture}>
             <View style={styles.container}>
                 {activeMediaPlayer === 'camera' && (
                     <CameraMainComponent
@@ -105,9 +89,6 @@ export default function CameraScreen() {
                     />
                 )}
             </View>
-        </GestureDetector>
-        </GestureHandlerRootView>
-
     )
 }
 

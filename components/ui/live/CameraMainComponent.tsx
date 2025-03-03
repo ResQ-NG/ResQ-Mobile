@@ -84,8 +84,13 @@ export default function CameraMainComponent({
         }
     };
 
+    const onSwipeUp = useCallback((event: any) => {
+        if (event.velocityY < -500) { // Threshold for swipe up
+            router.push("/preview-media");
+        }
+    }, [router]);
 
-    // this is purely ai code, i honestly 
+    // this is purely ai code, i honestly
     const onPinch = useCallback(
         (event: any) => {
             setIsZooming(true);
@@ -123,6 +128,16 @@ export default function CameraMainComponent({
     const pinchGesture = useMemo(
         () => Gesture.Pinch().onUpdate(onPinch).onEnd(onPinchEnd),
         [onPinch, onPinchEnd]
+    );
+
+    const swipeGesture = useMemo(
+        () => Gesture.Pan().onEnd(onSwipeUp),
+        [onSwipeUp]
+    );
+
+    const combinedGestures = useMemo(
+        () => Gesture.Race(pinchGesture, swipeGesture),
+        [pinchGesture, swipeGesture]
     );
 
     const ControlsArea = () => {
@@ -202,7 +217,7 @@ export default function CameraMainComponent({
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <GestureDetector gesture={pinchGesture}>
+            <GestureDetector gesture={combinedGestures}>
                 <TapGestureHandler
                     onHandlerStateChange={handleSingleTap}
                     waitFor={doubleTapRef}>
