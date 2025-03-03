@@ -40,6 +40,7 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(A_onboarding)" options={{headerShown: false }} />
         <Stack.Screen name="permission" options={{ headerShown: false, presentation: 'modal' }} />
+        <Stack.Screen name="preview-media" options={{ headerShown: false, presentation: 'modal' }} />
         <Stack.Screen name="(auth)" options={{headerShown: false}} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="(main)" options={{headerShown: false, presentation: "card" }}/>
