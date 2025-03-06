@@ -85,7 +85,8 @@ export default function CameraMainComponent({
     };
 
     const onSwipeUp = useCallback((event: any) => {
-        if (event.velocityY < -500) { // Threshold for swipe up
+        'worklet';
+        if (event.velocityY < -500) {
             router.push("/preview-media");
         }
     }, [router]);
@@ -93,6 +94,7 @@ export default function CameraMainComponent({
     // this is purely ai code, i honestly
     const onPinch = useCallback(
         (event: any) => {
+            'worklet';
             setIsZooming(true);
             const velocity = event.velocity / 10;
             const outFactor = lastZoom * (Platform.OS === 'ios' ? 40 : 20);
@@ -119,6 +121,7 @@ export default function CameraMainComponent({
 
     const onPinchEnd = useCallback(
         (event: any) => {
+            'worklet';
             setLastZoom(zoom);
             setIsZooming(false);
         },
@@ -235,6 +238,7 @@ export default function CameraMainComponent({
                             enableTorch={torchMode}
                             mirror={true}
                             zoom={zoom}
+                            videoStabilizationMode="auto"
                         >
                             <HeaderControls />
                             {isRecording && <View style={styles.recordingIndicator}>

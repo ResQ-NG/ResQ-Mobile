@@ -1,18 +1,18 @@
-import { View, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Platform } from 'react-native';
+import { View, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Platform, ActivityIndicator, StatusBar } from 'react-native';
 import { ResizeMode, Video } from 'expo-av';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { MediaContent } from '@/constants/Types';
+import PagerView from 'react-native-pager-view';
+import { useState, useRef, useEffect } from 'react';
+import { BlurView } from 'expo-blur';
+import React from 'react';
 
-
-interface MediaContent {
-  type: 'text' | 'voice' | 'camera' | 'previous' | null;
-  url?: string;
-  text?: string;
-  timestamp: number;
-}
+// Common video extensions
+const VIDEO_EXTENSIONS = ['.mov', '.mp4', '.avi', '.mkv', '.webm', '.m4v'];
 
 interface PreviewMediaProps {
   onPublish?: () => void;
@@ -34,7 +34,9 @@ export default function PreviewMedia({
   const params = useLocalSearchParams();
   const { mediaContents: mediaContentsParam } = params ?? {};
   const router = useRouter();
-
+  const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const pagerRef = useRef<PagerView>(null);
   const mediaContents = mediaContentsParam ? JSON.parse(mediaContentsParam as string) as MediaContent[] : [];
 
   // Combine previous image with media contents
@@ -44,66 +46,221 @@ export default function PreviewMedia({
       url: previousImage,
       timestamp: Date.now()
     }] : []),
-    ...mediaContents.filter(content => content.type === 'camera' && content.url)
+    ...mediaContents.filter(content => content?.type === 'camera' && content?.url)
   ];
 
-  const renderMediaItem = (item: MediaContent) => {
+  useEffect(() => {
+    // Hide status bar for immersive experience
+    StatusBar.setHidden(true);
+    return () => {
+      StatusBar.setHidden(false);
+    };
+  }, []);
+
+  const isVideo = (url: string) => {
+    if (!url) return false;
+    return VIDEO_EXTENSIONS.some(ext => url.toLowerCase().endsWith(ext));
+  };
+
+  const handleRemoveMedia = (timestamp: number) => {
+    // Filter out the media item with matching timestamp
+    const updatedMediaContents = mediaContents.filter(content => content.timestamp !== timestamp);
+    // Update the URL params with new media contents
+    router.setParams({ mediaContents: JSON.stringify(updatedMediaContents) });
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderMediaItem = (item: MediaContent, index: number) => {
+    if (!item?.url) return null;
+
+    const swipeIndicator = (
+      <View style={styles.swipeIndicatorContainer}>
+        <MaterialCommunityIcons
+          name="gesture-swipe-horizontal"
+          size={24}
+          color={Colors.brandConstants.primaryWhite}
+        />
+        <ThemedText style={styles.swipeText}>
+          {`${index + 1} of ${mediaItems.length}`}
+        </ThemedText>
+      </View>
+    );
+
+    const renderMediaControls = () => (
+      <View style={styles.mediaControls}>
+        <TouchableOpacity
+          style={styles.removeButton}
+          onPress={() => handleRemoveMedia(item.timestamp)}
+        >
+          <MaterialCommunityIcons name="trash-can-outline" size={18} color={Colors.brandConstants.primaryWhite} />
+          <ThemedText style={styles.removeButtonText}>Remove</ThemedText>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.removeButton, { backgroundColor: 'rgba(0,0,0,0.85)' }]}
+          onPress={handleDownload}
+        >
+          <MaterialCommunityIcons name="download" size={18} color={Colors.brandConstants.primaryWhite} />
+          <ThemedText style={styles.removeButtonText}>Download</ThemedText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.removeButton, { backgroundColor: 'rgba(0,0,0,0.85)' }]}
+          onPress={handleShare}
+        >
+          <MaterialCommunityIcons name="share-variant" size={18} color={Colors.brandConstants.primaryWhite} />
+          <ThemedText style={styles.removeButtonText}>Share</ThemedText>
+        </TouchableOpacity>
+      </View>
+    );
+
     if (item.type === 'previous') {
       return (
         <View key={item.timestamp} style={styles.carouselItem}>
-          <ThemedText style={styles.mediaLabel}>Previous Report Image</ThemedText>
-          <Image
-            source={{ uri: item.url }}
-            style={styles.carouselImage}
-            resizeMode="contain"
-            onError={(e) => console.warn('Image loading error:', e.nativeEvent.error)}
-          />
+          <View style={styles.mediaHeader}>
+            <View style={styles.mediaLabelContainer}>
+              <Ionicons name="images-outline" size={18} color={Colors.brandConstants.primaryWhite} />
+              <ThemedText style={styles.mediaLabel}>Previous Report Image</ThemedText>
+            </View>
+          </View>
+          <View style={styles.mediaWrapper}>
+            <Image
+              source={{ uri: item.url }}
+              style={styles.carouselImage}
+              resizeMode="contain"
+              onLoadStart={() => setLoading(true)}
+              onLoadEnd={() => setLoading(false)}
+              onError={(e) => console.warn('Image loading error:', e.nativeEvent.error)}
+            />
+            {loading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={Colors.brandConstants.primaryWhite} />
+              </View>
+            )}
+            {swipeIndicator}
+            {renderMediaControls()}
+          </View>
         </View>
       );
     }
 
-    if (item.url?.endsWith('.mp4')) {
+    if (isVideo(item.url)) {
       return (
         <View key={item.timestamp} style={styles.carouselItem}>
-          <ThemedText style={styles.mediaLabel}>Video Evidence</ThemedText>
-          <Video
-            source={{ uri: item.url }}
-            style={styles.carouselVideo}
-            useNativeControls
-            resizeMode={"contain" as ResizeMode}
-            onError={(e) => console.warn('Video loading error:', e)}
-          />
+          <View style={styles.mediaHeader}>
+            <View style={styles.mediaLabelContainer}>
+              <Ionicons name="videocam" size={18} color={Colors.brandConstants.primaryWhite} />
+              <ThemedText style={styles.mediaLabel}>Video Evidence</ThemedText>
+            </View>
+          </View>
+          <View style={styles.mediaWrapper}>
+            <Video
+              source={{ uri: item.url }}
+              style={styles.carouselVideo}
+              useNativeControls
+              resizeMode={"contain" as ResizeMode}
+              shouldPlay={currentPage === index}
+              isLooping={true}
+              onLoadStart={() => setLoading(true)}
+              onLoad={() => setLoading(false)}
+              onError={(error) => {
+                console.warn('Video loading error:', error);
+                setLoading(false);
+              }}
+            />
+            {loading && (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={Colors.brandConstants.primaryWhite} />
+              </View>
+            )}
+            {swipeIndicator}
+            {renderMediaControls()}
+          </View>
         </View>
       );
     }
 
     return (
       <View key={item.timestamp} style={styles.carouselItem}>
-        <ThemedText style={styles.mediaLabel}>Photo Evidence</ThemedText>
-        <Image
-          source={{ uri: item.url }}
-          style={styles.carouselImage}
-          resizeMode="cover"
-          onError={(e) => console.warn('Image loading error:', e.nativeEvent.error)}
-        />
+        <View style={styles.mediaHeader}>
+          <View style={styles.mediaLabelContainer}>
+            <Ionicons name="camera" size={18} color={Colors.brandConstants.primaryWhite} />
+            <ThemedText style={styles.mediaLabel}>Photo Evidence</ThemedText>
+          </View>
+        </View>
+        <View style={styles.mediaWrapper}>
+          <Image
+            source={{ uri: item.url }}
+            style={styles.carouselImage}
+            resizeMode="contain"
+            onLoadStart={() => setLoading(true)}
+            onLoadEnd={() => setLoading(false)}
+            onError={(e) => console.warn('Image loading error:', e.nativeEvent.error)}
+          />
+          {loading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={Colors.brandConstants.primaryWhite} />
+            </View>
+          )}
+          {swipeIndicator}
+          {renderMediaControls()}
+        </View>
       </View>
     );
   };
 
   const handleDownload = () => {
-    if (onDownload) onDownload();
+    if (onDownload) {
+      setLoading(true);
+      setTimeout(() => {
+        onDownload();
+        setLoading(false);
+      }, 500);
+    }
   };
 
   const handleShare = () => {
-    if (onShare) onShare();
+    if (onShare) {
+      setLoading(true);
+      setTimeout(() => {
+        onShare();
+        setLoading(false);
+      }, 500);
+    }
   };
 
   const handlePublish = () => {
-    if (onPublish) onPublish();
+    if (onPublish) {
+      setLoading(true);
+      setTimeout(() => {
+        onPublish();
+        setLoading(false);
+      }, 500);
+    }
   };
 
   const handleClose = () => {
     router.back();
+  };
+
+  const renderPaginationDots = () => {
+    if (mediaItems.length <= 1) return null;
+
+    return (
+      <View style={styles.paginationContainer}>
+        {mediaItems.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.paginationDot,
+              currentPage === index && styles.paginationDotActive
+            ]}
+          />
+        ))}
+      </View>
+    );
   };
 
   return (
@@ -111,7 +268,7 @@ export default function PreviewMedia({
       <View style={styles.overlay}>
         <View style={styles.header}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <MaterialCommunityIcons name="close" size={22} color={Colors.brandConstants.primaryWhite} />
+            <Ionicons name="close" size={22} color={Colors.brandConstants.primaryWhite} />
           </TouchableOpacity>
         </View>
       </View>
@@ -122,71 +279,93 @@ export default function PreviewMedia({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {mediaItems.length > 0 && (
+        {mediaItems.length > 0 ? (
           <View style={styles.carouselContainer}>
-            {mediaItems.map(item => renderMediaItem(item))}
+            <PagerView
+              ref={pagerRef}
+              style={styles.pagerView}
+              initialPage={0}
+              pageMargin={10}
+              onPageSelected={(e) => handlePageChange(e.nativeEvent.position)}
+            >
+              {mediaItems.map((item, index) => renderMediaItem(item, index))}
+            </PagerView>
+            {renderPaginationDots()}
+          </View>
+        ) : (
+          <View style={styles.emptyStateContainer}>
+            <BlurView intensity={20} style={styles.emptyStateBlur}>
+              <MaterialCommunityIcons name="camera-plus" size={64} color={Colors.brandConstants.primaryWhite} />
+              <ThemedText style={styles.emptyStateText}>No evidence added yet</ThemedText>
+              <ThemedText style={styles.emptyStateSubText}>Close this modal to take photos or videos</ThemedText>
+              <TouchableOpacity
+                style={styles.emptyStateButton}
+                onPress={handleClose}
+              >
+                <Ionicons name="camera" size={20} color={Colors.brandConstants.primaryWhite} />
+                <ThemedText style={styles.emptyStateButtonText}>Add Media</ThemedText>
+              </TouchableOpacity>
+            </BlurView>
           </View>
         )}
 
         {mediaContents?.map((content, index) => {
-          if (content.type === 'text' && content.text) {
+          if (content?.type === 'text' && content?.text) {
             return (
               <View key={content.timestamp} style={styles.textContainer}>
-                <ThemedText style={styles.textLabel}>Description</ThemedText>
+                <View style={styles.textHeaderContainer}>
+                  <Ionicons name="document-text" size={18} color={Colors.brandConstants.primaryWhite} />
+                  <ThemedText style={styles.textLabel}>Description</ThemedText>
+                </View>
                 <ThemedText style={styles.text}>{content.text}</ThemedText>
               </View>
             );
           }
           return null;
         })}
-        <View style={styles.bottomPadding} />
       </ScrollView>
 
-      <View style={styles.buttonContainer}>
-        <View style={styles.actionButtonsRow}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={handleDownload}
-            activeOpacity={0.7}
-          >
-            <View style={styles.actionButtonInner}>
-              <MaterialCommunityIcons name="download" size={24} color={Colors.brandConstants.primaryBlack} />
-              <ThemedText style={styles.actionButtonText}>Save</ThemedText>
-            </View>
-          </TouchableOpacity>
+      {mediaItems.length > 0 && (
+        <BlurView intensity={30} style={styles.buttonContainer}>
+          <View style={styles.mainButtonsRow}>
+            <TouchableOpacity
+              style={[styles.publishButton, mediaItems.length === 0 && styles.disabledButton]}
+              onPress={handlePublish}
+              activeOpacity={0.7}
+              disabled={mediaItems.length === 0 || loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={Colors.brandConstants.primaryWhite} />
+              ) : (
+                <>
+                  <MaterialCommunityIcons name="send" size={20} color={Colors.brandConstants.primaryWhite} style={styles.buttonIcon} />
+                  <ThemedText style={styles.publishButtonText}>Submit Report</ThemedText>
+                </>
+              )}
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={handleShare}
-            activeOpacity={0.7}
-          >
-            <View style={styles.actionButtonInner}>
-              <MaterialCommunityIcons name="share" size={24} color={Colors.brandConstants.primaryBlack} />
-              <ThemedText style={styles.actionButtonText}>Share</ThemedText>
-            </View>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.addMoreButton}
+              onPress={handleClose}
+              activeOpacity={0.7}
+              disabled={loading}
+            >
+              <MaterialCommunityIcons name="plus-circle" size={20} color={Colors.brandConstants.primaryBlack} style={styles.buttonIcon} />
+              <ThemedText style={styles.addMoreButtonText}>Add More</ThemedText>
+            </TouchableOpacity>
+          </View>
+
+        </BlurView>
+      )}
+
+      {loading && (
+        <View style={styles.globalLoadingContainer}>
+          <BlurView intensity={50} style={styles.loadingBlur}>
+            <ActivityIndicator size="large" color={Colors.brandConstants.primaryWhite} />
+            <ThemedText style={styles.loadingText}>Processing...</ThemedText>
+          </BlurView>
         </View>
-
-        <View style={styles.mainButtonsRow}>
-          <TouchableOpacity
-            style={styles.addMoreButton}
-            onPress={handleClose}
-            activeOpacity={0.7}
-          >
-            <MaterialCommunityIcons name="plus-circle" size={20} color={Colors.brandConstants.primaryBlack} style={styles.buttonIcon} />
-            <ThemedText style={styles.addMoreButtonText}>Add More Evidence</ThemedText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.publishButton}
-            onPress={handlePublish}
-            activeOpacity={0.7}
-          >
-            <MaterialCommunityIcons name="send" size={20} color={Colors.brandConstants.primaryWhite} style={styles.buttonIcon} />
-            <ThemedText style={styles.publishButtonText}>Submit Report</ThemedText>
-          </TouchableOpacity>
-        </View>
-      </View>
+      )}
     </ThemedView>
   );
 }
@@ -205,41 +384,145 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   carouselContainer: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingVertical: 20,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingVertical: 10,
+    height: screenHeight * 0.75,
+    borderRadius: 20,
+    overflow: 'hidden',
+    marginHorizontal: 10,
+    marginTop: 10,
+  },
+  pagerView: {
+    width: screenWidth,
+    height: '100%',
   },
   carouselItem: {
     width: screenWidth,
     alignItems: 'center',
-    marginBottom: 20,
+    height: '100%',
+  },
+  mediaWrapper: {
+    position: 'relative',
+    width: screenWidth - 40,
+    height: '90%',
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   carouselImage: {
-    width: screenWidth - 10,
-    height: screenHeight * 0.5,
-    borderRadius: 12,
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
   },
   carouselVideo: {
-    width: screenWidth - 10,
-    height: screenHeight * 0.5,
-    borderRadius: 12,
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
   },
-  mediaLabel: {
-    fontSize: 16,
-    color: Colors.brandConstants.primaryWhite,
+  mediaHeader: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
     marginBottom: 12,
+  },
+  mediaLabelContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  mediaControls: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    flexDirection: 'column',
+    gap: 8,
+  },
+  removeButton: {
+    backgroundColor: Colors.brandConstants.primaryRed,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: 'center',
+    gap: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  removeButtonText: {
+    color: Colors.brandConstants.primaryWhite,
+    fontSize: 13,
     fontWeight: '600',
   },
+  mediaLabel: {
+    fontSize: 14,
+    color: Colors.brandConstants.primaryWhite,
+    fontWeight: '600',
+  },
+  swipeIndicatorContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    padding: 10,
+    borderRadius: 25,
+    alignSelf: 'center',
+    width: 'auto',
+    paddingHorizontal: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  swipeText: {
+    color: Colors.brandConstants.primaryWhite,
+    fontSize: 14,
+    fontWeight: '500',
+  },
   textContainer: {
-    padding: 15,
+    padding: 20,
     backgroundColor: 'rgba(0,0,0,0.8)',
     marginTop: 20,
     marginHorizontal: 15,
-    borderRadius: 12,
+    borderRadius: 16,
+    borderLeftWidth: 3,
+    borderLeftColor: Colors.brandConstants.primaryRed,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  textHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    padding: 10,
+    borderRadius: 10,
+    width: 'auto',
+    alignSelf: 'flex-start',
   },
   textLabel: {
     fontSize: 16,
     color: Colors.brandConstants.primaryWhite,
-    marginBottom: 8,
     fontWeight: '600',
   },
   overlay: {
@@ -251,20 +534,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   header: {
-    paddingTop: Platform.OS === 'ios' ? 10 : 20,
+    paddingTop: Platform.OS === 'ios' ?  10 : 20,
     paddingHorizontal: 20,
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
   closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
   },
   text: {
     fontSize: 16,
@@ -274,77 +562,49 @@ const styles = StyleSheet.create({
   buttonContainer: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 40 : 24,
-    left: 0,
-    right: 0,
+    left: 15,
+    right: 15,
     padding: 20,
     gap: 16,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-  },
-  bottomPadding: {
-    height: 200, // Adjust based on button container height
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 25,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
   },
   actionButtonsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 20,
-    marginBottom: 16,
+    gap: 30,
   },
   mainButtonsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 12,
-  },
-  actionButton: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: Colors.brandConstants.primaryDullGray,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
-  },
-  actionButtonInner: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 4,
-  },
-  actionButtonText: {
-    fontSize: 12,
-    color: Colors.brandConstants.primaryBlack,
-    fontWeight: '600',
+    gap: 15,
   },
   buttonIcon: {
     marginRight: 6,
   },
   addMoreButton: {
-    flex: 1,
-    paddingHorizontal: 20,
-    height: 46,
-    borderRadius: 23,
+    flex: 0.4,
+    paddingHorizontal: 16,
+    height: 54,
+    borderRadius: 27,
     backgroundColor: Colors.brandConstants.primaryDullGray,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 7,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   addMoreButtonText: {
     color: Colors.brandConstants.primaryBlack,
@@ -352,29 +612,140 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   publishButton: {
-    flex: 1,
-    paddingHorizontal: 20,
-    height: 46,
-    borderRadius: 23,
+    flex: 0.6,
+    paddingHorizontal: 16,
+    height: 54,
+    borderRadius: 27,
     backgroundColor: Colors.brandConstants.primaryRed,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.2,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   publishButtonText: {
     color: Colors.brandConstants.primaryWhite,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+    height: screenHeight * 0.7,
+  },
+  emptyStateBlur: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 35,
+    borderRadius: 25,
+    width: '85%',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  emptyStateText: {
+    fontSize: 22,
+    color: Colors.brandConstants.primaryWhite,
+    marginTop: 20,
+    fontWeight: '600',
+  },
+  emptyStateSubText: {
+    fontSize: 15,
+    color: Colors.brandConstants.primaryWhite,
+    marginTop: 10,
+    opacity: 0.8,
+    textAlign: 'center',
+    marginBottom: 25,
+    lineHeight: 22,
+  },
+  emptyStateButton: {
+    backgroundColor: Colors.brandConstants.primaryRed,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  emptyStateButtonText: {
+    color: Colors.brandConstants.primaryWhite,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    borderRadius: 20,
+  },
+  globalLoadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  loadingBlur: {
+    padding: 35,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  loadingText: {
+    color: Colors.brandConstants.primaryWhite,
+    marginTop: 15,
+    fontSize: 17,
+    fontWeight: '500',
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 15,
+    gap: 10,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+  },
+  paginationDotActive: {
+    backgroundColor: Colors.brandConstants.primaryWhite,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
   },
 });

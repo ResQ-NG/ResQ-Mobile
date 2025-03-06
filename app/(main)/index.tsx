@@ -6,16 +6,12 @@ import { MediaControlArea } from '@/components/ui/live/MediaControlArea';
 import AudioRecordMainComponent from '@/components/ui/live/AudioRecordMainComponent';
 import TextMainComponent from '@/components/ui/live/TextMainComponent';
 import { VideoView } from 'expo-video'
+import { MediaContent } from '@/constants/Types';
 
 type MediaPlayerType = 'text' | 'voice' | 'camera' | null;
 type CameraModeType = 'photo' | 'video';
 
-interface MediaContent {
-    type: MediaPlayerType;
-    url?: string;
-    text?: string;
-    timestamp: number;
-}
+
 
 export default function CameraScreen() {
     const cameraRef = useRef<CameraView>(null);
@@ -29,6 +25,7 @@ export default function CameraScreen() {
     const [cameraMode, setCameraMode] = useState<CameraModeType>('photo');
     const [isRecording, setIsRecording] = useState(false);
     const [recordingDuration, setRecordingDuration] = useState(0);
+
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
