@@ -27,7 +27,10 @@ interface RecordingData {
 interface MediaState {
     currentRecordingData: RecordingData | null;
     recordingProgress: Animated.Value;
+    recordingTimer: NodeJS.Timeout | null;
 }
+
+const MAX_RECORDING_DURATION = 45000; // 45 seconds in milliseconds
 
 export const MediaControlArea = ({
     activeMediaPlayer,
@@ -42,31 +45,44 @@ export const MediaControlArea = ({
 }: IMediaControlAreaProps) => {
     const [mediaState, setMediaState] = useState<MediaState>({
         currentRecordingData: null,
-        recordingProgress: new Animated.Value(0)
+        recordingProgress: new Animated.Value(0),
+        recordingTimer: null
     });
 
     useEffect(() => {
         if (isRecording) {
-            startRecordingAnimation();
+            animateRecordingProgress();
+            const timer = setTimeout(() => {
+                finalizeVideoRecording();
+            }, MAX_RECORDING_DURATION);
+            setMediaState(prev => ({ ...prev, recordingTimer: timer }));
         } else {
             mediaState.recordingProgress.setValue(0);
+            if (mediaState.recordingTimer) {
+                clearTimeout(mediaState.recordingTimer);
+            }
         }
+        return () => {
+            if (mediaState.recordingTimer) {
+                clearTimeout(mediaState.recordingTimer);
+            }
+        };
     }, [isRecording]);
 
-    const startRecordingAnimation = () => {
+    const animateRecordingProgress = () => {
         Animated.timing(mediaState.recordingProgress, {
             toValue: 1,
-            duration: 1000,
+            duration: MAX_RECORDING_DURATION,
             useNativeDriver: false
         }).start();
     };
 
-    const handleRecordingState = (recordingState: boolean) => {
+    const updateRecordingState = (recordingState: boolean) => {
         setCameraMode(recordingState ? "video" : "photo");
         setIsRecording(recordingState);
     };
 
-    const addMediaContent = (url: string) => {
+    const appendMediaContent = (url: string) => {
         const newContent: MediaContent = {
             type: 'camera',
             url,
@@ -77,106 +93,111 @@ export const MediaControlArea = ({
         return updatedContents;
     };
 
-    const handlePictureActivation = (photo?: CameraCapturedPicture) => {
-        if (!photo?.uri) return;
-        const updatedContents = addMediaContent(photo.uri);
+    const openPreviewModalWithParams = (params: { image?: string, video?: string, mediaContents: string }) => {
+        if (!params.image && !params.video) return;
         router.push({
             pathname: "/preview-media",
-            params: {
-                image: photo.uri,
-                mediaContents: JSON.stringify(updatedContents)
-            }
+            params
         });
     };
 
-    const handleVideoActivation = (recordingData?: RecordingData) => {
-        if (!recordingData?.uri) return;
-        setMediaState(prev => ({
-            ...prev,
-            currentRecordingData: recordingData
-        }));
-        addMediaContent(recordingData.uri);
+    const processMediaCapture = (mediaType: 'photo' | 'video', media?: CameraCapturedPicture | RecordingData) => {
+        if (!media?.uri) return;
+
+        const updatedContents = appendMediaContent(media.uri);
+
+        if (mediaType === 'photo') {
+            openPreviewModalWithParams({
+                image: media.uri,
+                mediaContents: JSON.stringify(updatedContents)
+            });
+        } else {
+            setMediaState(prev => ({
+                ...prev,
+                currentRecordingData: media as RecordingData
+            }));
+            appendMediaContent(media.uri);
+        }
     };
 
-    const openPreviewModal = () => {
+    const openVideoPreviewModal = () => {
         if (!mediaState.currentRecordingData?.uri) return;
-        const updatedContents = addMediaContent(mediaState.currentRecordingData.uri);
-        router.push({
-            pathname: "/preview-media",
-            params: {
-                video: mediaState.currentRecordingData.uri,
-                mediaContents: JSON.stringify(updatedContents)
-            }
+        const updatedContents = appendMediaContent(mediaState.currentRecordingData.uri);
+        openPreviewModalWithParams({
+            video: mediaState.currentRecordingData.uri,
+            mediaContents: JSON.stringify(updatedContents)
         });
     };
 
-    const takePicture = async () => {
+    const capturePhoto = async () => {
         if (!cameraRef?.current) return;
         try {
             const photo = await cameraRef.current.takePictureAsync();
             if (photo) {
-                handlePictureActivation(photo);
+                processMediaCapture('photo', photo);
             }
         } catch (error) {
             console.error('Error taking picture:', error);
         }
     };
 
-    const startVideoProcess = async () => {
+    const initiateVideoRecording = async () => {
         if (!cameraRef?.current) return;
-        handleRecordingState(true);
+        updateRecordingState(true);
         try {
-            const recordedVideo = await cameraRef.current.recordAsync();
-            handleVideoActivation(recordedVideo);
+            const recordedVideo = await cameraRef.current.recordAsync({
+                maxDuration: MAX_RECORDING_DURATION / 1000 // Convert to seconds
+            });
+            processMediaCapture('video', recordedVideo);
         } catch (error) {
             console.error('Error recording video:', error);
         }
     };
 
-    const stopVideoProcess = async () => {
+    const finalizeVideoRecording = async () => {
         if (!cameraRef?.current) return;
         try {
             cameraRef.current.stopRecording();
-            handleRecordingState(false);
-            openPreviewModal();
+            updateRecordingState(false);
+            openVideoPreviewModal();
         } catch (error) {
             console.error('Error stopping video recording:', error);
         }
     };
 
-    const handleCameraAction = async (status: "start" | "stop", mode: "video" | "photo") => {
+    const handleMediaCapture = async (status: "start" | "stop", mode: CameraModeType) => {
         try {
             if (mode === 'photo') {
-                takePicture();
+                capturePhoto();
             } else {
-                status === "start" ? startVideoProcess() : stopVideoProcess();
+                status === "start" ? initiateVideoRecording() : finalizeVideoRecording();
             }
         } catch (error) {
             console.error('Camera action error:', error);
         }
     };
 
-    const disableRecording = () => {
-        handleRecordingState(false);
+    const stopRecording = () => {
+        updateRecordingState(false);
     };
 
-    const handleTextMessage = () => {
+    const switchToTextMode = () => {
         setActiveMediaPlayer('text');
-        disableRecording();
+        stopRecording();
     };
 
-    const toggleAudioRecording = () => {
+    const switchToVoiceMode = () => {
         setActiveMediaPlayer('voice');
-        disableRecording();
+        stopRecording();
     };
 
-    const renderControlButton = (
-        icon: keyof typeof MaterialCommunityIcons.glyphMap, 
+    const renderMediaButton = (
+        icon: keyof typeof MaterialCommunityIcons.glyphMap,
         onPress: () => void,
         isActive: boolean = false
     ) => (
-        <TouchableOpacity 
-            style={[styles.controlButton, isActive && styles.activeButton]} 
+        <TouchableOpacity
+            style={[styles.controlButton, isActive && styles.activeButton]}
             onPress={onPress}
         >
             {isActive ? (
@@ -189,12 +210,27 @@ export const MediaControlArea = ({
         </TouchableOpacity>
     );
 
-    const renderCameraButton = () => (
+    const renderCaptureButton = () => (
         <TouchableOpacity
             style={[styles.captureButton, styles.activeButton]}
-            onLongPress={() => handleCameraAction("start", "video")}
-            onPress={() => isRecording ? handleCameraAction("stop", "video") : handleCameraAction("stop", "photo")}
+            onLongPress={() => handleMediaCapture("start", "video")}
+            onPress={() => isRecording ? handleMediaCapture("stop", "video") : handleMediaCapture("stop", "photo")}
         >
+            {isRecording && (
+                <Animated.View
+                    style={[
+                        styles.circularProgress,
+                        {
+                            transform: [{
+                                rotate: mediaState.recordingProgress.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: ['0deg', '360deg']
+                                })
+                            }]
+                        }
+                    ]}
+                />
+            )}
             <View style={[
                 styles.captureButtonInner,
                 cameraMode === 'video' && styles.videoButtonInner
@@ -214,30 +250,30 @@ export const MediaControlArea = ({
         </TouchableOpacity>
     );
 
-    const renderMediaControls = () => {
+    const renderActiveMediaControls = () => {
         switch(activeMediaPlayer) {
             case 'text':
                 return (
                     <>
-                        {renderControlButton("microphone", toggleAudioRecording)}
-                        {renderControlButton("message-text", handleTextMessage, true)}
-                        {renderControlButton("video", () => setActiveMediaPlayer('camera'))}
+                        {renderMediaButton("microphone", switchToVoiceMode)}
+                        {renderMediaButton("message-text", switchToTextMode, true)}
+                        {renderMediaButton("video", () => setActiveMediaPlayer('camera'))}
                     </>
                 );
             case 'voice':
                 return (
                     <>
-                        {renderControlButton("video", () => setActiveMediaPlayer('camera'))}
-                        {renderControlButton("microphone", toggleAudioRecording, true)}
-                        {renderControlButton("message-text", handleTextMessage)}
+                        {renderMediaButton("video", () => setActiveMediaPlayer('camera'))}
+                        {renderMediaButton("microphone", switchToVoiceMode, true)}
+                        {renderMediaButton("message-text", switchToTextMode)}
                     </>
                 );
             default:
                 return (
                     <>
-                        {renderControlButton("message-text", handleTextMessage)}
-                        {renderCameraButton()}
-                        {renderControlButton("microphone", toggleAudioRecording)}
+                        {renderMediaButton("message-text", switchToTextMode)}
+                        {renderCaptureButton()}
+                        {renderMediaButton("microphone", switchToVoiceMode)}
                     </>
                 );
         }
@@ -245,7 +281,7 @@ export const MediaControlArea = ({
 
     return (
         <View style={styles.mediaPlayerArea}>
-            {renderMediaControls()}
+            {renderActiveMediaControls()}
         </View>
     );
 };
@@ -313,5 +349,14 @@ const styles = StyleSheet.create({
         height: '100%',
         borderRadius: 8,
         backgroundColor: '#ff0000',
+    },
+    circularProgress: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        borderRadius: 35,
+        borderWidth: 5,
+        borderColor: '#fff',
+        borderTopColor: '#ff4444',
     }
 });

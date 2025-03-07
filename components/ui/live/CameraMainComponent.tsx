@@ -16,7 +16,10 @@ interface ICameraMainComponentProps {
     cameraRef?: React.RefObject<CameraView>;
     flash?: 'on' | 'off';
     setFlash?: (flash: 'on' | 'off') => void;
+    setIsRecording?: (isRecording: boolean) => void;
 }
+
+const MAX_VIDEO_DURATION = 45; // Maximum video duration in seconds
 
 export default function CameraMainComponent({
     controlArea,
@@ -25,7 +28,8 @@ export default function CameraMainComponent({
     recordingDuration = 0,
     cameraRef,
     flash = 'off',
-    setFlash
+    setFlash,
+    setIsRecording
 }: ICameraMainComponentProps) {
     const [facing, setFacing] = useState<CameraType>('back');
     const [isMuted, setIsMuted] = useState(false);
@@ -37,6 +41,13 @@ export default function CameraMainComponent({
     const { cameraPermission } = useCheckPermission()
     const router = useRouter()
     const doubleTapRef = useRef(null);
+
+    useEffect(() => {
+        // Stop recording when max duration is reached
+        if (recordingDuration >= MAX_VIDEO_DURATION && isRecording && setIsRecording) {
+            setIsRecording(false);
+        }
+    }, [recordingDuration, isRecording, setIsRecording]);
 
     function toggleCameraFacing() {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
@@ -241,12 +252,22 @@ export default function CameraMainComponent({
                             videoStabilizationMode="auto"
                         >
                             <HeaderControls />
-                            {isRecording && <View style={styles.recordingIndicator}>
-                                <View style={styles.recordingDot} />
+                            {isRecording && <View style={[
+                                styles.recordingIndicator,
+                                recordingDuration >= MAX_VIDEO_DURATION - 5 && styles.recordingIndicatorWarning
+                            ]}>
+                                <View style={[
+                                    styles.recordingDot,
+                                    recordingDuration >= MAX_VIDEO_DURATION - 5 && styles.recordingDotWarning
+                                ]} />
                                 <View style={styles.recordingTimer}>
                                     {recordingDuration !== undefined && (
-                                        <Text style={styles.recordingTimerText}>
+                                        <Text style={[
+                                            styles.recordingTimerText,
+                                            recordingDuration >= MAX_VIDEO_DURATION - 5 && styles.recordingTimerTextWarning
+                                        ]}>
                                             {Math.floor(recordingDuration / 60)}:{(recordingDuration % 60).toString().padStart(2, '0')}
+                                            {recordingDuration >= MAX_VIDEO_DURATION - 5 && ` / ${MAX_VIDEO_DURATION}s`}
                                         </Text>
                                     )}
                                 </View>
@@ -336,11 +357,17 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         gap: 8,
     },
+    recordingIndicatorWarning: {
+        backgroundColor: 'rgba(255, 0, 0, 0.6)',
+    },
     recordingDot: {
         width: 8,
         height: 8,
         borderRadius: 4,
         backgroundColor: '#ff0000',
+    },
+    recordingDotWarning: {
+        backgroundColor: '#fff',
     },
     recordingTimer: {
         minWidth: 40,
@@ -349,6 +376,9 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 14,
         fontWeight: '600',
+    },
+    recordingTimerTextWarning: {
+        fontWeight: '700',
     },
     zoomIndicator: {
         position: 'absolute',

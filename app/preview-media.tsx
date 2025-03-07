@@ -11,32 +11,91 @@ import { useState, useRef, useEffect } from 'react';
 import { BlurView } from 'expo-blur';
 import React from 'react';
 
-// Common video extensions
+// Constants
 const VIDEO_EXTENSIONS = ['.mov', '.mp4', '.avi', '.mkv', '.webm', '.m4v'];
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
 
 interface PreviewMediaProps {
   onPublish?: () => void;
   onShare?: () => void;
   onDownload?: () => void;
-  isOpen?: boolean;
-  onClose?: () => void;
   previousImage?: string;
 }
+
+
+const LoadingIndicator = () => (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" color={Colors.brandConstants.primaryWhite} />
+  </View>
+);
+
+const SwipeIndicator = ({ index, total }: { index: number, total: number }) => (
+  <View style={styles.swipeIndicatorContainer}>
+    <MaterialCommunityIcons
+      name="gesture-swipe-horizontal"
+      size={24}
+      color={Colors.brandConstants.primaryWhite}
+    />
+    <ThemedText style={styles.swipeText}>
+      {`${index + 1} of ${total}`}
+    </ThemedText>
+  </View>
+);
+
+const MediaControls = ({
+  onRemove,
+  onDownload,
+  onShare,
+  timestamp
+}: {
+  onRemove: (timestamp: number) => void,
+  onDownload: () => void,
+  onShare: () => void,
+  timestamp: number
+}) => (
+  <View style={styles.mediaControls}>
+    <TouchableOpacity
+      style={styles.removeButton}
+      onPress={() => onRemove(timestamp)}
+    >
+      <MaterialCommunityIcons name="trash-can-outline" size={18} color={Colors.brandConstants.primaryWhite} />
+      <ThemedText style={styles.removeButtonText}>Remove</ThemedText>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[styles.removeButton, { backgroundColor: 'rgba(0,0,0,0.85)' }]}
+      onPress={onDownload}
+    >
+      <MaterialCommunityIcons name="download" size={18} color={Colors.brandConstants.primaryWhite} />
+      <ThemedText style={styles.removeButtonText}>Download</ThemedText>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[styles.removeButton, { backgroundColor: 'rgba(0,0,0,0.85)' }]}
+      onPress={onShare}
+    >
+      <MaterialCommunityIcons name="share-variant" size={18} color={Colors.brandConstants.primaryWhite} />
+      <ThemedText style={styles.removeButtonText}>Share</ThemedText>
+    </TouchableOpacity>
+  </View>
+);
 
 export default function PreviewMedia({
   onPublish,
   onShare,
   onDownload,
-  isOpen = false,
-  onClose,
   previousImage
 }: PreviewMediaProps) {
+  // Hooks
   const params = useLocalSearchParams();
-  const { mediaContents: mediaContentsParam } = params ?? {};
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const pagerRef = useRef<PagerView>(null);
+
+  // Parse media contents from params
+  const { mediaContents: mediaContentsParam } = params ?? {};
   const mediaContents = mediaContentsParam ? JSON.parse(mediaContentsParam as string) as MediaContent[] : [];
 
   // Combine previous image with media contents
@@ -49,202 +108,40 @@ export default function PreviewMedia({
     ...mediaContents.filter(content => content?.type === 'camera' && content?.url)
   ];
 
+
   useEffect(() => {
-    // Hide status bar for immersive experience
     StatusBar.setHidden(true);
-    return () => {
-      StatusBar.setHidden(false);
-    };
+    return () => StatusBar.setHidden(false);
   }, []);
 
+  
   const isVideo = (url: string) => {
     if (!url) return false;
     return VIDEO_EXTENSIONS.some(ext => url.toLowerCase().endsWith(ext));
   };
 
   const handleRemoveMedia = (timestamp: number) => {
-    // Filter out the media item with matching timestamp
     const updatedMediaContents = mediaContents.filter(content => content.timestamp !== timestamp);
-    // Update the URL params with new media contents
     router.setParams({ mediaContents: JSON.stringify(updatedMediaContents) });
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const handleAction = async (action: (() => void) | undefined) => {
+    if (!action) return;
 
-  const renderMediaItem = (item: MediaContent, index: number) => {
-    if (!item?.url) return null;
-
-    const swipeIndicator = (
-      <View style={styles.swipeIndicatorContainer}>
-        <MaterialCommunityIcons
-          name="gesture-swipe-horizontal"
-          size={24}
-          color={Colors.brandConstants.primaryWhite}
-        />
-        <ThemedText style={styles.swipeText}>
-          {`${index + 1} of ${mediaItems.length}`}
-        </ThemedText>
-      </View>
-    );
-
-    const renderMediaControls = () => (
-      <View style={styles.mediaControls}>
-        <TouchableOpacity
-          style={styles.removeButton}
-          onPress={() => handleRemoveMedia(item.timestamp)}
-        >
-          <MaterialCommunityIcons name="trash-can-outline" size={18} color={Colors.brandConstants.primaryWhite} />
-          <ThemedText style={styles.removeButtonText}>Remove</ThemedText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.removeButton, { backgroundColor: 'rgba(0,0,0,0.85)' }]}
-          onPress={handleDownload}
-        >
-          <MaterialCommunityIcons name="download" size={18} color={Colors.brandConstants.primaryWhite} />
-          <ThemedText style={styles.removeButtonText}>Download</ThemedText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.removeButton, { backgroundColor: 'rgba(0,0,0,0.85)' }]}
-          onPress={handleShare}
-        >
-          <MaterialCommunityIcons name="share-variant" size={18} color={Colors.brandConstants.primaryWhite} />
-          <ThemedText style={styles.removeButtonText}>Share</ThemedText>
-        </TouchableOpacity>
-      </View>
-    );
-
-    if (item.type === 'previous') {
-      return (
-        <View key={item.timestamp} style={styles.carouselItem}>
-          <View style={styles.mediaHeader}>
-            <View style={styles.mediaLabelContainer}>
-              <Ionicons name="images-outline" size={18} color={Colors.brandConstants.primaryWhite} />
-              <ThemedText style={styles.mediaLabel}>Previous Report Image</ThemedText>
-            </View>
-          </View>
-          <View style={styles.mediaWrapper}>
-            <Image
-              source={{ uri: item.url }}
-              style={styles.carouselImage}
-              resizeMode="contain"
-              onLoadStart={() => setLoading(true)}
-              onLoadEnd={() => setLoading(false)}
-              onError={(e) => console.warn('Image loading error:', e.nativeEvent.error)}
-            />
-            {loading && (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={Colors.brandConstants.primaryWhite} />
-              </View>
-            )}
-            {swipeIndicator}
-            {renderMediaControls()}
-          </View>
-        </View>
-      );
-    }
-
-    if (isVideo(item.url)) {
-      return (
-        <View key={item.timestamp} style={styles.carouselItem}>
-          <View style={styles.mediaHeader}>
-            <View style={styles.mediaLabelContainer}>
-              <Ionicons name="videocam" size={18} color={Colors.brandConstants.primaryWhite} />
-              <ThemedText style={styles.mediaLabel}>Video Evidence</ThemedText>
-            </View>
-          </View>
-          <View style={styles.mediaWrapper}>
-            <Video
-              source={{ uri: item.url }}
-              style={styles.carouselVideo}
-              useNativeControls
-              resizeMode={"contain" as ResizeMode}
-              shouldPlay={currentPage === index}
-              isLooping={true}
-              onLoadStart={() => setLoading(true)}
-              onLoad={() => setLoading(false)}
-              onError={(error) => {
-                console.warn('Video loading error:', error);
-                setLoading(false);
-              }}
-            />
-            {loading && (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={Colors.brandConstants.primaryWhite} />
-              </View>
-            )}
-            {swipeIndicator}
-            {renderMediaControls()}
-          </View>
-        </View>
-      );
-    }
-
-    return (
-      <View key={item.timestamp} style={styles.carouselItem}>
-        <View style={styles.mediaHeader}>
-          <View style={styles.mediaLabelContainer}>
-            <Ionicons name="camera" size={18} color={Colors.brandConstants.primaryWhite} />
-            <ThemedText style={styles.mediaLabel}>Photo Evidence</ThemedText>
-          </View>
-        </View>
-        <View style={styles.mediaWrapper}>
-          <Image
-            source={{ uri: item.url }}
-            style={styles.carouselImage}
-            resizeMode="contain"
-            onLoadStart={() => setLoading(true)}
-            onLoadEnd={() => setLoading(false)}
-            onError={(e) => console.warn('Image loading error:', e.nativeEvent.error)}
-          />
-          {loading && (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={Colors.brandConstants.primaryWhite} />
-            </View>
-          )}
-          {swipeIndicator}
-          {renderMediaControls()}
-        </View>
-      </View>
-    );
-  };
-
-  const handleDownload = () => {
-    if (onDownload) {
-      setLoading(true);
-      setTimeout(() => {
-        onDownload();
-        setLoading(false);
-      }, 500);
+    setLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      action();
+    } catch (error) {
+      console.error('Action failed:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleShare = () => {
-    if (onShare) {
-      setLoading(true);
-      setTimeout(() => {
-        onShare();
-        setLoading(false);
-      }, 500);
-    }
-  };
+  const handleClose = () => router.back();
 
-  const handlePublish = () => {
-    if (onPublish) {
-      setLoading(true);
-      setTimeout(() => {
-        onPublish();
-        setLoading(false);
-      }, 500);
-    }
-  };
-
-  const handleClose = () => {
-    router.back();
-  };
-
+  // Render functions
   const renderPaginationDots = () => {
     if (mediaItems.length <= 1) return null;
 
@@ -263,8 +160,75 @@ export default function PreviewMedia({
     );
   };
 
+  const renderMediaItem = (item: MediaContent, index: number) => {
+    if (!item?.url) return null;
+
+    const commonProps = {
+      onLoadStart: () => setLoading(true),
+      onLoadEnd: () => setLoading(false),
+      style: styles.carouselImage,
+      resizeMode: "contain" as const
+    };
+
+    let mediaComponent;
+    if (item.type === 'previous' || !isVideo(item.url)) {
+      mediaComponent = (
+        <Image
+          source={{ uri: item.url }}
+          {...commonProps}
+          onError={(e) => console.warn('Image loading error:', e.nativeEvent.error)}
+        />
+      );
+    } else {
+      mediaComponent = (
+        <Video
+          source={{ uri: item.url }}
+          style={styles.carouselVideo}
+          useNativeControls
+          resizeMode={"contain" as ResizeMode}
+          shouldPlay={currentPage === index}
+          isLooping={true}
+          onError={(error) => {
+            console.warn('Video loading error:', error);
+            setLoading(false);
+          }}
+        />
+      );
+    }
+
+    return (
+      <View key={item.timestamp} style={styles.carouselItem}>
+        <View style={styles.mediaHeader}>
+          <View style={styles.mediaLabelContainer}>
+            <Ionicons
+              name={item.type === 'previous' ? 'images-outline' : isVideo(item.url) ? 'videocam' : 'camera'}
+              size={18}
+              color={Colors.brandConstants.primaryWhite}
+            />
+            <ThemedText style={styles.mediaLabel}>
+              {item.type === 'previous' ? 'Previous Report Image' : isVideo(item.url) ? 'Video Evidence' : 'Photo Evidence'}
+            </ThemedText>
+          </View>
+        </View>
+
+        <View style={styles.mediaWrapper}>
+          {mediaComponent}
+          {loading && <LoadingIndicator />}
+          <SwipeIndicator index={index} total={mediaItems.length} />
+          <MediaControls
+            onRemove={handleRemoveMedia}
+            onDownload={() => handleAction(onDownload)}
+            onShare={() => handleAction(onShare)}
+            timestamp={item.timestamp}
+          />
+        </View>
+      </View>
+    );
+  };
+
   return (
     <ThemedView style={styles.modalContainer}>
+      {/* Header */}
       <View style={styles.overlay}>
         <View style={styles.header}>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
@@ -273,6 +237,7 @@ export default function PreviewMedia({
         </View>
       </View>
 
+      {/* Content */}
       <ScrollView
         style={styles.contentContainer}
         bounces={false}
@@ -286,7 +251,7 @@ export default function PreviewMedia({
               style={styles.pagerView}
               initialPage={0}
               pageMargin={10}
-              onPageSelected={(e) => handlePageChange(e.nativeEvent.position)}
+              onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
             >
               {mediaItems.map((item, index) => renderMediaItem(item, index))}
             </PagerView>
@@ -309,7 +274,8 @@ export default function PreviewMedia({
           </View>
         )}
 
-        {mediaContents?.map((content, index) => {
+        {/* Text Content */}
+        {mediaContents?.map((content) => {
           if (content?.type === 'text' && content?.text) {
             return (
               <View key={content.timestamp} style={styles.textContainer}>
@@ -325,12 +291,13 @@ export default function PreviewMedia({
         })}
       </ScrollView>
 
+      {/* Bottom Buttons */}
       {mediaItems.length > 0 && (
         <BlurView intensity={30} style={styles.buttonContainer}>
           <View style={styles.mainButtonsRow}>
             <TouchableOpacity
               style={[styles.publishButton, mediaItems.length === 0 && styles.disabledButton]}
-              onPress={handlePublish}
+              onPress={() => handleAction(onPublish)}
               activeOpacity={0.7}
               disabled={mediaItems.length === 0 || loading}
             >
@@ -354,10 +321,10 @@ export default function PreviewMedia({
               <ThemedText style={styles.addMoreButtonText}>Add More</ThemedText>
             </TouchableOpacity>
           </View>
-
         </BlurView>
       )}
 
+      {/* Global Loading */}
       {loading && (
         <View style={styles.globalLoadingContainer}>
           <BlurView intensity={50} style={styles.loadingBlur}>
@@ -369,8 +336,6 @@ export default function PreviewMedia({
     </ThemedView>
   );
 }
-
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   modalContainer: {
@@ -480,14 +445,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+    borderRadius: 10,
     gap: 8,
     backgroundColor: 'rgba(0,0,0,0.7)',
     padding: 10,
-    borderRadius: 25,
     alignSelf: 'center',
-    width: 'auto',
+    width: "auto",
     paddingHorizontal: 18,
-    borderWidth: 1,
+    borderWidth: 0.4,
     borderColor: 'rgba(255,255,255,0.15)',
   },
   swipeText: {
@@ -567,9 +532,9 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 16,
     borderWidth: 1,
+    overflow: "hidden",
     borderColor: 'rgba(255,255,255,0.15)',
     borderRadius: 25,
-    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
