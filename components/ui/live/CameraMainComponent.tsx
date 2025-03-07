@@ -14,8 +14,8 @@ interface ICameraMainComponentProps {
     isRecording?: boolean;
     recordingDuration?: number;
     cameraRef?: React.RefObject<CameraView>;
-    flash?: 'on' | 'off';
-    setFlash?: (flash: 'on' | 'off') => void;
+    flash?: 'on' | 'off' | 'auto';
+    setFlash?: (flash: 'on' | 'off' | 'auto') => void;
     setIsRecording?: (isRecording: boolean) => void;
 }
 
@@ -27,13 +27,13 @@ export default function CameraMainComponent({
     isRecording = false,
     recordingDuration = 0,
     cameraRef,
-    flash = 'off',
+    flash = 'auto',
     setFlash,
     setIsRecording
 }: ICameraMainComponentProps) {
     const [facing, setFacing] = useState<CameraType>('back');
     const [isMuted, setIsMuted] = useState(false);
-    const [flashMode, setFlashMode] = useState<boolean>(false);
+    const [flashMode, setFlashMode] = useState<'on' | 'off' | 'auto'>('auto');
     const [torchMode, setTorchMode] = useState<boolean>(false);
     const [zoom, setZoom] = useState(0);
     const [lastZoom, setLastZoom] = useState(0);
@@ -42,6 +42,12 @@ export default function CameraMainComponent({
     const router = useRouter()
     const doubleTapRef = useRef(null);
 
+    // Store current recording state in a ref to preserve between camera switches
+    const recordingStateRef = useRef({
+        isRecording: false,
+        pauseRecording: false
+    });
+
     useEffect(() => {
         // Stop recording when max duration is reached
         if (recordingDuration >= MAX_VIDEO_DURATION && isRecording && setIsRecording) {
@@ -49,20 +55,57 @@ export default function CameraMainComponent({
         }
     }, [recordingDuration, isRecording, setIsRecording]);
 
+    // Update the ref when isRecording changes
+    useEffect(() => {
+        recordingStateRef.current.isRecording = isRecording;
+    }, [isRecording]);
+
     const toggleCameraFacing = useCallback(() => {
-        setFacing(current => (current === 'back' ? 'front' : 'back'));
-    }, []);
+        if (isRecording && setIsRecording && cameraRef?.current) {
+            // Signal that recording should pause during camera switch
+            recordingStateRef.current.pauseRecording = true;
+
+            // Pause recording (or stop if necessary)
+            // Option 1: If your camera API supports pausing
+            // cameraRef.current.pauseRecording();
+
+            // Option A2: If you need to stop recording temporarily
+            setIsRecording(false);
+
+            // Switch camera and resume recording after a short delay
+            setTimeout(() => {
+                setFacing(current => (current === 'back' ? 'front' : 'back'));
+
+                // Resume recording after camera has switched
+                setTimeout(() => {
+                    if (recordingStateRef.current.pauseRecording) {
+                        setIsRecording(true);
+                        recordingStateRef.current.pauseRecording = false;
+                    }
+                }, 300); // Delay to ensure camera has switched
+            }, 50);
+        } else {
+            // Normal camera flip when not recording
+            setFacing(current => (current === 'back' ? 'front' : 'back'));
+        }
+    }, [isRecording, setIsRecording, cameraRef]);
 
     const toggleMute = useCallback(() => {
+        // We can safely toggle mute without restarting recording
         setIsMuted(prev => !prev);
     }, []);
 
     const toggleFlash = useCallback(() => {
-        setFlashMode(current => current === false ? true : false);
-        if (setFlash) {
-            setFlash(flash === 'on' ? 'off' : 'on');
-        }
-    }, [flash, setFlash]);
+        setFlashMode(current => {
+            const modes: ('on' | 'off' | 'auto')[] = ['auto', 'on', 'off'];
+            const nextIndex = (modes.indexOf(current) + 1) % modes.length;
+            const nextMode = modes[nextIndex];
+            if (setFlash) {
+                setFlash(nextMode);
+            }
+            return nextMode;
+        });
+    }, [setFlash]);
 
     const toggleTorch = useCallback(() => {
         setTorchMode(current => !current);
@@ -102,7 +145,6 @@ export default function CameraMainComponent({
         }
     }, [router]);
 
-    // this is purely ai code, i honestly
     const onPinch = useCallback(
         (event: any) => {
             'worklet';
@@ -173,7 +215,7 @@ export default function CameraMainComponent({
                     onPress={toggleFlash}
                 >
                     <MaterialCommunityIcons
-                        name={flashMode === true ? "flash" : "flash-off"}
+                        name={flashMode === 'on' ? "flash" : flashMode === 'auto' ? "flash-auto" : "flash-off"}
                         size={24}
                         color="white"
                     />

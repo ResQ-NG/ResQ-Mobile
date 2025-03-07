@@ -1,0 +1,4 @@
+- Limitations and bugs
+
+- okay so when recording video on the click of the mute button the recording stops and restarts again
+- same thing happens on the camera facing props too. its not like that for flash and torch tho. 
