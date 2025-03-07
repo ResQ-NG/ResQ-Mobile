@@ -49,29 +49,29 @@ export default function CameraMainComponent({
         }
     }, [recordingDuration, isRecording, setIsRecording]);
 
-    function toggleCameraFacing() {
+    const toggleCameraFacing = useCallback(() => {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
-    }
+    }, []);
 
-    function toggleMute() {
+    const toggleMute = useCallback(() => {
         setIsMuted(prev => !prev);
-    }
+    }, []);
 
-    function toggleFlash() {
+    const toggleFlash = useCallback(() => {
         setFlashMode(current => current === false ? true : false);
         if (setFlash) {
             setFlash(flash === 'on' ? 'off' : 'on');
         }
-    }
+    }, [flash, setFlash]);
 
-    function toggleTorch() {
+    const toggleTorch = useCallback(() => {
         setTorchMode(current => !current);
-    }
+    }, []);
 
-    const setQuickZoom = (zoomLevel: number) => {
+    const setQuickZoom = useCallback((zoomLevel: number) => {
         setZoom(zoomLevel);
         setLastZoom(zoomLevel);
-    };
+    }, []);
 
     useEffect(() => {
         const checkPermission = async () => {
@@ -154,7 +154,7 @@ export default function CameraMainComponent({
         [pinchGesture, swipeGesture]
     );
 
-    const ControlsArea = () => {
+    const ControlsArea = useCallback(() => {
         return (
             <SafeAreaView style={styles.cameraControlsSection}>
                 <TouchableOpacity
@@ -202,9 +202,9 @@ export default function CameraMainComponent({
                 </TouchableOpacity>
             </SafeAreaView>
         )
-    }
+    }, [isMuted, flashMode, torchMode, toggleMute, toggleFlash, toggleTorch, toggleCameraFacing]);
 
-    const ZoomControls = () => {
+    const ZoomControls = useCallback(() => {
         return (
             <View style={styles.zoomControlsSection}>
                 <TouchableOpacity
@@ -227,7 +227,7 @@ export default function CameraMainComponent({
                 </TouchableOpacity>
             </View>
         )
-    }
+    }, [setQuickZoom]);
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
