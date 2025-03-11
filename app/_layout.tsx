@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { MediaProvider } from '@/components/MediaContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -36,17 +37,19 @@ export default function RootLayout() {
 
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme} >
-      <Stack>
-        <Stack.Screen name="(A_onboarding)" options={{headerShown: false }} />
-        <Stack.Screen name="permission" options={{ headerShown: false, presentation: 'modal' }} />
-        <Stack.Screen name="preview-media" options={{ headerShown: false, presentation: 'modal' }} />
-        <Stack.Screen name="(auth)" options={{headerShown: false}} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(main)" options={{headerShown: false, presentation: "card" }}/>
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <MediaProvider>
+        <Stack>
+          <Stack.Screen name="(A_onboarding)" options={{headerShown: false }} />
+          <Stack.Screen name="permission" options={{ headerShown: false, presentation: 'modal' }} />
+          <Stack.Screen name="preview-media" options={{ headerShown: false, presentation: 'modal' }} />
+          <Stack.Screen name="(auth)" options={{headerShown: false}} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(main)" options={{headerShown: false, presentation: "card" }}/>
+          <Stack.Screen name="+not-found" />
+        </Stack>
+        <StatusBar style="auto" />
+      </MediaProvider>
     </ThemeProvider>
   );
 }

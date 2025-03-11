@@ -6,7 +6,8 @@ import { MediaControlArea } from '@/components/ui/live/MediaControlArea';
 import AudioRecordMainComponent from '@/components/ui/live/AudioRecordMainComponent';
 import TextMainComponent from '@/components/ui/live/TextMainComponent';
 import { VideoView } from 'expo-video'
-import { MediaContent } from '@/constants/Types';
+import { useMedia } from '@/components/MediaContext';
+
 
 type MediaPlayerType = 'text' | 'voice' | 'camera' | null;
 type CameraModeType = 'photo' | 'video';
@@ -16,10 +17,8 @@ type CameraModeType = 'photo' | 'video';
 export default function CameraScreen() {
     const cameraRef = useRef<CameraView>(null);
     const videoRef = useRef<VideoView>(null)
-
-    // Media player states
     const [activeMediaPlayer, setActiveMediaPlayer] = useState<MediaPlayerType>('camera');
-    const [mediaContents, setMediaContents] = useState<MediaContent[]>([]);
+    const { mediaContents, setMediaContents } = useMedia();
 
     // Camera states
     const [cameraMode, setCameraMode] = useState<CameraModeType>('photo');

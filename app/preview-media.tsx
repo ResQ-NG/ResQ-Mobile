@@ -1,6 +1,6 @@
 import { View, Image, StyleSheet, TouchableOpacity, ScrollView, Dimensions, Platform, ActivityIndicator, StatusBar } from 'react-native';
 import { ResizeMode, Video } from 'expo-av';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Colors } from '@/constants/Colors';
@@ -10,6 +10,7 @@ import PagerView from 'react-native-pager-view';
 import { useState, useRef, useEffect } from 'react';
 import { BlurView } from 'expo-blur';
 import React from 'react';
+import { useMedia } from '@/components/MediaContext';
 
 // Constants
 const VIDEO_EXTENSIONS = ['.mov', '.mp4', '.avi', '.mkv', '.webm', '.m4v'];
@@ -88,15 +89,11 @@ export default function PreviewMedia({
   previousImage
 }: PreviewMediaProps) {
   // Hooks
-  const params = useLocalSearchParams();
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(0);
   const [loading, setLoading] = useState(false);
   const pagerRef = useRef<PagerView>(null);
-
-  // Parse media contents from params
-  const { mediaContents: mediaContentsParam } = params ?? {};
-  const mediaContents = mediaContentsParam ? JSON.parse(mediaContentsParam as string) as MediaContent[] : [];
+  const { mediaContents, setMediaContents } = useMedia();
 
   // Combine previous image with media contents
   const mediaItems = [
@@ -105,7 +102,7 @@ export default function PreviewMedia({
       url: previousImage,
       timestamp: Date.now()
     }] : []),
-    ...mediaContents.filter(content => content?.type === 'camera' && content?.url)
+    ...(mediaContents?.filter(content => content?.type === 'camera' && content?.url) || [])
   ];
 
 
@@ -114,15 +111,21 @@ export default function PreviewMedia({
     return () => StatusBar.setHidden(false);
   }, []);
 
-  
+
   const isVideo = (url: string) => {
     if (!url) return false;
     return VIDEO_EXTENSIONS.some(ext => url.toLowerCase().endsWith(ext));
   };
 
   const handleRemoveMedia = (timestamp: number) => {
-    const updatedMediaContents = mediaContents.filter(content => content.timestamp !== timestamp);
-    router.setParams({ mediaContents: JSON.stringify(updatedMediaContents) });
+    if (!mediaContents) return;
+
+    const updatedMediaContents = mediaContents.filter(content =>
+      content && content.timestamp !== timestamp
+    );
+
+    // Update context
+    setMediaContents(updatedMediaContents);
   };
 
   const handleAction = async (action: (() => void) | undefined) => {
@@ -143,7 +146,7 @@ export default function PreviewMedia({
 
   // Render functions
   const renderPaginationDots = () => {
-    if (mediaItems.length <= 1) return null;
+    if (!mediaItems || mediaItems.length <= 1) return null;
 
     return (
       <View style={styles.paginationContainer}>
@@ -244,7 +247,7 @@ export default function PreviewMedia({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {mediaItems.length > 0 ? (
+        {mediaItems && mediaItems.length > 0 ? (
           <View style={styles.carouselContainer}>
             <PagerView
               ref={pagerRef}
@@ -276,7 +279,7 @@ export default function PreviewMedia({
 
         {/* Text Content */}
         {mediaContents?.map((content) => {
-          if (content?.type === 'text' && content?.text) {
+          if (content && content.type === 'text' && content.text) {
             return (
               <View key={content.timestamp} style={styles.textContainer}>
                 <View style={styles.textHeaderContainer}>
@@ -292,14 +295,14 @@ export default function PreviewMedia({
       </ScrollView>
 
       {/* Bottom Buttons */}
-      {mediaItems.length > 0 && (
+      {mediaItems && mediaItems.length > 0 && (
         <BlurView intensity={30} style={styles.buttonContainer}>
           <View style={styles.mainButtonsRow}>
             <TouchableOpacity
-              style={[styles.publishButton, mediaItems.length === 0 && styles.disabledButton]}
+              style={[styles.publishButton, (!mediaItems || mediaItems.length === 0) && styles.disabledButton]}
               onPress={() => handleAction(onPublish)}
               activeOpacity={0.7}
-              disabled={mediaItems.length === 0 || loading}
+              disabled={!mediaItems || mediaItems.length === 0 || loading}
             >
               {loading ? (
                 <ActivityIndicator size="small" color={Colors.brandConstants.primaryWhite} />
