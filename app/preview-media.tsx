@@ -95,7 +95,7 @@ export default function PreviewMedia({
   const pagerRef = useRef<PagerView>(null);
   const { mediaContents, setMediaContents } = useMedia();
 
-  // Combine previous image with media contents
+
   const mediaItems = [
     ...(previousImage ? [{
       type: 'previous' as const,

@@ -1,11 +1,10 @@
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react'
 import { CameraView } from 'expo-camera'
 import CameraMainComponent from '@/components/ui/live/CameraMainComponent';
 import { MediaControlArea } from '@/components/ui/live/MediaControlArea';
 import AudioRecordMainComponent from '@/components/ui/live/AudioRecordMainComponent';
 import TextMainComponent from '@/components/ui/live/TextMainComponent';
-import { VideoView } from 'expo-video'
 import { useMedia } from '@/components/MediaContext';
 
 
@@ -16,7 +15,6 @@ type CameraModeType = 'photo' | 'video';
 
 export default function CameraScreen() {
     const cameraRef = useRef<CameraView>(null);
-    const videoRef = useRef<VideoView>(null)
     const [activeMediaPlayer, setActiveMediaPlayer] = useState<MediaPlayerType>('camera');
     const { mediaContents, setMediaContents } = useMedia();
 
@@ -25,6 +23,7 @@ export default function CameraScreen() {
     const [isRecording, setIsRecording] = useState(false);
     const [recordingDuration, setRecordingDuration] = useState(0);
 
+    //typing states
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
