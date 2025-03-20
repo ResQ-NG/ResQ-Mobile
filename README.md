@@ -1,50 +1,29 @@
-# Welcome to your Expo app 👋
+# ResQ Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+ResQ Mobile is the official mobile application for the **ResQ** platform, designed to provide real-time safety reporting, emergency alerts, and live tracking for users.
+![splash](https://github.com/user-attachments/assets/0fae3187-09fc-4c57-a839-94fd50624573)
 
-## Get started
+## 🚀 Overview
+The app enables users to report incidents, activate the "Watch Me" feature for live tracking, and receive safety updates. It serves as the primary interface for interacting with the ResQ ecosystem.
 
-1. Install dependencies
+## 🏗 Tech Stack
+- **React Native (Expo)** – Cross-platform mobile development
+- **React Navigation** – Navigation and routing
+- **Redux Toolkit** – State management
+- **REST API & WebSockets** – Communication with the ResQ backend
+- **Firebase** – Push notifications and analytics
 
-   ```bash
-   npm install
-   ```
 
-2. Start the app
+## ⚙️ Architecture
+The app follows the default **Expo architecture**, ensuring a modular and maintainable codebase.
 
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+## 📥 Installation
+```sh
+git clone https://github.com/ResQ-NG/ResQ-Mobile.git
+cd ResQ-Mobile
+npm install  # or yarn install
+expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 📧 Contact
+For inquiries or contributions, reach out at [support@resq.ng](mailto:support@resq.ng).
