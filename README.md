@@ -1,10 +1,12 @@
 # ResQ Mobile App
 
 ResQ Mobile is the official mobile application for the **ResQ** platform, designed to provide real-time safety reporting, emergency alerts, and live tracking for users.
-![splash](https://github.com/user-attachments/assets/0fae3187-09fc-4c57-a839-94fd50624573)
+
 
 ## 🚀 Overview
 The app enables users to report incidents, activate the "Watch Me" feature for live tracking, and receive safety updates. It serves as the primary interface for interacting with the ResQ ecosystem.
+
+![splash](https://github.com/user-attachments/assets/0fae3187-09fc-4c57-a839-94fd50624573)
 
 ## 🏗 Tech Stack
 - **React Native (Expo)** – Cross-platform mobile development
