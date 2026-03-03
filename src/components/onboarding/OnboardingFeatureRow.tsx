@@ -24,14 +24,14 @@ export function OnboardingFeatureRow({ feature, index }: OnboardingFeatureRowPro
       entering={brandFadeInUp.delay(160 + index * 80)}
       className="mb-6 flex-row gap-4"
     >
-      <View className="h-12 w-12 items-center justify-center rounded-full bg-surface-light">
+      <View className="h-12 w-12 items-center justify-center rounded-full bg-surface-light dark:bg-surface-dark">
         <Icon width={24} height={24} color={ICON_COLOR} />
       </View>
       <View className="flex-1">
-        <AppText className="font-metropolis-extrabold text-lg text-primaryDark">
+        <AppText className="font-metropolis-extrabold text-lg">
           {title}
         </AppText>
-        <AppText className="mt-1 text-base leading-5 text-primaryDark">
+        <AppText className="mt-1 text-base leading-5">
           {description}
         </AppText>
       </View>

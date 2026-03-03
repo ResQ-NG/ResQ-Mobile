@@ -15,10 +15,10 @@ const levelStyles: Record<HeadingLevel, string> = {
 };
 
 const colorStyles: Record<HeadingColor, string> = {
-  default: 'text-primaryDark',
-  primary: 'text-primary-blue',
-  accent: 'text-accent-red',
-  muted: 'text-captionDark',
+  default: 'text-primaryDark dark:text-primaryDark-dark',
+  primary: 'text-primary-blue dark:text-primary-blue-dark',
+  accent: 'text-accent-red dark:text-accent-red-dark',
+  muted: 'text-captionDark dark:text-captionDark-dark',
 };
 
 export type AppHeadingProps = TextProps & {

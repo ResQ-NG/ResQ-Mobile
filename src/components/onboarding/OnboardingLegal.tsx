@@ -8,7 +8,7 @@ const PRIVACY_URL = 'https://example.com/privacy';
 export function OnboardingLegal() {
   return (
     <AppAnimatedView entering={brandFadeIn.delay(480)} className="mb-4">
-      <AppText variant="caption" className="text-center text-sm text-captionDark">
+      <AppText variant="caption" className="text-center text-sm">
         By using ResQ&apos;s app, you agree to our{' '}
         <AppText
           variant="caption"

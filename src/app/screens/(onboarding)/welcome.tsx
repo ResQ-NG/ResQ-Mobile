@@ -12,10 +12,12 @@ import {
   STEP_1_FEATURES,
   STEP_2_FEATURES,
 } from '@/components/onboarding';
+import { useAppColorScheme } from '@/theme/colorMode';
 
-export default function OnboardingScreen() {
+export default function WelcomeScreen() {
   const [step, setStep] = useState<1 | 2>(1);
   const progressWidth = useSharedValue('50%');
+  const { theme } = useAppColorScheme();
 
   const handleContinue = () => {
     if (step === 1) {
@@ -30,7 +32,7 @@ export default function OnboardingScreen() {
 
   return (
     <AppAnimatedSafeAreaView
-      className="flex-1 bg-white"
+      className={`flex-1 ${theme.background}`}
       edges={['top', 'left', 'right']}
       paddingSize="md"
     >
@@ -50,7 +52,7 @@ export default function OnboardingScreen() {
       </ScrollView>
 
       <OnboardingFooter onContinue={handleContinue} />
-      <StatusBar style="dark" />
+      <StatusBar style={theme.statusBarStyle} />
     </AppAnimatedSafeAreaView>
   );
 }

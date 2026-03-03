@@ -12,12 +12,15 @@ import { AppAnimatedText } from '@/components/ui/animated/AppAnimatedText';
 import { AppAnimatedView } from '@/components/ui/animated/AppAnimatedView';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { AppText } from '@/components/ui/AppText';
+import { useAppColorScheme } from '@/theme/colorMode';
 
 const favicon = require('@assets/favicon.png');
 
 export default function HomeScreen() {
+  const { theme } = useAppColorScheme();
+
   return (
-    <View className="flex-1 bg-surface-light">
+    <View className={`flex-1 ${theme.background}`}>
       <View className="flex-1 items-center justify-center px-6">
         <AppAnimatedView entering={brandScaleIn.delay(0)} className="mb-4">
           <Image source={favicon} className="h-32 w-32" resizeMode="contain" />
@@ -36,7 +39,7 @@ export default function HomeScreen() {
 
         <AppAnimatedText
           entering={brandFadeIn.delay(200)}
-          className="font-metropolis-regular text-sm text-captionDark text-center"
+          className="font-metropolis-regular text-sm text-captionDark dark:text-captionDark-dark text-center"
         >
           Built with Metropolis, NativeWind & Zustand.
         </AppAnimatedText>
@@ -48,13 +51,13 @@ export default function HomeScreen() {
           <AppButton
             variant="primary"
             size="lg"
-            onPress={() => router.push('/screens/onboarding-one')}
+            onPress={() => router.push('/screens/welcome')}
           >
             See onboarding
           </AppButton>
         </AppAnimatedView>
       </View>
-      <StatusBar style="dark" />
+      <StatusBar style={theme.statusBarStyle} />
     </View>
   );
 }

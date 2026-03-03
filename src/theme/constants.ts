@@ -7,8 +7,8 @@
 export const DEFAULT_APP_TEXT_VARIANT = 'body' as const;
 
 export const APP_TEXT_VARIANT_STYLES: Record<'body' | 'caption', string> = {
-  body: 'text-base font-metropolis-regular text-primaryDark',
-  caption: 'text-sm font-metropolis-regular text-captionDark',
+  body: 'text-base font-metropolis-regular text-primaryDark dark:text-primaryDark-dark',
+  caption: 'text-sm font-metropolis-regular text-captionDark dark:text-captionDark-dark',
 };
 
 // --- Safe area (and general) padding sizes (rem) ---
