@@ -25,6 +25,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "scheme": "resq-mobile",
+    "plugins": [["expo-router", { "root": "src/app" }]]
   }
 }

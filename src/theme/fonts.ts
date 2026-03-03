@@ -1,7 +1,3 @@
-/**
- * Metropolis font family mapping for expo-font.
- * Uses .otf files from assets/fonts/.
- */
 export const metropolisFonts = {
   'Metropolis-Thin': require('../../assets/fonts/Metropolis-Thin.otf'),
   'Metropolis-ExtraLight': require('../../assets/fonts/Metropolis-ExtraLight.otf'),
