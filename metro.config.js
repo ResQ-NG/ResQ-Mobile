@@ -8,6 +8,7 @@ config.resolver = {
   ...(config.resolver || {}),
   alias: {
     '@': path.resolve(__dirname, 'src'),
+    '@assets': path.resolve(__dirname, 'assets'),
   },
   // Pin a single React copy to prevent hook/context crashes.
   extraNodeModules: {

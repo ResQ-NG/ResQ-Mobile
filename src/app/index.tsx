@@ -1,23 +1,35 @@
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
-import { FadeIn, FadeInDown, FadeInUp, ZoomIn } from '@/lib/animation';
+import { router } from 'expo-router';
+import { Image, View } from 'react-native';
+import {
+  brandFadeIn,
+  brandFadeInDown,
+  brandFadeInUp,
+  brandScaleIn,
+} from '@/lib/animation';
+import { AppButton } from '@/components/ui/AppButton';
 import { AppAnimatedText } from '@/components/ui/animated/AppAnimatedText';
 import { AppAnimatedView } from '@/components/ui/animated/AppAnimatedView';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { AppText } from '@/components/ui/AppText';
 
+const favicon = require('@assets/favicon.png');
+
 export default function HomeScreen() {
   return (
     <View className="flex-1 bg-surface-light">
       <View className="flex-1 items-center justify-center px-6">
-        <AppAnimatedView entering={FadeInUp.duration(400)} className="mb-4">
+        <AppAnimatedView entering={brandScaleIn.delay(0)} className="mb-4">
+          <Image source={favicon} className="h-32 w-32" resizeMode="contain" />
+        </AppAnimatedView>
+        <AppAnimatedView entering={brandFadeInUp.delay(60)} className="mb-4">
           <AppHeading level={1} color="primary">
             ResQ
           </AppHeading>
         </AppAnimatedView>
 
         <AppAnimatedView
-          entering={FadeInDown.duration(400).delay(120)}
+          entering={brandFadeInDown.delay(120)}
           className="mb-2"
         >
           <AppText variant="body" className="text-center">
@@ -26,22 +38,20 @@ export default function HomeScreen() {
         </AppAnimatedView>
 
         <AppAnimatedText
-          entering={FadeIn.duration(400).delay(220)}
+          entering={brandFadeIn.delay(200)}
           className="font-metropolis-regular text-sm text-captionDark text-center"
         >
           Built with Metropolis, NativeWind & Zustand.
         </AppAnimatedText>
 
-        <AppAnimatedView
-          entering={ZoomIn.duration(500).delay(320)}
-          className="mt-8 rounded-xl bg-primary-blue px-6 py-3"
-        >
-          <AppText
-            variant="body"
-            className="text-center font-metropolis-semibold text-white"
+        <AppAnimatedView entering={brandFadeInUp.delay(280)} className="mt-8 w-full max-w-xs">
+          <AppButton
+            variant="primary"
+            size="lg"
+            onPress={() => router.push('/screens/Welcome')}
           >
-            Animated view + base text
-          </AppText>
+            See onboarding
+          </AppButton>
         </AppAnimatedView>
       </View>
       <StatusBar style="dark" />

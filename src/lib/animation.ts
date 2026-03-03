@@ -29,4 +29,11 @@ export {
   Easing,
 } from 'react-native-reanimated';
 
+export {
+  brandFadeIn,
+  brandFadeInUp,
+  brandFadeInDown,
+  brandScaleIn,
+} from '@/lib/brandAnimations';
+
 export default Animated;
