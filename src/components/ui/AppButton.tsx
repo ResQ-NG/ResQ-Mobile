@@ -1,4 +1,5 @@
 import { Pressable, PressableProps } from 'react-native';
+import { cn } from '@/lib/cn';
 import { AppText } from './AppText';
 
 type ButtonVariant = 'primary' | 'accent' | 'outline' | 'ghost';
@@ -12,9 +13,9 @@ const variantStyles: Record<ButtonVariant, string> = {
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'py-2 px-3 rounded-lg',
-  md: 'py-3 px-5 rounded-xl',
-  lg: 'py-4 px-6 rounded-xl',
+  sm: 'py-2 px-3',
+  md: 'py-3 px-5',
+  lg: 'py-4 px-6',
 };
 
 const labelColorStyles: Record<ButtonVariant, string> = {
@@ -41,18 +42,19 @@ export function AppButton({
   disabled,
   ...rest
 }: AppButtonProps) {
-  const base = 'items-center justify-center';
-  const variantClass = variantStyles[variant];
-  const sizeClass = sizeStyles[size];
-  const disabledClass = disabled ? 'opacity-60' : '';
-  const combined = [base, variantClass, sizeClass, disabledClass, className]
-    .filter(Boolean)
-    .join(' ');
+  const combined = cn(
+    'items-center justify-center rounded-full',
+    variantStyles[variant],
+    sizeStyles[size],
+    disabled && 'opacity-60',
+    className,
+  );
 
-  const labelColor = labelColorStyles[variant];
-  const labelCombined = [labelColor, 'font-metropolis-semibold', labelClassName]
-    .filter(Boolean)
-    .join(' ');
+  const labelCombined = cn(
+    labelColorStyles[variant],
+    'font-metropolis-semibold',
+    labelClassName,
+  );
 
   const labelSize =
     size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base';
@@ -64,10 +66,7 @@ export function AppButton({
       accessibilityRole="button"
       {...rest}
     >
-      <AppText
-        variant="body"
-        className={`${labelSize} ${labelCombined}`}
-      >
+      <AppText variant="body" className={`${labelSize} ${labelCombined}`}>
         {children}
       </AppText>
     </Pressable>

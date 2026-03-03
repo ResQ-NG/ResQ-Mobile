@@ -1,16 +1,17 @@
 import { Text, TextProps } from 'react-native';
+import { cn } from '@/lib/cn';
 
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 type HeadingColor = 'default' | 'primary' | 'accent' | 'muted';
 
 const levelStyles: Record<HeadingLevel, string> = {
-  1: 'text-4xl font-metropolis-bold tracking-tight',
-  2: 'text-3xl font-metropolis-bold tracking-tight',
-  3: 'text-2xl font-metropolis-semibold',
-  4: 'text-xl font-metropolis-semibold',
-  5: 'text-lg font-metropolis-medium',
-  6: 'text-base font-metropolis-semibold',
+  1: 'text-4xl font-metropolis-extrabold tracking-tight',
+  2: 'text-3xl font-metropolis-extrabold tracking-tight',
+  3: 'text-2xl font-metropolis-extrabold',
+  4: 'text-xl font-metropolis-extrabold',
+  5: 'text-lg font-metropolis-extrabold',
+  6: 'text-base font-metropolis-extrabold',
 };
 
 const colorStyles: Record<HeadingColor, string> = {
@@ -37,11 +38,7 @@ export function AppHeading({
   children,
   ...rest
 }: AppHeadingProps) {
-  const levelClass = levelStyles[level];
-  const colorClass = colorStyles[color];
-  const combined = [levelClass, colorClass, className]
-    .filter(Boolean)
-    .join(' ');
+  const combined = cn(levelStyles[level], colorStyles[color], className);
 
   return (
     <Text className={combined} accessibilityRole="header" {...rest}>

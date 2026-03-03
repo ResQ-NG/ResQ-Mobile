@@ -28,10 +28,7 @@ export default function HomeScreen() {
           </AppHeading>
         </AppAnimatedView>
 
-        <AppAnimatedView
-          entering={brandFadeInDown.delay(120)}
-          className="mb-2"
-        >
+        <AppAnimatedView entering={brandFadeInDown.delay(120)} className="mb-2">
           <AppText variant="body" className="text-center">
             Welcome to your app.
           </AppText>
@@ -44,11 +41,14 @@ export default function HomeScreen() {
           Built with Metropolis, NativeWind & Zustand.
         </AppAnimatedText>
 
-        <AppAnimatedView entering={brandFadeInUp.delay(280)} className="mt-8 w-full max-w-xs">
+        <AppAnimatedView
+          entering={brandFadeInUp.delay(280)}
+          className="mt-8 w-full max-w-xs"
+        >
           <AppButton
             variant="primary"
             size="lg"
-            onPress={() => router.push('/screens/Welcome')}
+            onPress={() => router.push('/screens/onboarding-one')}
           >
             See onboarding
           </AppButton>

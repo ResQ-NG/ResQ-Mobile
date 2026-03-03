@@ -19,6 +19,8 @@ This doc describes where things live and how we organize the app.
 - **`@/`** → **`src/`** (set in `tsconfig.json` and `metro.config.js`).
 - Use `@/components/...`, `@/hooks/...`, `@/theme/...`, `@/lib/...` everywhere instead of relative paths into `src/`.
 
+- **`cn()`** — **`@/lib/cn`** merges Tailwind classes with conflict resolution (`clsx` + `tailwind-merge`). Use when combining base styles with a `className` prop so overrides win: `cn('text-base', className)`.
+
 ---
 
 ## UI and components
@@ -43,8 +45,18 @@ This doc describes where things live and how we organize the app.
 ## Theme and fonts
 
 - **`src/theme/fonts.ts`** — Metropolis font family constants.
+- **`src/theme/constants.ts`** — Shared UI constants: **`DEFAULT_APP_TEXT_VARIANT`** (`'body'` — base is never caption), **`APP_TEXT_VARIANT_STYLES`**, **`PADDING_SIZE_CLASSES`** (`none` | `sm` | `md` | `lg`) for optional padding (e.g. **`AppAnimatedSafeAreaView`** `paddingSize` prop).
 - **`src/hooks/useMetropolisFonts.ts`** — Loads Metropolis fonts; used in `_layout.tsx`. Wait for this before hiding splash.
 - **`tailwind.config.js`** + **`global.css`** — Theme colors (e.g. `primary`, `accent`, `surface-light`, `surface-dark`, `success`, `primaryDark`, `captionDark`) and dark variants. Use Tailwind classes like `text-primary`, `bg-surface-light`.
+
+---
+
+## Icons (Monicon)
+
+- **Install:** `@monicon/core`, `@monicon/metro`, `react-native-svg` (required for SVG icons).
+- **`monicon.config.ts`** (project root) — Declares **`icons`** (e.g. `mdi:camera-outline`) and optionally **`collections`** (e.g. `['lucide']`). Plugins: **`clean`** (patterns to clear) and **`reactNative`** (outputPath, e.g. `src/components/icons`). Generated components land in **`src/components/icons/`** (e.g. `@/components/icons/mdi/camera-outline`).
+- **Metro** — `metro.config.js` uses **`withMonicon(config)`** so icons are generated when the dev server starts. Run **`npm run generate:icons`** to generate once without starting the app.
+- **Usage:** Import the default export and pass `color`, `width`, `height`: e.g. `<HomeIcon color="aqua" width={32} height={32} />`.
 
 ---
 
@@ -54,7 +66,15 @@ This doc describes where things live and how we organize the app.
   - **`assets/favicon.png`** — Favicon; shown on the home screen.
   - **`assets/icon.png`**, **`assets/splash-icon.png`** — App and splash icons.
   - **`assets/fonts/`** — Metropolis `.otf` files.
-- From `src/app/` use relative require, e.g. `require('../../assets/favicon.png')`.
+- Use the **`@assets/`** alias: `require('@assets/favicon.png')`, `require('@assets/fonts/...')`.
+
+---
+
+## Linting, formatting, and typed routes
+
+- **ESLint** — Strong rules via `eslint.config.js` (extends `eslint-config-expo/flat` + `eslint-config-prettier/flat`): `@typescript-eslint/no-explicit-any`, `no-unused-vars`, `react-hooks/*`, `prefer-const`, `no-console` (warn). Run **`npm run lint`**.
+- **Prettier** — Config in `.prettierrc` (semi, singleQuote, tabWidth 2, trailingComma es5, printWidth 80); `.prettierignore` excludes node_modules, .expo, dist, generated icons. Run **`npm run format`** to fix, **`npm run format:check`** to verify. ESLint is configured so it doesn’t conflict with Prettier.
+- **Typed routes** — Enabled with `experiments.typedRoutes` in `app.json`. `router.push('/wrong')` or `<Link href="/typo" />` will **throw a TypeScript error** once route types are generated. Types are generated when you run **`npx expo start`** (or open the app); then run **`npm run typecheck`** to catch invalid routes without starting the server. Keep `expo-env.d.ts` and `.expo/` in `.gitignore`; CI should run `npx expo customize tsconfig.json` (or start the app once) so typecheck has the route types.
 
 ---
 
@@ -70,11 +90,11 @@ This doc describes where things live and how we organize the app.
 
 ## Summary
 
-| Purpose            | Location / convention                                      |
-|--------------------|------------------------------------------------------------|
-| Routes / screens   | `src/app/*.tsx`, inline components, no re-exports          |
-| Path alias         | `@/` → `src/`                                             |
-| UI primitives      | `src/components/ui/` and `src/components/ui/animated/`    |
-| Animations         | `src/lib/animation.ts`, Reanimated presets                 |
-| Theme / fonts      | `src/theme/fonts.ts`, `src/hooks/useMetropolisFonts.ts`    |
-| Assets             | `assets/` (favicon, icons, `assets/fonts/`)                |
+| Purpose          | Location / convention                                   |
+| ---------------- | ------------------------------------------------------- |
+| Routes / screens | `src/app/*.tsx`, inline components, no re-exports       |
+| Path alias       | `@/` → `src/`                                           |
+| UI primitives    | `src/components/ui/` and `src/components/ui/animated/`  |
+| Animations       | `src/lib/animation.ts`, Reanimated presets              |
+| Theme / fonts    | `src/theme/fonts.ts`, `src/hooks/useMetropolisFonts.ts` |
+| Assets           | `assets/` (favicon, icons, `assets/fonts/`)             |

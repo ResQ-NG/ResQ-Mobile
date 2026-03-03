@@ -1,5 +1,6 @@
 const path = require('path');
 const { getDefaultConfig } = require('expo/metro-config');
+const { withMonicon } = require('@monicon/metro');
 const { withNativeWind } = require('nativewind/metro');
 
 const config = getDefaultConfig(__dirname);
@@ -18,4 +19,5 @@ config.resolver = {
   },
 };
 
-module.exports = withNativeWind(config, { input: './global.css' });
+const configWithMonicon = withMonicon(config);
+module.exports = withNativeWind(configWithMonicon, { input: './global.css' });
