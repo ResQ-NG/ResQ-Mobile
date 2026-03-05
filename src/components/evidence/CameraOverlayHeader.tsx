@@ -1,0 +1,109 @@
+import { View, TouchableOpacity } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  AppAnimatedView,
+  AppAnimatedImage,
+  brandFadeInDown,
+} from '@/lib/animation';
+import { AppText } from '@/components/ui/AppText';
+import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
+import SolarBellBoldIcon from '@/components/icons/solar/bell-bold';
+import SolarClockCircleBoldIcon from '@/components/icons/solar/clock-circle-bold';
+
+interface CameraOverlayHeaderProps {
+  location?: string;
+  time?: string;
+  avatarUri?: string;
+  onLocationPress?: () => void;
+  onNotificationPress?: () => void;
+}
+
+export function CameraOverlayHeader({
+  location = 'MARYLAND, LAGOS.',
+  time = '9:01:12 PM',
+  avatarUri,
+  onLocationPress,
+  onNotificationPress,
+}: CameraOverlayHeaderProps) {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <AppAnimatedView
+      entering={brandFadeInDown}
+      className="absolute left-0 right-0 px-4 pt-2 gap-[10px]"
+      style={{ top: insets.top }}
+    >
+      {/* Row 1: Avatar left — glass pill with action icons right */}
+      <View className="flex-row items-center justify-between">
+        {/* Avatar */}
+        <AppAnimatedView
+          entering={brandFadeInDown.delay(60)}
+          className="w-[52px] h-[52px] rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.6)]"
+        >
+          {avatarUri ? (
+            <AppAnimatedImage
+              source={{ uri: avatarUri }}
+              className="w-full h-full"
+            />
+          ) : (
+            <View className="flex-1 bg-[rgba(255,255,255,0.2)]" />
+          )}
+        </AppAnimatedView>
+
+        <View className="flex-row items-center gap-2">
+          {/* Glass pill around action icons */}
+          <AppAnimatedView
+            entering={brandFadeInDown.delay(100)}
+            className="flex-row items-center gap-2 px-1 py-1 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)]"
+          >
+            <TouchableOpacity
+              onPress={onNotificationPress}
+              className="w-12 h-12 rounded-full items-center justify-center"
+            >
+              <SolarBellBoldIcon width={20} height={20} color="#fff" />
+            </TouchableOpacity>
+          </AppAnimatedView>
+
+          {/* Glass pill around action icons */}
+          <AppAnimatedView
+            entering={brandFadeInDown.delay(100)}
+            className="flex-row items-center gap-2 px-1 py-1 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)]"
+          >
+            <TouchableOpacity
+              onPress={onLocationPress}
+              className="w-12 h-12 rounded-full items-center justify-center"
+            >
+              <SolarMapPointBoldIcon width={20} height={20} color="#fff" />
+            </TouchableOpacity>
+          </AppAnimatedView>
+        </View>
+      </View>
+
+      {/* Row 2: Location + Time inside a glass pill */}
+      <View className="flex-col gap-2 mt-4 ">
+      <AppAnimatedView
+        entering={brandFadeInDown.delay(160)}
+        className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
+      >
+        <View className="flex-row items-center gap-[6px]">
+          <SolarMapPointBoldIcon width={14} height={14} color="#fff" />
+          <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
+            {location}
+          </AppText>
+        </View>
+      </AppAnimatedView>
+
+      <AppAnimatedView
+        entering={brandFadeInDown.delay(160)}
+        className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
+      >
+        <View className="flex-row items-center gap-[6px]">
+          <SolarClockCircleBoldIcon width={14} height={14} color="#fff" />
+          <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">{time}</AppText>
+        </View>
+      </AppAnimatedView>
+      </View>
+
+    </AppAnimatedView>
+  );
+}

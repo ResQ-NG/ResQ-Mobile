@@ -1,18 +1,14 @@
-import { AppAnimatedSafeAreaView } from '@/lib/animation';
-import { AppText } from '@/components/ui/AppText';
-import { useAppColorScheme } from '@/theme/colorMode';
+import { View } from 'react-native';
+import { CameraOverlay } from '@/components/evidence/CameraOverlay';
 
 export default function MainScreen() {
-  const { theme } = useAppColorScheme();
-
   return (
-    <AppAnimatedSafeAreaView
-      className={`flex-1 items-center justify-center ${theme.background}`}
-      edges={['top', 'left', 'right']}
-      paddingSize="md"
-    >
-      <AppText className="text-2xl font-metropolis-bold">Main</AppText>
-    </AppAnimatedSafeAreaView>
+    <View style={{ flex: 1, backgroundColor: '#1a1a1a' }}>
+      {/* Camera feed will live here */}
+      <CameraOverlay
+        location="MARYLAND, LAGOS."
+        time="9:01:12 PM"
+      />
+    </View>
   );
 }
-

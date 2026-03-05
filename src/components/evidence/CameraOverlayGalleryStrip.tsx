@@ -1,0 +1,67 @@
+import { View, TouchableOpacity } from 'react-native';
+import {
+  AppAnimatedView,
+  AppAnimatedImage,
+  AppAnimatedScrollView,
+  brandFadeInUp,
+} from '@/lib/animation';
+import { AppText } from '@/components/ui/AppText';
+
+interface GalleryItem {
+  uri: string;
+  id: string;
+}
+
+interface CameraOverlayGalleryStripProps {
+  items?: GalleryItem[];
+  onItemPress?: (item: GalleryItem) => void;
+  onMorePress?: () => void;
+}
+
+export function CameraOverlayGalleryStrip({
+  items = [],
+  onItemPress,
+  onMorePress,
+}: CameraOverlayGalleryStripProps) {
+  return (
+    <AppAnimatedView
+      entering={brandFadeInUp}
+      className="flex-row items-center px-3"
+    >
+      <AppAnimatedScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ gap: 4, paddingRight: 4 }}
+        className="flex-1"
+      >
+        {items.map((item, index) => (
+          <AppAnimatedView key={item.id} entering={brandFadeInUp.delay(index * 40)}>
+            <TouchableOpacity
+              onPress={() => onItemPress?.(item)}
+              className="w-16 h-16 rounded-[10px] overflow-hidden border-[1.5px] border-[rgba(255,255,255,0.25)]"
+            >
+              <AppAnimatedImage
+                source={{ uri: item.uri }}
+                className="w-full h-full"
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          </AppAnimatedView>
+        ))}
+
+        {/* Placeholder thumbs when no items yet */}
+        {items.length === 0 &&
+          [1, 2, 3, 4, 5].map((n, index) => (
+            <AppAnimatedView key={n} entering={brandFadeInUp.delay(index * 40)}>
+              <View className="w-16 h-16 rounded-[10px] bg-[rgba(255,255,255,0.12)] border-[1.5px] border-[rgba(255,255,255,0.15)]" />
+            </AppAnimatedView>
+          ))}
+      </AppAnimatedScrollView>
+
+      {/* More arrow */}
+      <TouchableOpacity onPress={onMorePress} className="pl-1">
+        <AppText className="text-white text-3xl font-metropolis-bold">›</AppText>
+      </TouchableOpacity>
+    </AppAnimatedView>
+  );
+}

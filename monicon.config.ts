@@ -13,6 +13,19 @@ export default {
     'solar:settings-bold',
     'solar:map-point-rotate-bold',
     'solar:folder-open-bold',
+    // Camera overlay
+    'solar:bolt-bold',               // flash
+    'solar:videocamera-record-bold', // video toggle
+    'solar:camera-rotate-bold',      // flip camera
+    'solar:microphone-bold',         // mic
+    'solar:text-bold',               // text overlay
+    'solar:camera-lens-bold',        // lens/filter
+    'solar:smartphone-rotate-angle-bold',
+    'solar:map-arrow-right-bold',    // navigate / compass
+    'solar:map-point-bold',          // location pin (header)
+    'solar:bell-bold',               // notification (header)
+    'solar:clock-circle-bold',       // time (header)
+    'solar:gallery-add-bold',        // add media (bottom left)
   ],
   plugins: [
     clean({ patterns: ['src/components/icons'] }),

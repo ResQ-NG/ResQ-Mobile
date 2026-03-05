@@ -11,6 +11,10 @@ export const APP_TEXT_VARIANT_STYLES: Record<'body' | 'caption', string> = {
   caption: 'text-sm font-metropolis-regular text-captionDark dark:text-captionDark-dark',
 };
 
+// --- Tab bar ---
+/** Static height of the tab bar above the device's safe-area inset (paddingTop + icon + paddingBottom). */
+export const TAB_BAR_HEIGHT = 84;
+
 // --- Safe area (and general) padding sizes (rem) ---
 export type PaddingSize = 'none' | 'sm' | 'md' | 'lg';
 

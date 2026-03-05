@@ -53,7 +53,7 @@ export function AppTabBar({ state, descriptors, navigation }: BottomTabBarProps)
           width: '100%',
           overflow: 'hidden',
           paddingHorizontal: 20,
-          paddingBottom: insets.bottom,
+          paddingBottom: insets.bottom + 12,
           paddingTop: 20,
           borderWidth: 1,
           borderColor: glassBorder,
