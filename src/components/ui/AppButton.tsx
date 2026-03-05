@@ -47,13 +47,13 @@ export function AppButton({
     variantStyles[variant],
     sizeStyles[size],
     disabled && 'opacity-60',
-    className,
+    className
   );
 
   const labelCombined = cn(
     labelColorStyles[variant],
     'font-metropolis-semibold',
-    labelClassName,
+    labelClassName
   );
 
   const labelSize =
