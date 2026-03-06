@@ -15,13 +15,13 @@ export default function SettingsScreen() {
     <AppAnimatedSafeAreaView
       className={`flex-1 ${theme.background}`}
       edges={['top', 'left', 'right']}
+      header={<SettingsHeader />}
     >
       <AppAnimatedScrollView
-        className="flex-1 px-6"
+        className="flex-1 px-6 pt-8"
         contentContainerStyle={{ paddingBottom: bottomPadding }}
         showsVerticalScrollIndicator={false}
       >
-        <SettingsHeader />
         <SettingsProfileCard />
         <SettingsList />
       </AppAnimatedScrollView>

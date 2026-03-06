@@ -30,6 +30,19 @@ export default {
     'solar:lock-keyhole-bold',
     'solar:info-circle-bold',
     'hugeicons:arrow-right-01',
+
+    // Community
+    'solar:user-speak-bold',
+    'solar:users-group-rounded-bold',
+    'solar:shield-check-bold',
+    'solar:lock-keyhole-bold',
+    'solar:info-circle-bold',
+    'solar:bell-bold',
+    'solar:clock-circle-bold',
+    'solar:gallery-add-bold',
+    'solar:arrow-left-broken',
+    'mingcute:search-line'
+
   ],
   plugins: [
     clean({ patterns: ['src/components/icons'] }),

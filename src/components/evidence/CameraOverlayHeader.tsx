@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   AppAnimatedView,
@@ -6,6 +6,7 @@ import {
   brandFadeInDown,
 } from '@/lib/animation';
 import { AppText } from '@/components/ui/AppText';
+import { RoundedButton } from '@/components/ui/RoundedButton';
 import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
 import SolarBellBoldIcon from '@/components/icons/solar/bell-bold';
 import SolarClockCircleBoldIcon from '@/components/icons/solar/clock-circle-bold';
@@ -56,12 +57,10 @@ export function CameraOverlayHeader({
             entering={brandFadeInDown.delay(100)}
             className="flex-row items-center gap-2 px-1 py-1 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)]"
           >
-            <TouchableOpacity
+            <RoundedButton
               onPress={onNotificationPress}
-              className="w-12 h-12 rounded-full items-center justify-center"
-            >
-              <SolarBellBoldIcon width={20} height={20} color="#fff" />
-            </TouchableOpacity>
+              icon={<SolarBellBoldIcon width={20} height={20} color="#fff" />}
+            />
           </AppAnimatedView>
 
           {/* Glass pill around action icons */}
@@ -69,12 +68,10 @@ export function CameraOverlayHeader({
             entering={brandFadeInDown.delay(100)}
             className="flex-row items-center gap-2 px-1 py-1 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)]"
           >
-            <TouchableOpacity
+            <RoundedButton
               onPress={onLocationPress}
-              className="w-12 h-12 rounded-full items-center justify-center"
-            >
-              <SolarMapPointBoldIcon width={20} height={20} color="#fff" />
-            </TouchableOpacity>
+              icon={<SolarMapPointBoldIcon width={20} height={20} color="#fff" />}
+            />
           </AppAnimatedView>
         </View>
       </View>

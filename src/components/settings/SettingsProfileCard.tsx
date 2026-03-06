@@ -9,9 +9,9 @@ export function SettingsProfileCard() {
       entering={brandFadeInUp.delay(60)}
       className="flex-row items-center gap-4 mb-8"
     >
-      <View className="w-24 h-24 rounded-full overflow-hidden border-2 border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.12)] bg-surface-light dark:bg-surface-dark" />
+      <View className="w-24 h-24 rounded-full overflow-hidden border-2 border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.12)] bg-surface-light dark:bg-surface-dark elevation-md " />
       <View className="flex-1 gap-0.5">
-        <AppHeading level={2}>MaRia</AppHeading>
+        <AppHeading level={3}>MaRia</AppHeading>
         <AppText
           variant="body"
           className="text-captionDark dark:text-captionDark-dark text-sm"
