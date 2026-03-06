@@ -6,9 +6,7 @@ import SolarLockKeyholeBoldIcon from '@/components/icons/solar/lock-keyhole-bold
 
 export function BroadcastOfficialBanner() {
   return (
-    <AppAnimatedView
-      entering={brandFadeInUp.delay(240)}
-    >
+    <AppAnimatedView entering={brandFadeInUp.delay(240)}>
       <LinearGradient
         colors={['#F56C13', '#F56C13', '#D1443A']}
         start={{ x: 0, y: 0 }}

@@ -70,7 +70,9 @@ export function CameraOverlayHeader({
           >
             <RoundedButton
               onPress={onLocationPress}
-              icon={<SolarMapPointBoldIcon width={20} height={20} color="#fff" />}
+              icon={
+                <SolarMapPointBoldIcon width={20} height={20} color="#fff" />
+              }
             />
           </AppAnimatedView>
         </View>
@@ -78,29 +80,30 @@ export function CameraOverlayHeader({
 
       {/* Row 2: Location + Time inside a glass pill */}
       <View className="flex-col gap-2 mt-4 ">
-      <AppAnimatedView
-        entering={brandFadeInDown.delay(160)}
-        className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
-      >
-        <View className="flex-row items-center gap-[6px]">
-          <SolarMapPointBoldIcon width={14} height={14} color="#fff" />
-          <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
-            {location}
-          </AppText>
-        </View>
-      </AppAnimatedView>
+        <AppAnimatedView
+          entering={brandFadeInDown.delay(160)}
+          className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
+        >
+          <View className="flex-row items-center gap-[6px]">
+            <SolarMapPointBoldIcon width={14} height={14} color="#fff" />
+            <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
+              {location}
+            </AppText>
+          </View>
+        </AppAnimatedView>
 
-      <AppAnimatedView
-        entering={brandFadeInDown.delay(160)}
-        className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
-      >
-        <View className="flex-row items-center gap-[6px]">
-          <SolarClockCircleBoldIcon width={14} height={14} color="#fff" />
-          <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">{time}</AppText>
-        </View>
-      </AppAnimatedView>
+        <AppAnimatedView
+          entering={brandFadeInDown.delay(160)}
+          className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
+        >
+          <View className="flex-row items-center gap-[6px]">
+            <SolarClockCircleBoldIcon width={14} height={14} color="#fff" />
+            <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
+              {time}
+            </AppText>
+          </View>
+        </AppAnimatedView>
       </View>
-
     </AppAnimatedView>
   );
 }

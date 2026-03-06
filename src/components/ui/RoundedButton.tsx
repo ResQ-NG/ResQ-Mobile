@@ -2,10 +2,7 @@ import type { ReactNode } from 'react';
 import { TouchableOpacity, TouchableOpacityProps } from 'react-native';
 import { cn } from '@/lib/cn';
 
-export type RoundedButtonProps = Omit<
-  TouchableOpacityProps,
-  'children'
-> & {
+export type RoundedButtonProps = Omit<TouchableOpacityProps, 'children'> & {
   /** Icon or element to render inside the button (e.g. <Icon width={20} height={20} color="..." />) */
   icon: ReactNode;
   /** Optional extra Tailwind classes (merged with base w-12 h-12 rounded-full) */

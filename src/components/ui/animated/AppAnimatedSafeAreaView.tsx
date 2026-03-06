@@ -2,10 +2,7 @@ import type { ComponentProps, ReactNode } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated from 'react-native-reanimated';
 import { cn } from '@/lib/cn';
-import {
-  PADDING_SIZE_CLASSES,
-  type PaddingSize,
-} from '@/theme/constants';
+import { PADDING_SIZE_CLASSES, type PaddingSize } from '@/theme/constants';
 
 const AnimatedSafeAreaView = Animated.createAnimatedComponent(SafeAreaView);
 
@@ -33,10 +30,7 @@ export function AppAnimatedSafeAreaView({
 }: AppAnimatedSafeAreaViewProps) {
   const paddingClass = PADDING_SIZE_CLASSES[paddingSize];
   return (
-    <AnimatedSafeAreaView
-      className={cn(paddingClass, className)}
-      {...props}
-    >
+    <AnimatedSafeAreaView className={cn(paddingClass, className)} {...props}>
       {header}
       {children}
     </AnimatedSafeAreaView>

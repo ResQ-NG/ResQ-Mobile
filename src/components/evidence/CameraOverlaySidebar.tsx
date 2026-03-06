@@ -7,7 +7,11 @@ import SolarTextBoldIcon from '@/components/icons/solar/text-bold';
 import type { ComponentType } from 'react';
 import SolarSmartphoneRotateAngleBoldIcon from '../icons/solar/smartphone-rotate-angle-bold';
 
-type IconComponent = ComponentType<{ width: number; height: number; color: string }>;
+type IconComponent = ComponentType<{
+  width: number;
+  height: number;
+  color: string;
+}>;
 
 interface SidebarButtonConfig {
   key: string;
@@ -33,7 +37,11 @@ export function CameraOverlaySidebar({
 }: CameraOverlaySidebarProps) {
   const buttons: SidebarButtonConfig[] = [
     { key: 'flash', Icon: SolarBoltBoldIcon, onPress: onFlash },
-    { key: 'video', Icon: SolarVideocameraRecordBoldIcon, onPress: onVideoToggle },
+    {
+      key: 'video',
+      Icon: SolarVideocameraRecordBoldIcon,
+      onPress: onVideoToggle,
+    },
     { key: 'mic', Icon: SolarMicrophoneBoldIcon, onPress: onMic },
     { key: 'text', Icon: SolarTextBoldIcon, onPress: onText },
     { key: 'lens', Icon: SolarSmartphoneRotateAngleBoldIcon, onPress: onLens },

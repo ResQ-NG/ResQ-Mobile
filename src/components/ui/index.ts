@@ -9,3 +9,6 @@ export type { AppButtonProps } from './AppButton';
 
 export { RoundedButton } from './RoundedButton';
 export type { RoundedButtonProps } from './RoundedButton';
+
+export { Avatar } from './Avatar';
+export type { AvatarProps, AvatarSize } from './Avatar';

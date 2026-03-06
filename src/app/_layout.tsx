@@ -7,16 +7,48 @@ import { useEffect } from 'react';
 import { LogBox } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useMetropolisFonts } from '@/hooks/useMetropolisFonts';
-
+import { debugAppConfig } from '@/lib/app-config';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider, useTheme } from '@/context/ThemeContext';
+import { setupOnlineManager } from '@/lib/utils/react-query/onlineManager';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { StatusBar } from 'expo-status-bar';
+import { useFocusManager } from '@/lib/utils/react-query/focusManager';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetRegistry } from './screens/(bottom-sheets)/registry';
 // We use only react-native-safe-area-context; this warning comes from a dependency.
 LogBox.ignoreLogs([
   "SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead.",
 ]);
 
+debugAppConfig();
 SplashScreen.preventAutoHideAsync();
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      refetchOnReconnect: true,
+      refetchOnMount: true,
+      refetchOnWindowFocus: true,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
+
+function ThemeAwareStatusBar() {
+  const { isDark } = useTheme();
+  return <StatusBar style={isDark ? 'light' : 'dark'} />;
+}
 
 export default function RootLayout() {
   const { loaded, error } = useMetropolisFonts();
+  useFocusManager();
+
+  useEffect(() => {
+    setupOnlineManager();
+  }, []);
 
   useEffect(() => {
     if (loaded || error) {
@@ -30,7 +62,19 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ThemeProvider>
+          <ThemeAwareStatusBar />
+          <QueryClientProvider client={queryClient}>
+            <KeyboardProvider>
+              <BottomSheetModalProvider>
+                <BottomSheetRegistry />
+                <Stack screenOptions={{ headerShown: false }} />
+              </BottomSheetModalProvider>
+            </KeyboardProvider>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }
