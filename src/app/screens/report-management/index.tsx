@@ -14,8 +14,7 @@ export default function NewReportScreen() {
 
   const handleBack = () => router.back();
   const handleNext = () => {
-    // TODO: navigate to next step in report flow
-    router.back();
+    router.push('/screens/report-management/details');
   };
 
   return (

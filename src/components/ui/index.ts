@@ -7,6 +7,9 @@ export type { AppTextProps } from './AppText';
 export { AppButton } from './AppButton';
 export type { AppButtonProps } from './AppButton';
 
+export { AppInput } from './AppInput';
+export type { AppInputProps } from './AppInput';
+
 export { RoundedButton } from './RoundedButton';
 export type { RoundedButtonProps } from './RoundedButton';
 
