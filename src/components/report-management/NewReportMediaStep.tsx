@@ -25,8 +25,10 @@ export interface MediaSlot {
 interface NewReportMediaStepProps {
   /** Media items shown in the horizontal strip; default two empty slots. */
   mediaSlots?: MediaSlot[];
-  /** Called when user taps a slot to add/change media. */
+  /** Called when user taps an empty slot to add/change media. */
   onSlotPress?: (slot: MediaSlot, index: number) => void;
+  /** Called when user taps a slot that has an image – open full-screen preview. */
+  onPreviewImage?: (uri: string, index: number) => void;
   /** Thumbnail for footer "add more" (e.g. last added); optional. */
   footerThumbUri?: string | null;
   onAddMorePress?: () => void;
@@ -44,6 +46,7 @@ const DEFAULT_SLOTS: MediaSlot[] = [
 export function NewReportMediaStep({
   mediaSlots = DEFAULT_SLOTS,
   onSlotPress,
+  onPreviewImage,
   footerThumbUri = null,
   onAddMorePress,
   onAddTextPress,
@@ -72,7 +75,11 @@ export function NewReportMediaStep({
         {mediaSlots.map((slot, index) => (
           <TouchableOpacity
             key={slot.id}
-            onPress={() => onSlotPress?.(slot, index)}
+            onPress={() =>
+              onPreviewImage
+                ? onPreviewImage(slot.uri ?? '', index)
+                : onSlotPress?.(slot, index)
+            }
             activeOpacity={0.85}
             className="rounded-2xl overflow-hidden bg-surface-light dark:bg-surface-dark border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.1)]"
             style={{

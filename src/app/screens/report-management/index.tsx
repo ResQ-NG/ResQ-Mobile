@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -7,15 +8,27 @@ import { RoundedButton } from '@/components/ui/RoundedButton';
 import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
 import { useAppColorScheme } from '@/theme/colorMode';
 import { NewReportMediaStep } from '@/components/report-management/NewReportMediaStep';
+import { useReportDraftStore } from '@/stores/report-draft-store';
 
 export default function NewReportScreen() {
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
+  const mediaSlots = useReportDraftStore((s) => s.mediaSlots);
+  const setMediaUris = useReportDraftStore((s) => s.setMediaUris);
 
   const handleBack = () => router.back();
   const handleNext = () => {
+    const uris = mediaSlots.map((s) => s.uri).filter((u): u is string => u != null);
+    setMediaUris(uris);
     router.push('/screens/report-management/details');
   };
+
+  const handlePreviewImage = useCallback((uri: string, index: number) => {
+    router.push({
+      pathname: '/(modals)/image-preview',
+      params: { uri, mode: 'media', index: String(index) },
+    } as Parameters<typeof router.push>[0]);
+  }, []);
 
   return (
     <AppAnimatedSafeAreaView
@@ -43,6 +56,9 @@ export default function NewReportScreen() {
       }
     >
       <NewReportMediaStep
+        mediaSlots={mediaSlots}
+        onSlotPress={() => {}}
+        onPreviewImage={handlePreviewImage}
         onNextPress={handleNext}
         bottomInset={insets.bottom}
       />

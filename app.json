@@ -46,6 +46,13 @@
         {
           "root": "src/app"
         }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "ResQ needs access to your photos for reports.",
+          "savePhotosPermission": "ResQ saves photos to your library when you download."
+        }
       ]
     ],
     "experiments": {

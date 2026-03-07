@@ -1,6 +1,13 @@
 import { useState } from 'react';
-import { View, ScrollView, Image, useWindowDimensions } from 'react-native';
+import {
+  View,
+  ScrollView,
+  Image,
+  useWindowDimensions,
+  TouchableOpacity,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import {
   AppAnimatedSafeAreaView,
   AppAnimatedView,
@@ -47,6 +54,13 @@ export function NewReportDetailsStep({
   const [desc, setDesc] = useState(description);
   const [loc, setLoc] = useState(location);
   const bottomInset = insets.bottom;
+
+  const handlePreviewImage = (uri: string, index: number) => {
+    router.push({
+      pathname: '/(modals)/image-preview',
+      params: { uri, mode: 'details', index: String(index) },
+    } as Parameters<typeof router.push>[0]);
+  };
 
   const handleDescChange = (text: string) => {
     setDesc(text);
@@ -110,8 +124,10 @@ export function NewReportDetailsStep({
         >
           {mediaUris.length > 0
             ? mediaUris.map((uri, i) => (
-                <View
+                <TouchableOpacity
                   key={i}
+                  onPress={() => handlePreviewImage(uri, i)}
+                  activeOpacity={0.9}
                   className="rounded-xl overflow-hidden bg-surface-light dark:bg-surface-dark border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.1)]"
                   style={{
                     width: cardWidth,
@@ -124,7 +140,7 @@ export function NewReportDetailsStep({
                     className="w-full h-full"
                     resizeMode="cover"
                   />
-                </View>
+                </TouchableOpacity>
               ))
             : [1, 2, 3].map((i) => (
                 <View
