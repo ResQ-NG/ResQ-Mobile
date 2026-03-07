@@ -9,10 +9,16 @@ export type AppThemeTokens = {
   surface: string;
   /** Surface color for inline styles (e.g. buttons, cards) */
   surfaceBackground: string;
-  /** Muted text color for inline styles */
+  /** Muted text / icon color for inline styles */
   textMuted: string;
   /** Heavy avatar border: dark in light theme, white in dark theme */
   avatarBorder: string;
+  /** Icon color on accent/primary buttons (e.g. white) */
+  iconOnAccent: string;
+  /** Accent red for badges, feedback, etc. */
+  accentRed: string;
+  /** Primary blue for links, primary actions */
+  primaryBlue: string;
   statusBarStyle: 'light' | 'dark';
 };
 
@@ -22,6 +28,9 @@ export const LIGHT_THEME_TOKENS: AppThemeTokens = {
   surfaceBackground: '#F7F7F7',
   textMuted: '#6b7280',
   avatarBorder: 'rgba(0,0,0,0.14)',
+  iconOnAccent: '#ffffff',
+  accentRed: '#F00033',
+  primaryBlue: '#0000FF',
   statusBarStyle: 'dark',
 };
 
@@ -31,6 +40,9 @@ export const DARK_THEME_TOKENS: AppThemeTokens = {
   surfaceBackground: '#121212',
   textMuted: '#9ca3af',
   avatarBorder: '#ffffff',
+  iconOnAccent: '#ffffff',
+  accentRed: '#FF3366',
+  primaryBlue: '#3333FF',
   statusBarStyle: 'light',
 };
 

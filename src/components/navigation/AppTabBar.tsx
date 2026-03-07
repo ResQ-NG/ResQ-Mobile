@@ -19,18 +19,16 @@ const TAB_ICONS: Record<string, IconComponent> = {
   reports: SolarFolderOpenBoldIcon,
   settings: SolarSettingsBoldIcon,
 };
-const ACCENT_BLUE = '#0000FF';
 const ICON_SIZE = 24;
 const REPORT_ICON_SIZE = 26;
 
 export function AppTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const { themeName } = useAppColorScheme();
+  const { theme, themeName } = useAppColorScheme();
   const isDark = themeName === 'dark';
 
-  // All icons are white; inactive ones are muted
-  const activeColor = '#ffffff';
-  const inactiveColor = isDark ? '#6b7280' : '#9ca3af';
+  const activeColor = theme.iconOnAccent;
+  const inactiveColor = theme.textMuted;
 
   // Glassmorphism via BlurView background + soft border
   const glassBackground = isDark ? 'rgba(18,18,18,0.75)' : 'rgba(255,255,255,0.72)';
@@ -99,7 +97,7 @@ export function AppTabBar({ state, descriptors, navigation }: BottomTabBarProps)
                         width: 52,
                         height: 52,
                         borderRadius: 26,
-                        backgroundColor: ACCENT_BLUE,
+                        backgroundColor: theme.primaryBlue,
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}

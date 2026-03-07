@@ -44,7 +44,8 @@ export default {
     'solar:arrow-left-broken',
     'mingcute:search-line',
 
-
+    'solar:archive-minimalistic-bold',
+    'solar:text-square-bold'
 
   ],
   plugins: [

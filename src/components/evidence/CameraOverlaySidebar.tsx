@@ -1,5 +1,6 @@
 import { AppAnimatedView, brandFadeIn } from '@/lib/animation';
 import { RoundedButton } from '@/components/ui/RoundedButton';
+import { useAppColorScheme } from '@/theme/colorMode';
 import SolarBoltBoldIcon from '@/components/icons/solar/bolt-bold';
 import SolarVideocameraRecordBoldIcon from '@/components/icons/solar/videocamera-record-bold';
 import SolarMicrophoneBoldIcon from '@/components/icons/solar/microphone-bold';
@@ -35,6 +36,7 @@ export function CameraOverlaySidebar({
   onText,
   onLens,
 }: CameraOverlaySidebarProps) {
+  const { theme } = useAppColorScheme();
   const buttons: SidebarButtonConfig[] = [
     { key: 'flash', Icon: SolarBoltBoldIcon, onPress: onFlash },
     {
@@ -56,7 +58,7 @@ export function CameraOverlaySidebar({
         <AppAnimatedView key={key} entering={brandFadeIn.delay(index * 50)}>
           <RoundedButton
             onPress={onPress}
-            icon={<Icon width={20} height={20} color="#fff" />}
+            icon={<Icon width={20} height={20} color={theme.iconOnAccent} />}
             className="bg-[rgba(80,80,80,0.55)]"
           />
         </AppAnimatedView>

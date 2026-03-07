@@ -2,12 +2,14 @@ import { AppAnimatedView, brandFadeIn } from '@/lib/animation';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { RoundedButton } from '@/components/ui/RoundedButton';
 import SolarBellBoldIcon from '@/components/icons/solar/bell-bold';
+import { useAppColorScheme } from '@/theme/colorMode';
 
 interface SettingsHeaderProps {
   onNotificationsPress?: () => void;
 }
 
 export function SettingsHeader({ onNotificationsPress }: SettingsHeaderProps) {
+  const { theme } = useAppColorScheme();
   return (
     <AppAnimatedView
       entering={brandFadeIn}
@@ -16,7 +18,7 @@ export function SettingsHeader({ onNotificationsPress }: SettingsHeaderProps) {
       <AppHeading level={3}>Settings</AppHeading>
       <RoundedButton
         onPress={onNotificationsPress}
-        icon={<SolarBellBoldIcon width={20} height={20} color="#6b7280" />}
+        icon={<SolarBellBoldIcon width={20} height={20} color={theme.textMuted} />}
         className="bg-surface-light dark:bg-surface-dark border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.12)]"
         accessibilityLabel="Notifications"
       />

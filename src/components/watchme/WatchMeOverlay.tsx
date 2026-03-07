@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppAnimatedView, brandFadeInUp, brandFadeInDown } from '@/lib/animation';
 import { AppText } from '@/components/ui/AppText';
 import { TAB_BAR_HEIGHT } from '@/theme/constants';
+import { useAppColorScheme } from '@/theme/colorMode';
 import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
 import { AppButton, Avatar, AVATAR_BACKGROUNDS } from '../ui';
 
@@ -22,7 +23,7 @@ export function WatchMeOverlay({
   onWatchPress,
 }: WatchMeOverlayProps) {
   const insets = useSafeAreaInsets();
-
+  const { theme } = useAppColorScheme();
   const bottomOffset = TAB_BAR_HEIGHT + insets.bottom + 16;
 
   return (
@@ -33,7 +34,7 @@ export function WatchMeOverlay({
         className="absolute self-center flex-row items-center gap-2 px-4 py-2 rounded-full bg-[rgba(255,255,255,0.92)] dark:bg-[rgba(18,18,18,0.9)] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.18)]"
         style={{ bottom: 210 + bottomOffset }}
       >
-        <SolarMapPointBoldIcon width={18} height={18} color="#0000FF" />
+        <SolarMapPointBoldIcon width={18} height={18} color={theme.primaryBlue} />
         <AppText className="text-base font-metropolis-semibold text-primaryDark dark:text-primaryDark-dark">
           {location}
         </AppText>

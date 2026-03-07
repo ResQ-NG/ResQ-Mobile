@@ -6,6 +6,7 @@ import SolarGalleryAddBoldIcon from '@/components/icons/solar/gallery-add-bold';
 import SolarUsersGroupRoundedBoldIcon from '@/components/icons/solar/users-group-rounded-bold';
 import SolarInfoCircleBoldIcon from '@/components/icons/solar/info-circle-bold';
 import HugeiconsArrowRight01Icon from '@/components/icons/hugeicons/arrow-right-01';
+import { useAppColorScheme } from '@/theme/colorMode';
 import type { ReportItem, ReportAgency } from './ReportCard';
 
 const ICON_SIZE = 22;
@@ -26,6 +27,7 @@ interface ReportsListProps {
 }
 
 function AgencyChip({ agency }: { agency: ReportAgency }) {
+  const { theme } = useAppColorScheme();
   const initial = agency.name.charAt(0).toUpperCase();
   return (
     <View className="flex-row items-center gap-2 rounded-full bg-[rgba(0,0,0,0.06)] dark:bg-[rgba(255,255,255,0.08)] pl-1 pr-2.5 py-1">
@@ -50,7 +52,7 @@ function AgencyChip({ agency }: { agency: ReportAgency }) {
       </AppText>
       {agency.requestingFeedback && (
         <View className="rounded-full bg-accent-red/20 dark:bg-accent-red-dark/20 p-0.5">
-          <SolarInfoCircleBoldIcon width={14} height={14} color="#F00033" />
+          <SolarInfoCircleBoldIcon width={14} height={14} color={theme.accentRed} />
         </View>
       )}
     </View>
@@ -58,10 +60,11 @@ function AgencyChip({ agency }: { agency: ReportAgency }) {
 }
 
 export function ReportsList({ reports, onReportPress }: ReportsListProps) {
+  const { theme } = useAppColorScheme();
   return (
     <View className="gap-4">
       {reports.map((item) => {
-        const iconBg = item.category ? CATEGORY_COLORS[item.category] : '#2563eb';
+        const iconBg = item.category ? CATEGORY_COLORS[item.category] : theme.primaryBlue;
         const agencies = item.attendingAgencies ?? [];
 
         return (
@@ -89,7 +92,7 @@ export function ReportsList({ reports, onReportPress }: ReportsListProps) {
                   />
                 ) : (
                   <View className="w-full h-full items-center justify-center">
-                    <SolarGalleryAddBoldIcon width={32} height={32} color="#9ca3af" />
+                    <SolarGalleryAddBoldIcon width={32} height={32} color={theme.textMuted} />
                   </View>
                 )}
                 <View className="absolute top-3 right-3">
@@ -109,12 +112,12 @@ export function ReportsList({ reports, onReportPress }: ReportsListProps) {
 
               {/* Content below cover */}
               <View className="flex-row  gap-3 px-4 py-3.5">
-                <View
-                  className="w-9 h-9 rounded-full items-center justify-center"
-                  style={{ backgroundColor: iconBg }}
-                >
-                  <SolarFolderOpenBoldIcon width={ICON_SIZE} height={ICON_SIZE} color="#fff" />
-                </View>
+                  <View
+                    className="w-9 h-9 rounded-full items-center justify-center"
+                    style={{ backgroundColor: iconBg }}
+                  >
+                    <SolarFolderOpenBoldIcon width={ICON_SIZE} height={ICON_SIZE} color={theme.iconOnAccent} />
+                  </View>
 
                 <View className="flex-1 min-w-0">
                   <AppText variant="body" className="font-metropolis-semibold" numberOfLines={1}>
@@ -131,14 +134,14 @@ export function ReportsList({ reports, onReportPress }: ReportsListProps) {
                   <View className="mt-2">
                     {agencies.length > 0 ? (
                       <View className="flex-row items-center gap-1.5 flex-wrap">
-                        <SolarUsersGroupRoundedBoldIcon width={12} height={12} color="#9ca3af" />
+                        <SolarUsersGroupRoundedBoldIcon width={12} height={12} color={theme.textMuted} />
                         {agencies.map((agency) => (
                           <AgencyChip key={agency.id} agency={agency} />
                         ))}
                       </View>
                     ) : (
                       <View className="flex-row items-center gap-1.5">
-                        <SolarUsersGroupRoundedBoldIcon width={12} height={12} color="#9ca3af" />
+                        <SolarUsersGroupRoundedBoldIcon width={12} height={12} color={theme.textMuted} />
                         <View className="flex-row items-center gap-1">
                           {Array.from({ length: AGENCY_PLACEHOLDER_COUNT }).map((_, i) => (
                             <View
@@ -154,7 +157,7 @@ export function ReportsList({ reports, onReportPress }: ReportsListProps) {
                 </View>
 
                 <View className="items-end justify-center">
-                  <HugeiconsArrowRight01Icon width={18} height={18} color="#9ca3af" />
+                  <HugeiconsArrowRight01Icon width={18} height={18} color={theme.textMuted} />
                 </View>
               </View>
             </TouchableOpacity>

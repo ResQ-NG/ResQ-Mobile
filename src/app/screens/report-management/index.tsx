@@ -1,0 +1,52 @@
+import { View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { AppAnimatedSafeAreaView, AppAnimatedView, brandFadeIn } from '@/lib/animation';
+import { AppHeading } from '@/components/ui/AppHeading';
+import { RoundedButton } from '@/components/ui/RoundedButton';
+import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
+import { useAppColorScheme } from '@/theme/colorMode';
+import { NewReportMediaStep } from '@/components/report-management/NewReportMediaStep';
+
+export default function NewReportScreen() {
+  const { theme } = useAppColorScheme();
+  const insets = useSafeAreaInsets();
+
+  const handleBack = () => router.back();
+  const handleNext = () => {
+    // TODO: navigate to next step in report flow
+    router.back();
+  };
+
+  return (
+    <AppAnimatedSafeAreaView
+      className={`flex-1 ${theme.background}`}
+      edges={['top', 'left', 'right']}
+      paddingSize="sm"
+      header={
+        <AppAnimatedView
+          entering={brandFadeIn}
+          className="flex-row items-center justify-between py-2"
+        >
+          <RoundedButton
+            onPress={handleBack}
+            icon={
+              <SolarArrowLeftBrokenIcon width={20} height={20} color={theme.textMuted} />
+            }
+            className="bg-white dark:bg-[#1a1a1a] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.12)]"
+            accessibilityLabel="Go back"
+          />
+          <AppHeading level={4} className="text-primaryDark dark:text-primaryDark-dark">
+            New report
+          </AppHeading>
+          <View style={{ width: 44, height: 44 }} />
+        </AppAnimatedView>
+      }
+    >
+      <NewReportMediaStep
+        onNextPress={handleNext}
+        bottomInset={insets.bottom}
+      />
+    </AppAnimatedSafeAreaView>
+  );
+}

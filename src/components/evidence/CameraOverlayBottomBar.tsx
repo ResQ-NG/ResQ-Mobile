@@ -8,6 +8,7 @@ import {
 } from '@/lib/animation';
 import SolarGalleryAddBoldIcon from '@/components/icons/solar/gallery-add-bold';
 import SolarMapArrowRightBoldIcon from '@/components/icons/solar/map-arrow-right-bold';
+import { useAppColorScheme } from '@/theme/colorMode';
 
 interface CameraOverlayBottomBarProps {
   onCapture?: () => void;
@@ -20,6 +21,7 @@ export function CameraOverlayBottomBar({
   onAddMedia,
   onNavigate,
 }: CameraOverlayBottomBarProps) {
+  const { theme } = useAppColorScheme();
   const scale = useSharedValue(1);
 
   const shutterStyle = useAnimatedStyle(() => ({
@@ -46,7 +48,7 @@ export function CameraOverlayBottomBar({
           onPress={onAddMedia}
           className="w-[52px] h-[52px] rounded-[14px] bg-[rgba(80,80,80,0.55)] items-center justify-center border-[1.5px] border-[rgba(255,255,255,0.2)]"
         >
-          <SolarGalleryAddBoldIcon width={22} height={22} color="#fff" />
+          <SolarGalleryAddBoldIcon width={22} height={22} color={theme.iconOnAccent} />
         </TouchableOpacity>
       </AppAnimatedView>
 
@@ -70,7 +72,7 @@ export function CameraOverlayBottomBar({
           onPress={onNavigate}
           className="w-[52px] h-[52px] rounded-full bg-accent-red items-center justify-center"
         >
-          <SolarMapArrowRightBoldIcon width={24} height={24} color="#fff" />
+          <SolarMapArrowRightBoldIcon width={24} height={24} color={theme.iconOnAccent} />
         </TouchableOpacity>
       </AppAnimatedView>
     </AppAnimatedView>

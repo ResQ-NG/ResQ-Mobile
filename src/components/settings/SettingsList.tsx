@@ -6,6 +6,7 @@ import SolarLockKeyholeBoldIcon from '@/components/icons/solar/lock-keyhole-bold
 import SolarInfoCircleBoldIcon from '@/components/icons/solar/info-circle-bold';
 import SolarBellBoldIcon from '@/components/icons/solar/bell-bold';
 import HugeiconsArrowRight01Icon from '@/components/icons/hugeicons/arrow-right-01';
+import { useAppColorScheme } from '@/theme/colorMode';
 
 const ICON_SIZE = 22;
 
@@ -22,6 +23,10 @@ export function SettingsList({
   onNotificationsPress,
   onHelpPress,
 }: SettingsListProps) {
+  const { theme } = useAppColorScheme();
+  const iconOnColor = theme.iconOnAccent;
+  const iconMuted = theme.textMuted;
+
   return (
     <AppAnimatedView
       entering={brandFadeInUp.delay(120)}
@@ -39,7 +44,7 @@ export function SettingsList({
           <SolarUsersGroupRoundedBoldIcon
             width={ICON_SIZE}
             height={ICON_SIZE}
-            color="#fff"
+            color={iconOnColor}
           />
         </View>
         <AppText variant="body" className="flex-1 font-metropolis-medium">
@@ -62,13 +67,13 @@ export function SettingsList({
           <SolarLockKeyholeBoldIcon
             width={ICON_SIZE - 2}
             height={ICON_SIZE - 2}
-            color="#fff"
+            color={iconOnColor}
           />
         </View>
         <AppText variant="body" className="flex-1 font-metropolis-medium">
           Privacy & security
         </AppText>
-        <HugeiconsArrowRight01Icon width={18} height={18} color="#9ca3af" />
+        <HugeiconsArrowRight01Icon width={18} height={18} color={iconMuted} />
       </TouchableOpacity>
 
       {/* Notifications */}
@@ -83,13 +88,13 @@ export function SettingsList({
           <SolarBellBoldIcon
             width={ICON_SIZE - 2}
             height={ICON_SIZE - 2}
-            color="#fff"
+            color={iconOnColor}
           />
         </View>
         <AppText variant="body" className="flex-1 font-metropolis-medium">
           Notifications
         </AppText>
-        <HugeiconsArrowRight01Icon width={18} height={18} color="#9ca3af" />
+        <HugeiconsArrowRight01Icon width={18} height={18} color={iconMuted} />
       </TouchableOpacity>
 
       {/* Help & support */}
@@ -104,13 +109,13 @@ export function SettingsList({
           <SolarInfoCircleBoldIcon
             width={ICON_SIZE - 2}
             height={ICON_SIZE - 2}
-            color="#fff"
+            color={iconOnColor}
           />
         </View>
         <AppText variant="body" className="flex-1 font-metropolis-medium">
           Help & support
         </AppText>
-        <HugeiconsArrowRight01Icon width={18} height={18} color="#9ca3af" />
+        <HugeiconsArrowRight01Icon width={18} height={18} color={iconMuted} />
       </TouchableOpacity>
     </AppAnimatedView>
   );

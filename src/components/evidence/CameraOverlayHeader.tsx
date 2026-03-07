@@ -7,6 +7,7 @@ import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
 import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
 import SolarBellBoldIcon from '@/components/icons/solar/bell-bold';
 import SolarClockCircleBoldIcon from '@/components/icons/solar/clock-circle-bold';
+import { useAppColorScheme } from '@/theme/colorMode';
 
 interface CameraOverlayHeaderProps {
   location?: string;
@@ -24,6 +25,8 @@ export function CameraOverlayHeader({
   onNotificationPress,
 }: CameraOverlayHeaderProps) {
   const insets = useSafeAreaInsets();
+  const { theme } = useAppColorScheme();
+  const iconColor = theme.iconOnAccent;
 
   return (
     <AppAnimatedView
@@ -53,7 +56,7 @@ export function CameraOverlayHeader({
           >
             <RoundedButton
               onPress={onNotificationPress}
-              icon={<SolarBellBoldIcon width={20} height={20} color="#fff" />}
+              icon={<SolarBellBoldIcon width={20} height={20} color={iconColor} />}
             />
           </AppAnimatedView>
 
@@ -65,7 +68,7 @@ export function CameraOverlayHeader({
             <RoundedButton
               onPress={onLocationPress}
               icon={
-                <SolarMapPointBoldIcon width={20} height={20} color="#fff" />
+                <SolarMapPointBoldIcon width={20} height={20} color={iconColor} />
               }
             />
           </AppAnimatedView>
@@ -79,7 +82,7 @@ export function CameraOverlayHeader({
           className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
         >
           <View className="flex-row items-center gap-[6px]">
-            <SolarMapPointBoldIcon width={14} height={14} color="#fff" />
+            <SolarMapPointBoldIcon width={14} height={14} color={iconColor} />
             <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
               {location}
             </AppText>
@@ -91,7 +94,7 @@ export function CameraOverlayHeader({
           className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
         >
           <View className="flex-row items-center gap-[6px]">
-            <SolarClockCircleBoldIcon width={14} height={14} color="#fff" />
+            <SolarClockCircleBoldIcon width={14} height={14} color={iconColor} />
             <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
               {time}
             </AppText>
