@@ -26,6 +26,7 @@ export default {
     'solar:bell-bold', // notification (header)
     'solar:clock-circle-bold', // time (header)
     'solar:gallery-add-bold', // add media (bottom left)
+    'solar:map-gps-bold', // GPS (header/location)
     // Settings
     'solar:lock-keyhole-bold',
     'solar:info-circle-bold',
@@ -41,7 +42,9 @@ export default {
     'solar:clock-circle-bold',
     'solar:gallery-add-bold',
     'solar:arrow-left-broken',
-    'mingcute:search-line'
+    'mingcute:search-line',
+
+
 
   ],
   plugins: [

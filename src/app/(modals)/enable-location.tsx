@@ -1,6 +1,4 @@
-import { View } from 'react-native';
-import { Linking } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Linking, View } from 'react-native';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
 import { AppText } from '@/components/ui/AppText';
@@ -10,16 +8,17 @@ import { RoundedButton } from '@/components/ui/RoundedButton';
 import { useLocationStore } from '@/stores/location-store';
 import { useAppColorScheme } from '@/theme/colorMode';
 import {
+  AppAnimatedSafeAreaView,
+  AppAnimatedScrollView,
   AppAnimatedView,
   brandFadeIn,
   brandFadeInUp,
   brandScaleIn,
 } from '@/lib/animation';
-import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
+import LottieView from 'lottie-react-native';
 import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
 
 export default function EnableLocationScreen() {
-  const insets = useSafeAreaInsets();
   const { theme } = useAppColorScheme();
   const setLocationModalVisible = useLocationStore(
     (s) => s.setLocationModalVisible
@@ -43,40 +42,45 @@ export default function EnableLocationScreen() {
   };
 
   return (
-    <View
+    <AppAnimatedSafeAreaView
       className={`flex-1 ${theme.background}`}
-      style={{ paddingTop: insets.top, paddingBottom: insets.bottom + 24 }}
+      edges={['top', 'left', 'right']}
+      paddingSize="md"
+      header={
+        <AppAnimatedView
+          entering={brandFadeIn}
+          className="flex-row items-center justify-between"
+        >
+          <RoundedButton
+            onPress={handleDismiss}
+            icon={
+              <SolarArrowLeftBrokenIcon
+                width={20}
+                height={20}
+                color={theme.textMuted}
+              />
+            }
+            className="bg-surface-light dark:bg-surface-dark"
+            accessibilityLabel="Go back"
+          />
+          <AppHeading level={4}>Location access</AppHeading>
+          <View className="w-12 h-12" />
+        </AppAnimatedView>
+      }
     >
-      {/* Header */}
-      <AppAnimatedView
-        entering={brandFadeIn}
-        className="flex-row items-center justify-between px-4 py-3"
-      >
-        <RoundedButton
-          onPress={handleDismiss}
-          icon={
-            <SolarArrowLeftBrokenIcon
-              width={20}
-              height={20}
-              color={theme.textMuted}
-            />
-          }
-          className="bg-surface-light dark:bg-surface-dark"
-          accessibilityLabel="Go back"
-        />
-        <AppHeading level={4}>Location access</AppHeading>
-        {/* Spacer to balance the header */}
-        <View className="w-12 h-12" />
-      </AppAnimatedView>
-
-      <View className="flex-1 px-6 pt-8 pb-6">
+      <AppAnimatedScrollView className="flex-1 pt-8 pb-6">
         {/* Icon + heading + description */}
         <AppAnimatedView
           entering={brandScaleIn.delay(80)}
           className="items-center mb-10"
         >
-          <View className="w-24 h-24 rounded-full bg-surface-light dark:bg-surface-dark items-center justify-center mb-6">
-            <SolarMapPointBoldIcon width={44} height={44} color="#F00033" />
+          <View className="rounded-full items-center justify-center mb-6 ">
+            <LottieView
+              source={require('../../../assets/lottie/globe.json')}
+              autoPlay
+              loop
+              style={{ width: 300, height: 300 }}
+            />
           </View>
           <AppHeading level={3} className="text-center mb-3">
             Enable location
@@ -98,7 +102,7 @@ export default function EnableLocationScreen() {
             Allow location access
           </AppButton>
           <AppButton
-            variant="outline"
+            variant="secondary"
             size="lg"
             onPress={handleOpenSettings}
             className="w-full"
@@ -112,7 +116,7 @@ export default function EnableLocationScreen() {
             You can change this later in your device settings.
           </AppText>
         </AppAnimatedView>
-      </View>
-    </View>
+      </AppAnimatedScrollView>
+    </AppAnimatedSafeAreaView>
   );
 }

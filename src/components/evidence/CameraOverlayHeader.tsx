@@ -1,12 +1,9 @@
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  AppAnimatedView,
-  AppAnimatedImage,
-  brandFadeInDown,
-} from '@/lib/animation';
+import { AppAnimatedView, brandFadeInDown } from '@/lib/animation';
 import { AppText } from '@/components/ui/AppText';
 import { RoundedButton } from '@/components/ui/RoundedButton';
+import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
 import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
 import SolarBellBoldIcon from '@/components/icons/solar/bell-bold';
 import SolarClockCircleBoldIcon from '@/components/icons/solar/clock-circle-bold';
@@ -39,16 +36,13 @@ export function CameraOverlayHeader({
         {/* Avatar */}
         <AppAnimatedView
           entering={brandFadeInDown.delay(60)}
-          className="w-[52px] h-[52px] rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.6)]"
+          className="rounded-full overflow-hidden border-2 border-[rgba(255,255,255,0.6)]"
         >
-          {avatarUri ? (
-            <AppAnimatedImage
-              source={{ uri: avatarUri }}
-              className="w-full h-full"
-            />
-          ) : (
-            <View className="flex-1 bg-[rgba(255,255,255,0.2)]" />
-          )}
+          <Avatar
+            size={52}
+            source={avatarUri ? { uri: avatarUri } : undefined}
+            backgroundColor={AVATAR_BACKGROUNDS[1]}
+          />
         </AppAnimatedView>
 
         <View className="flex-row items-center gap-2">

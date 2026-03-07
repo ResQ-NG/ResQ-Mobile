@@ -1,15 +1,10 @@
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  AppAnimatedView,
-  AppAnimatedImage,
-  brandFadeInUp,
-  brandFadeInDown,
-} from '@/lib/animation';
+import { AppAnimatedView, brandFadeInUp, brandFadeInDown } from '@/lib/animation';
 import { AppText } from '@/components/ui/AppText';
 import { TAB_BAR_HEIGHT } from '@/theme/constants';
 import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
-import { AppButton } from '../ui';
+import { AppButton, Avatar, AVATAR_BACKGROUNDS } from '../ui';
 
 interface WatchMeOverlayProps {
   location?: string;
@@ -51,17 +46,16 @@ export function WatchMeOverlay({
         style={{ bottom: bottomOffset }}
       >
         {/* Avatars row */}
-        <View className="flex-row -space-x-2 mb-3 justify-center items-center">
+        <View className="flex-row -mr-2 mb-3 justify-center items-center">
           {AVATAR_PLACEHOLDERS.map((i) => (
             <AppAnimatedView
               key={i}
               entering={brandFadeInUp.delay(120 + i * 40)}
-              className="w-12 h-12 rounded-full border-2 border-white dark:border-black overflow-hidden bg-[#f97316]"
+              className="rounded-full overflow-hidden"
             >
-              {/* Placeholder avatar color / image area */}
-              <AppAnimatedImage
-                style={{ width: '100%', height: '100%', opacity: 0 }}
-                source={{ uri: '' }}
+              <Avatar
+                size={48}
+                backgroundColor={AVATAR_BACKGROUNDS[i % AVATAR_BACKGROUNDS.length]}
               />
             </AppAnimatedView>
           ))}

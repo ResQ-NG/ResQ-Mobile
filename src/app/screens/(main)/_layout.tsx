@@ -10,7 +10,7 @@ export default function MainLayout() {
       <Tabs.Screen name="community" options={{ title: 'Community' }} />
       <Tabs.Screen name="watchme" options={{ title: 'Watch Me' }} />
       <Tabs.Screen name="main" options={{ title: 'Report' }} />
-      <Tabs.Screen name="evidence" options={{ title: 'Evidence' }} />
+      <Tabs.Screen name="reports" options={{ title: 'Reports' }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
     </Tabs>
   );

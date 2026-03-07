@@ -2,6 +2,7 @@ import { View } from 'react-native';
 import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { AppText } from '@/components/ui/AppText';
+import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
 
 export function SettingsProfileCard() {
   return (
@@ -9,7 +10,11 @@ export function SettingsProfileCard() {
       entering={brandFadeInUp.delay(60)}
       className="flex-row items-center gap-4 mb-8"
     >
-      <View className="w-24 h-24 rounded-full overflow-hidden border-2 border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.12)] bg-surface-light dark:bg-surface-dark elevation-md " />
+      <Avatar
+        size={96}
+        altText="MaRia"
+        backgroundColor={AVATAR_BACKGROUNDS[2]}
+      />
       <View className="flex-1 gap-0.5">
         <AppHeading level={3}>MaRia</AppHeading>
         <AppText

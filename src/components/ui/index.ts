@@ -10,5 +10,5 @@ export type { AppButtonProps } from './AppButton';
 export { RoundedButton } from './RoundedButton';
 export type { RoundedButtonProps } from './RoundedButton';
 
-export { Avatar } from './Avatar';
+export { Avatar, AVATAR_BACKGROUNDS, DEFAULT_AVATAR_SOURCE } from './Avatar';
 export type { AvatarProps, AvatarSize } from './Avatar';

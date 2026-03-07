@@ -16,7 +16,7 @@ const TAB_ICONS: Record<string, IconComponent> = {
   community: SolarUserSpeakBoldIcon,
   watchme: SolarMapPointRotateBoldIcon,
   main: SolarCameraBoldIcon,
-  evidence: SolarFolderOpenBoldIcon,
+  reports: SolarFolderOpenBoldIcon,
   settings: SolarSettingsBoldIcon,
 };
 const ACCENT_BLUE = '#0000FF';
