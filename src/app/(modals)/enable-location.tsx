@@ -1,21 +1,29 @@
-import { View, useColorScheme } from 'react-native';
+import { View } from 'react-native';
+import { Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Location from 'expo-location';
-import { Linking } from 'react-native';
 import { AppText } from '@/components/ui/AppText';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { AppButton } from '@/components/ui/AppButton';
-import { useLocationStore } from '@/stores/location-store';
 import { RoundedButton } from '@/components/ui/RoundedButton';
+import { useLocationStore } from '@/stores/location-store';
+import { useAppColorScheme } from '@/theme/colorMode';
+import {
+  AppAnimatedView,
+  brandFadeIn,
+  brandFadeInUp,
+  brandScaleIn,
+} from '@/lib/animation';
 import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
-import HugeiconsArrowRight01Icon from '@/components/icons/hugeicons/arrow-right-01';
+import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
 
 export default function EnableLocationScreen() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const setLocationModalVisible = useLocationStore((s) => s.setLocationModalVisible);
-  const iconColor = colorScheme === 'dark' ? '#E5E5E5' : '#222222';
+  const { theme } = useAppColorScheme();
+  const setLocationModalVisible = useLocationStore(
+    (s) => s.setLocationModalVisible
+  );
 
   const handleDismiss = () => {
     setLocationModalVisible(false);
@@ -36,45 +44,51 @@ export default function EnableLocationScreen() {
 
   return (
     <View
-      className="flex-1 bg-white dark:bg-black"
+      className={`flex-1 ${theme.background}`}
       style={{ paddingTop: insets.top, paddingBottom: insets.bottom + 24 }}
     >
-      {/* Header with close */}
-      <View className="flex-row items-center justify-between px-4 py-3 border-b border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.12)]">
-        <View className="w-12 h-12" />
-        <AppHeading level={4} className="text-primaryDark dark:text-primaryDark-dark">
-          Location access
-        </AppHeading>
+      {/* Header */}
+      <AppAnimatedView
+        entering={brandFadeIn}
+        className="flex-row items-center justify-between px-4 py-3"
+      >
         <RoundedButton
           onPress={handleDismiss}
           icon={
-            <View style={{ transform: [{ scaleX: -1 }] }}>
-              <HugeiconsArrowRight01Icon width={20} height={20} color={iconColor} />
-            </View>
+            <SolarArrowLeftBrokenIcon
+              width={20}
+              height={20}
+              color={theme.textMuted}
+            />
           }
           className="bg-surface-light dark:bg-surface-dark"
-          accessibilityLabel="Close"
+          accessibilityLabel="Go back"
         />
-      </View>
+        <AppHeading level={4}>Location access</AppHeading>
+        {/* Spacer to balance the header */}
+        <View className="w-12 h-12" />
+      </AppAnimatedView>
 
       <View className="flex-1 px-6 pt-8 pb-6">
-        <View className="items-center mb-8">
-          <View className="w-20 h-20 rounded-full bg-primary-blue/10 dark:bg-primary-blue-dark/20 items-center justify-center mb-6">
-            <SolarMapPointBoldIcon width={40} height={40} color="#0000FF" />
+        {/* Icon + heading + description */}
+        <AppAnimatedView
+          entering={brandScaleIn.delay(80)}
+          className="items-center mb-10"
+        >
+          <View className="w-24 h-24 rounded-full bg-surface-light dark:bg-surface-dark items-center justify-center mb-6">
+            <SolarMapPointBoldIcon width={44} height={44} color="#F00033" />
           </View>
-          <AppHeading level={3} className="text-center text-primaryDark dark:text-primaryDark-dark mb-2">
+          <AppHeading level={3} className="text-center mb-3">
             Enable location
           </AppHeading>
-          <AppText
-            variant="caption"
-            className="text-center text-captionDark dark:text-captionDark-dark"
-          >
-            ResQ uses your location to show your position on the map, share it in
-            emergency reports, and help responders find you quickly.
+          <AppText variant="caption" className="text-center leading-5">
+            ResQ uses your location to show your position on the map, share it
+            in emergency reports, and help responders find you quickly.
           </AppText>
-        </View>
+        </AppAnimatedView>
 
-        <View className="gap-3">
+        {/* Action buttons */}
+        <AppAnimatedView entering={brandFadeInUp.delay(160)} className="gap-3">
           <AppButton
             variant="primary"
             size="lg"
@@ -91,14 +105,13 @@ export default function EnableLocationScreen() {
           >
             Open settings
           </AppButton>
-        </View>
+        </AppAnimatedView>
 
-        <AppText
-          variant="caption"
-          className="text-center mt-6 text-captionDark dark:text-captionDark-dark text-xs"
-        >
-          You can change this later in your device settings.
-        </AppText>
+        <AppAnimatedView entering={brandFadeInUp.delay(240)}>
+          <AppText variant="caption" className="text-center mt-6 text-xs">
+            You can change this later in your device settings.
+          </AppText>
+        </AppAnimatedView>
       </View>
     </View>
   );
