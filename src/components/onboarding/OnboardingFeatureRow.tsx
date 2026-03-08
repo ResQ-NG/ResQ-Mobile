@@ -28,7 +28,7 @@ export function OnboardingFeatureRow({ feature, index }: OnboardingFeatureRowPro
         <Icon width={24} height={24} color={ICON_COLOR} />
       </View>
       <View className="flex-1">
-        <AppText className="font-metropolis-extrabold text-lg">
+        <AppText className="font-metropolis-bold text-lg">
           {title}
         </AppText>
         <AppText className="mt-1 text-base leading-5">

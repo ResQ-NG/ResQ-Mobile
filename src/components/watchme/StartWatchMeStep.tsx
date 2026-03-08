@@ -56,11 +56,11 @@ export function StartWatchMeStep({
         {/* Your current location */}
         <AppAnimatedView
           entering={brandFadeInUp.delay(60)}
-          className="px-4 mb-5"
+          className="mt-5 mb-5"
         >
           <AppHeading
-            level={5}
-            className="text-primaryDark font-metropolis-bold dark:text-primaryDark-dark mb-2"
+            level={6}
+            className="text-primaryDark font-metropolis-semibold dark:text-primaryDark-dark mb-2"
           >
             Your current location
           </AppHeading>
@@ -70,7 +70,11 @@ export function StartWatchMeStep({
             placeholder="Enter location"
             className="rounded-full"
             leftIcon={
-              <SolarMapPointBoldIcon width={20} height={20} color={theme.textMuted} />
+              <SolarMapPointBoldIcon
+                width={20}
+                height={20}
+                color={theme.textMuted}
+              />
             }
           />
           <AppText
@@ -82,12 +86,9 @@ export function StartWatchMeStep({
         </AppAnimatedView>
 
         {/* Where are you going? */}
-        <AppAnimatedView
-          entering={brandFadeInUp.delay(120)}
-          className="px-4 mb-5"
-        >
+        <AppAnimatedView entering={brandFadeInUp.delay(120)} className="mb-5">
           <AppHeading
-            level={5}
+            level={6}
             className="text-primaryDark font-metropolis-semibold dark:text-primaryDark-dark mb-2"
           >
             Where are you going?
@@ -98,18 +99,19 @@ export function StartWatchMeStep({
             placeholder="Enter destination"
             className="rounded-full "
             leftIcon={
-              <SolarMapPointBoldIcon width={20} height={20} color={theme.textMuted} />
+              <SolarMapPointBoldIcon
+                width={20}
+                height={20}
+                color={theme.textMuted}
+              />
             }
           />
         </AppAnimatedView>
 
         {/* Estimated arrival time */}
-        <AppAnimatedView
-          entering={brandFadeInUp.delay(180)}
-          className="px-4 mb-6"
-        >
+        <AppAnimatedView entering={brandFadeInUp.delay(180)} className=" mb-6">
           <AppHeading
-            level={5}
+            level={6}
             className="text-primaryDark font-metropolis-semibold dark:text-primaryDark-dark mb-2"
           >
             Estimated arrival time
@@ -120,7 +122,11 @@ export function StartWatchMeStep({
             placeholder="Enter"
             className="rounded-full"
             leftIcon={
-              <SolarClockCircleBoldIcon width={20} height={20} color={theme.textMuted} />
+              <SolarClockCircleBoldIcon
+                width={20}
+                height={20}
+                color={theme.textMuted}
+              />
             }
           />
         </AppAnimatedView>

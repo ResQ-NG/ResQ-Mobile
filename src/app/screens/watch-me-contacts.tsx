@@ -1,59 +1,29 @@
-import { useState } from 'react';
+import { useCallback } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import {
-  AppAnimatedSafeAreaView,
-  AppAnimatedScrollView,
-  AppAnimatedView,
-  brandFadeInUp,
-} from '@/lib/animation';
+import { router, useFocusEffect } from 'expo-router';
 import { AppText } from '@/components/ui/AppText';
 import { AppButton } from '@/components/ui/AppButton';
-import {
-  WatchMeHeader,
-  WatchMeContactSection,
-  type WatchMeContactGroup,
-} from '@/components/watchme';
+import { WatchMeHeader } from '@/components/watchme';
 import { useAppColorScheme } from '@/theme/colorMode';
+import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
+import { AppAnimatedSafeAreaView } from '@/lib/animation';
 
-const MOCK_GROUPS: WatchMeContactGroup[] = [
-  {
-    id: 'family',
-    name: 'Family members',
-    contacts: [
-      { id: '1', name: 'Mum', maskedPhone: '0803***4567', avatarBgIndex: 0 },
-      { id: '2', name: 'Brother Tunde', maskedPhone: '0701***8901', avatarBgIndex: 1 },
-    ],
-  },
-  {
-    id: 'work',
-    name: 'Work colleagues',
-    contacts: [
-      { id: '3', name: 'LizBee', maskedPhone: '0701***8901', avatarBgIndex: 2 },
-    ],
-  },
-];
-
+/**
+ * Watch Me contact management is shown in the app bottom sheet.
+ * This screen opens that sheet when focused and provides a fallback
+ * to reopen it if the user dismissed the sheet.
+ */
 export default function WatchMeContactsScreen() {
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
+  const openSheet = useWatchMeContactsSheetStore((s) => s.open);
 
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(['1', '2']));
-
-  const toggleContact = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const handleBack = () => router.back();
-  const handleContinue = () => {
-    router.push('/screens/start-watch-me');
-  };
+  useFocusEffect(
+    useCallback(() => {
+      openSheet();
+    }, [openSheet])
+  );
 
   return (
     <AppAnimatedSafeAreaView
@@ -62,49 +32,24 @@ export default function WatchMeContactsScreen() {
       paddingSize="sm"
       header={
         <WatchMeHeader
-          onBack={handleBack}
+          onBack={() => router.back()}
           title="Watch me contacts"
           subtitle="Set up who can watch your journey"
         />
       }
     >
-      <AppAnimatedScrollView
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <AppAnimatedView
-          entering={brandFadeInUp.delay(80)}
-          className="px-4 mb-5"
-        >
-          <AppText
-            variant="body"
-            className="text-captionDark dark:text-captionDark-dark leading-6"
-          >
-            Add and group your trusted contacts. When you start a Watch me session, you’ll choose who can see your live location.
-          </AppText>
-        </AppAnimatedView>
-
-        <WatchMeContactSection
-          groups={MOCK_GROUPS}
-          selectedIds={selectedIds}
-          onToggleContact={toggleContact}
-          onViewMorePress={() => {}}
-          enteringDelay={140}
-        />
-      </AppAnimatedScrollView>
-
       <View
-        className="absolute left-0 right-0 bottom-0 px-4 bg-white dark:bg-black"
-        style={{ paddingBottom: insets.bottom + 16, paddingTop: 16 }}
+        className="flex-1 px-4 justify-center items-center"
+        style={{ paddingBottom: insets.bottom + 24 }}
       >
-        <AppButton
-          onPress={handleContinue}
-          variant="primary"
-          size="lg"
-          className="w-full"
+        <AppText
+          variant="body"
+          className="text-captionDark dark:text-captionDark-dark text-center mb-6"
         >
-          Continue to Start Watch me
+          Manage your emergency contacts in the sheet above. If you closed it, tap below to open again.
+        </AppText>
+        <AppButton variant="outline" size="lg" onPress={openSheet}>
+          Open contact management
         </AppButton>
       </View>
     </AppAnimatedSafeAreaView>

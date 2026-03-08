@@ -30,7 +30,7 @@ export function AppInput({
     return (
       <View
         className={cn(
-          'flex-row items-center rounded-2xl px-4 gap-2',
+          'flex-row items-center rounded-full min-h-[48px] px-4 gap-2',
           BORDER_CLASS,
           className
         )}
@@ -61,7 +61,7 @@ export function AppInput({
     <TextInput
       placeholderTextColor={placeholderColor}
       className={cn(
-        'rounded-2xl px-4  font-metropolis-regular text-primaryDark dark:text-primaryDark-dark',
+        'rounded-full min-h-[48px] px-4 font-metropolis-regular text-primaryDark dark:text-primaryDark-dark',
         BORDER_CLASS,
         className,
         inputClassName

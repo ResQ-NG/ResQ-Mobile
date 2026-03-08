@@ -45,7 +45,9 @@ export default {
     'mingcute:search-line',
 
     'solar:archive-minimalistic-bold',
-    'solar:text-square-bold'
+    'solar:text-square-bold',
+    'solar:trash-bin-2-bold-duotone',
+    'solar:alt-arrow-down-bold',
 
   ],
   plugins: [

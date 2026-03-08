@@ -10,6 +10,9 @@ export type { AppButtonProps } from './AppButton';
 export { AppInput } from './AppInput';
 export type { AppInputProps } from './AppInput';
 
+export { AppDropdown } from './AppDropdown';
+export type { AppDropdownProps, AppDropdownOption } from './AppDropdown';
+
 export { RoundedButton } from './RoundedButton';
 export type { RoundedButtonProps } from './RoundedButton';
 

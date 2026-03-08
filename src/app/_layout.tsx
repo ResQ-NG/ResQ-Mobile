@@ -14,9 +14,10 @@ import { setupOnlineManager } from '@/lib/utils/react-query/onlineManager';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { StatusBar } from 'expo-status-bar';
 import { useFocusManager } from '@/lib/utils/react-query/focusManager';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetRegistry } from './screens/(bottom-sheets)/registry';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { BottomSheetRegistry } from './(bottom-sheets)/registry';
+
 // We use only react-native-safe-area-context; this warning comes from a dependency.
 LogBox.ignoreLogs([
   "SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead.",
@@ -65,14 +66,14 @@ export default function RootLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ThemeProvider>
           <ThemeAwareStatusBar />
-          <QueryClientProvider client={queryClient}>
-            <KeyboardProvider>
-              <BottomSheetModalProvider>
+          <BottomSheetModalProvider>
+            <QueryClientProvider client={queryClient}>
+              <KeyboardProvider>
                 <BottomSheetRegistry />
                 <Stack screenOptions={{ headerShown: false }} />
-              </BottomSheetModalProvider>
-            </KeyboardProvider>
-          </QueryClientProvider>
+              </KeyboardProvider>
+            </QueryClientProvider>
+          </BottomSheetModalProvider>
         </ThemeProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>

@@ -9,7 +9,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary: 'bg-primary-blue active:opacity-90',
   accent: 'bg-accent-red active:opacity-90',
   secondary: 'bg-surface-light dark:bg-surface-dark active:opacity-90',
-  outline: 'border-2 border-primary-blue bg-transparent active:opacity-80',
+  outline: 'border-2 border-primaryDark dark:border-primaryDark-dark bg-transparent active:opacity-80',
   ghost: 'bg-transparent active:opacity-70',
 };
 
@@ -23,7 +23,7 @@ const labelColorStyles: Record<ButtonVariant, string> = {
   primary: 'text-white',
   accent: 'text-white',
   secondary: 'text-primary-dark dark:text-primary-dark-dark',
-  outline: 'text-primary-blue',
+  outline: 'text-primaryDark dark:text-primaryDark-dark',
   ghost: 'text-primary-blue',
 };
 

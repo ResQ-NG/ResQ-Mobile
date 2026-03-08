@@ -5,6 +5,10 @@ export type AppThemeName = 'light' | 'dark';
 export type AppThemeTokens = {
   /** Main page background: white (light) / black (dark) */
   background: string;
+
+  /** background color for inline styles (e.g. buttons, cards) */
+  backgroundColor: string;
+
   /** Subtle surface (cards, sections): off-white (light) / dark-grey (dark) */
   surface: string;
   /** Surface color for inline styles (e.g. buttons, cards) */
@@ -25,6 +29,7 @@ export type AppThemeTokens = {
 export const LIGHT_THEME_TOKENS: AppThemeTokens = {
   background: 'bg-white',
   surface: 'bg-surface-light',
+  backgroundColor: 'white',
   surfaceBackground: '#F7F7F7',
   textMuted: '#6b7280',
   avatarBorder: 'rgba(0,0,0,0.14)',
@@ -37,6 +42,7 @@ export const LIGHT_THEME_TOKENS: AppThemeTokens = {
 export const DARK_THEME_TOKENS: AppThemeTokens = {
   background: 'bg-black',
   surface: 'bg-surface-dark',
+  backgroundColor: '#121212',
   surfaceBackground: '#121212',
   textMuted: '#9ca3af',
   avatarBorder: '#ffffff',

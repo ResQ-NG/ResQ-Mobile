@@ -6,17 +6,25 @@ import { OnboardingLegal } from './OnboardingLegal';
 
 type OnboardingFooterProps = {
   onContinue: () => void;
+  /** Button label; default "Continue" */
+  continueLabel?: string;
+  /** If true, hide the legal terms link (e.g. for in-modal onboarding). */
+  hideLegal?: boolean;
 };
 
-export function OnboardingFooter({ onContinue }: OnboardingFooterProps) {
+export function OnboardingFooter({
+  onContinue,
+  continueLabel = 'Continue',
+  hideLegal = false,
+}: OnboardingFooterProps) {
   const { theme } = useAppColorScheme();
 
   return (
     <View className={`${theme.background} px-6 pb-6 pt-4`}>
-      <OnboardingLegal />
+      {!hideLegal && <OnboardingLegal />}
       <AppAnimatedView entering={brandFadeInUp.delay(520)}>
         <AppButton variant="primary" size="lg" className="w-full" onPress={onContinue}>
-          Continue
+          {continueLabel}
         </AppButton>
       </AppAnimatedView>
     </View>

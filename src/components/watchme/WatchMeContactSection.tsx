@@ -41,7 +41,7 @@ export function WatchMeContactSection({
   return (
     <AppAnimatedView
       entering={brandFadeInUp.delay(enteringDelay)}
-      className="px-4 mb-6"
+      className="mt-4 mb-6"
     >
       <View className="flex-row items-center justify-center gap-1 mb-4">
         <AppText className="font-metropolis-bold text-primaryDark dark:text-primaryDark-dark uppercase tracking-wide text-sm">
