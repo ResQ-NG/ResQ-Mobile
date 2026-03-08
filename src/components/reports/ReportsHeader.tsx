@@ -18,7 +18,7 @@ export function ReportsHeader({ onNotificationsPress, onSearchPress }: ReportsHe
       entering={brandFadeIn}
       className="flex-row items-center justify-between px-4 py-3 bg-white dark:bg-black"
     >
-      <AppHeading level={3}>Reports</AppHeading>
+      <AppHeading level={4}>My reports</AppHeading>
 
       <View className="flex-row items-center gap-2">
         <RoundedButton

@@ -26,23 +26,32 @@ export function AppInput({
   const placeholderColor = placeholderTextColor ?? theme.textMuted;
 
   if (leftIcon) {
+    const { style: inputStyle, ...restInputProps } = rest as TextInputProps;
     return (
       <View
         className={cn(
-          'flex-row items-center rounded-2xl px-4 py-3 gap-2',
+          'flex-row items-center rounded-2xl px-4 gap-2',
           BORDER_CLASS,
           className
         )}
-        style={[{ backgroundColor: theme.surfaceBackground }, style as object]}
+        style={[
+          { backgroundColor: theme.surfaceBackground, minHeight: 48 },
+          style as object,
+        ]}
       >
         {leftIcon}
         <TextInput
           placeholderTextColor={placeholderColor}
           className={cn(
-            'flex-1 text-base font-metropolis-regular text-primaryDark dark:text-primaryDark-dark py-0',
+            'flex-1  font-metropolis-regular text-primaryDark dark:text-primaryDark-dark',
             inputClassName
           )}
-          {...rest}
+          style={[
+            { paddingVertical: 0, paddingTop: 0, paddingBottom: 0 },
+            inputStyle as object,
+          ]}
+          textAlignVertical="center"
+          {...restInputProps}
         />
       </View>
     );
@@ -52,7 +61,7 @@ export function AppInput({
     <TextInput
       placeholderTextColor={placeholderColor}
       className={cn(
-        'rounded-2xl px-4 py-3 text-base font-metropolis-regular text-primaryDark dark:text-primaryDark-dark',
+        'rounded-2xl px-4  font-metropolis-regular text-primaryDark dark:text-primaryDark-dark',
         BORDER_CLASS,
         className,
         inputClassName

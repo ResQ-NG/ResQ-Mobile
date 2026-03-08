@@ -2,3 +2,6 @@ when i come back here i want to work on the
 - avatars
 - finalize the map styling
 - fix the ugly permission modal screen and its weird presentation
+
+
+

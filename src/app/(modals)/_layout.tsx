@@ -11,6 +11,7 @@ export default function ModalsLayout() {
     >
       <Stack.Screen name="enable-location" />
       <Stack.Screen name="image-preview" />
+      <Stack.Screen name="watch-me-onboarding" />
     </Stack>
   );
 }
