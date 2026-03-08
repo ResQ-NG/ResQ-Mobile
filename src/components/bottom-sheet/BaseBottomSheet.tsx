@@ -6,7 +6,7 @@ import {
   BottomSheetFooter,
   type BottomSheetBackdropProps,
   type BottomSheetFooterProps,
-} from "@gorhom/bottom-sheet";
+} from '@gorhom/bottom-sheet';
 import React, {
   useRef,
   useEffect,
@@ -16,12 +16,18 @@ import React, {
   type ReactNode,
   forwardRef,
   useImperativeHandle,
-} from "react";
-import { Platform, type StyleProp, type ViewStyle, View, StyleSheet } from "react-native";
-import { FullWindowOverlay } from "react-native-screens";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BottomSheetHeader } from "./ui/Header";
-import { useThemeColors } from "@/context/ThemeContext";
+} from 'react';
+import {
+  Platform,
+  type StyleProp,
+  type ViewStyle,
+  View,
+  StyleSheet,
+} from 'react-native';
+import { FullWindowOverlay } from 'react-native-screens';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BottomSheetHeader } from './ui/Header';
+import { useThemeColors } from '@/context/ThemeContext';
 
 export interface BaseBottomSheetProps {
   children: ReactNode;
@@ -90,7 +96,7 @@ export const BaseBottomSheet = forwardRef<
       if (enableDynamicSizing) {
         return customSnapPoints || [];
       }
-      return customSnapPoints || ["50%", "75%"];
+      return customSnapPoints || ['50%', '75%'];
     }, [customSnapPoints, enableDynamicSizing]);
 
     const effectiveIndex = enableDynamicSizing ? 0 : snapIndex;
@@ -177,7 +183,7 @@ export const BaseBottomSheet = forwardRef<
 
     const renderHeader = () => {
       if (customHeader) {
-        if (typeof customHeader === "function") {
+        if (typeof customHeader === 'function') {
           return customHeader(handleClose);
         }
         return customHeader;
@@ -227,7 +233,11 @@ export const BaseBottomSheet = forwardRef<
           backgroundColor: colors.backgroundColor,
         }}
         containerComponent={
-          Platform.OS === "ios" ? (FullWindowOverlay as unknown as React.ComponentType<{ children?: ReactNode }>) : undefined
+          Platform.OS === 'ios'
+            ? (FullWindowOverlay as unknown as React.ComponentType<{
+                children?: ReactNode;
+              }>)
+            : undefined
         }
         footerComponent={footer ? renderFooter : undefined}
       >
@@ -271,12 +281,12 @@ export const BaseBottomSheet = forwardRef<
   }
 );
 
-BaseBottomSheet.displayName = "BaseBottomSheet";
+BaseBottomSheet.displayName = 'BaseBottomSheet';
 
 const styles = StyleSheet.create({
   bottomSheetView: {
     flex: 1,
-    overflow: "visible",
+    overflow: 'visible',
   },
   headerContainer: {
     marginBottom: 0,
@@ -286,14 +296,14 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    minHeight: "100%",
-    overflow: "visible",
+    minHeight: '100%',
+    overflow: 'visible',
     zIndex: 9999,
   },
   footerContainer: {
     paddingTop: 16,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 16,
     zIndex: -1,
     elevation: 0,

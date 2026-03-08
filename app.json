@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "ResQ-Mobile",
+    "name": "ResQ",
     "slug": "ResQ-Mobile",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,12 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff",
+      "dark": {
+        "image": "./assets/splash-icon.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#0a0a0a"
+      }
     },
     "ios": {
       "supportsTablet": true,
@@ -34,6 +39,20 @@
     },
     "scheme": "resq-mobile",
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "imageWidth": 50.4,
+          "imageHeight": 50.4,
+          "dark": {
+            "image": "./assets/splash-icon.png",
+            "backgroundColor": "#0a0a0a"
+          }
+        }
+      ],
       ["@rnmapbox/maps"],
       [
         "expo-location",

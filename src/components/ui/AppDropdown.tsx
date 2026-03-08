@@ -13,7 +13,6 @@ import { AppText } from '@/components/ui/AppText';
 import { useAppColorScheme } from '@/theme/colorMode';
 import SolarAltArrowDownBoldIcon from '@/components/icons/solar/alt-arrow-down-bold';
 
-
 const BORDER_CLASS =
   'border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.1)]';
 
