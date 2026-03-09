@@ -29,6 +29,8 @@ interface NewReportMediaStepProps {
   onSlotPress?: (slot: MediaSlot, index: number) => void;
   /** Called when user taps a slot that has an image – open full-screen preview. */
   onPreviewImage?: (uri: string, index: number) => void;
+  /** Called when user wants to remove a media slot from the list. */
+  onRemoveMedia?: (slot: MediaSlot, index: number) => void;
   /** Thumbnail for footer "add more" (e.g. last added); optional. */
   footerThumbUri?: string | null;
   onAddMorePress?: () => void;
@@ -47,6 +49,7 @@ export function NewReportMediaStep({
   mediaSlots = DEFAULT_SLOTS,
   onSlotPress,
   onPreviewImage,
+  onRemoveMedia,
   footerThumbUri = null,
   onAddMorePress,
   onAddTextPress,
@@ -80,6 +83,7 @@ export function NewReportMediaStep({
                 ? onPreviewImage(slot.uri ?? '', index)
                 : onSlotPress?.(slot, index)
             }
+            onLongPress={() => onRemoveMedia?.(slot, index)}
             activeOpacity={0.85}
             className="rounded-2xl overflow-hidden bg-surface-light dark:bg-surface-dark border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.1)]"
             style={{

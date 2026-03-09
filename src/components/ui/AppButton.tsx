@@ -22,7 +22,7 @@ const sizeStyles: Record<ButtonSize, string> = {
 const labelColorStyles: Record<ButtonVariant, string> = {
   primary: 'text-white',
   accent: 'text-white',
-  secondary: 'text-primary-dark dark:text-primary-dark-dark',
+  secondary: 'text-primaryDark dark:text-primaryDark-dark',
   outline: 'text-primaryDark dark:text-primaryDark-dark',
   ghost: 'text-primary-blue',
 };

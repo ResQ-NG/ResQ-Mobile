@@ -9,6 +9,7 @@ import {
 import SolarGalleryAddBoldIcon from '@/components/icons/solar/gallery-add-bold';
 import SolarMapArrowRightBoldIcon from '@/components/icons/solar/map-arrow-right-bold';
 import { useAppColorScheme } from '@/theme/colorMode';
+import { router } from 'expo-router';
 
 interface CameraOverlayBottomBarProps {
   onCapture?: () => void;
@@ -19,7 +20,6 @@ interface CameraOverlayBottomBarProps {
 export function CameraOverlayBottomBar({
   onCapture,
   onAddMedia,
-  onNavigate,
 }: CameraOverlayBottomBarProps) {
   const { theme } = useAppColorScheme();
   const scale = useSharedValue(1);
@@ -48,7 +48,11 @@ export function CameraOverlayBottomBar({
           onPress={onAddMedia}
           className="w-[52px] h-[52px] rounded-[14px] bg-[rgba(80,80,80,0.55)] items-center justify-center border-[1.5px] border-[rgba(255,255,255,0.2)]"
         >
-          <SolarGalleryAddBoldIcon width={22} height={22} color={theme.iconOnAccent} />
+          <SolarGalleryAddBoldIcon
+            width={22}
+            height={22}
+            color={theme.iconOnAccent}
+          />
         </TouchableOpacity>
       </AppAnimatedView>
 
@@ -69,10 +73,15 @@ export function CameraOverlayBottomBar({
       {/* Navigate / compass */}
       <AppAnimatedView entering={brandFadeInUp.delay(120)}>
         <TouchableOpacity
-          onPress={onNavigate}
-          className="w-[52px] h-[52px] rounded-full bg-accent-red items-center justify-center"
+          onPress={() => router.push('/screens/report-management')}
+          className="w-[52px] h-[52px] rounded-full bg-white items-center justify-center"
         >
-          <SolarMapArrowRightBoldIcon width={24} height={24} color={theme.iconOnAccent} />
+          <SolarMapArrowRightBoldIcon
+            width={24}
+            height={24}
+            color={'#F00033'}
+            style={{ transform: [{ rotate: '-40deg' }] }}
+          />
         </TouchableOpacity>
       </AppAnimatedView>
     </AppAnimatedView>

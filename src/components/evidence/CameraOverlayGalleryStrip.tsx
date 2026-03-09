@@ -1,4 +1,4 @@
-import { View, TouchableOpacity } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import {
   AppAnimatedView,
   AppAnimatedImage,
@@ -6,6 +6,7 @@ import {
   brandFadeInUp,
 } from '@/lib/animation';
 import { AppText } from '@/components/ui/AppText';
+import { useCapturedMediaStore } from '@/stores/captured-media-store';
 
 interface GalleryItem {
   uri: string;
@@ -13,16 +14,17 @@ interface GalleryItem {
 }
 
 interface CameraOverlayGalleryStripProps {
-  items?: GalleryItem[];
   onItemPress?: (item: GalleryItem) => void;
   onMorePress?: () => void;
 }
 
 export function CameraOverlayGalleryStrip({
-  items = [],
   onItemPress,
   onMorePress,
 }: CameraOverlayGalleryStripProps) {
+  const items = useCapturedMediaStore((state) => state.items);
+
+
   return (
     <AppAnimatedView
       entering={brandFadeInUp}
@@ -35,7 +37,10 @@ export function CameraOverlayGalleryStrip({
         className="flex-1"
       >
         {items.map((item, index) => (
-          <AppAnimatedView key={item.id} entering={brandFadeInUp.delay(index * 40)}>
+          <AppAnimatedView
+            key={item.id}
+            entering={brandFadeInUp.delay(index * 40)}
+          >
             <TouchableOpacity
               onPress={() => onItemPress?.(item)}
               className="w-16 h-16 rounded-[10px] overflow-hidden border-[1.5px] border-[rgba(255,255,255,0.25)]"
@@ -48,20 +53,16 @@ export function CameraOverlayGalleryStrip({
             </TouchableOpacity>
           </AppAnimatedView>
         ))}
-
-        {/* Placeholder thumbs when no items yet */}
-        {items.length === 0 &&
-          [1, 2, 3, 4, 5].map((n, index) => (
-            <AppAnimatedView key={n} entering={brandFadeInUp.delay(index * 40)}>
-              <View className="w-16 h-16 rounded-[10px] bg-[rgba(255,255,255,0.12)] border-[1.5px] border-[rgba(255,255,255,0.15)]" />
-            </AppAnimatedView>
-          ))}
       </AppAnimatedScrollView>
 
       {/* More arrow */}
-      <TouchableOpacity onPress={onMorePress} className="pl-1">
-        <AppText className="text-white text-3xl font-metropolis-bold">›</AppText>
-      </TouchableOpacity>
+      {items.length > 7 && (
+        <TouchableOpacity onPress={onMorePress} className="pl-1">
+          <AppText className="text-white text-3xl font-metropolis-bold">
+            ›
+          </AppText>
+        </TouchableOpacity>
+      )}
     </AppAnimatedView>
   );
 }

@@ -48,6 +48,11 @@ export default {
     'solar:text-square-bold',
     'solar:trash-bin-2-bold-duotone',
     'solar:alt-arrow-down-bold',
+    'solar:file-bold',
+
+    'solar:share-bold',
+    'solar:download-bold',
+    'solar:delete-bin-2-bold',
 
   ],
   plugins: [

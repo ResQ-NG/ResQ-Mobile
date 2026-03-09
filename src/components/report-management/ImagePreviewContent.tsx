@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Share,
   Platform,
   ActivityIndicator,
@@ -13,9 +12,10 @@ import * as MediaLibrary from 'expo-media-library';
 import { AppText } from '@/components/ui/AppText';
 import { useAppColorScheme } from '@/theme/colorMode';
 import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
-import SolarFolderOpenBoldIcon from '@/components/icons/solar/folder-open-bold';
-import SolarArchiveMinimalisticBoldIcon from '@/components/icons/solar/archive-minimalistic-bold';
-import SolarUsersGroupRoundedBoldIcon from '@/components/icons/solar/users-group-rounded-bold';
+import { RoundedButton } from '@/components/ui';
+import SolarDownloadBoldIcon from '../icons/solar/download-bold';
+import SolarShareBoldIcon from '../icons/solar/share-bold';
+import SolarTrashBin2BoldDuotoneIcon from '../icons/solar/trash-bin-2-bold-duotone';
 
 export interface ImagePreviewContentProps {
   imageUri: string;
@@ -89,13 +89,11 @@ export function ImagePreviewContent({
   };
 
   const isDark = themeName === 'dark';
-  const bg = isDark ? '#111' : '#fff';
   const textColor = isDark ? '#e5e5e5' : '#1a1a1a';
-  const mutedColor = isDark ? '#888' : '#666';
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.95)' }}>
-      {/* Header: close + title */}
+    <View style={{ flex: 1, backgroundColor: '#000' }}>
+      {/* Header: close + title – styled like overlay controls */}
       <View
         style={{
           flexDirection: 'row',
@@ -106,26 +104,36 @@ export function ImagePreviewContent({
           paddingBottom: 12,
         }}
       >
-        <TouchableOpacity
+        <RoundedButton
           onPress={onClose}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          style={{ padding: 8 }}
+          icon={<SolarArrowLeftBrokenIcon width={20} height={20} color="#fff" />}
+          className="bg-[rgba(0,0,0,0.85)] border border-[rgba(255,255,255,0.18)]"
+        />
+        <AppText
+          className="text-white font-metropolis-semibold"
+          style={{ fontSize: 16 }}
         >
-          <SolarArrowLeftBrokenIcon width={24} height={24} color="#fff" />
-        </TouchableOpacity>
-        <AppText className="text-white font-metropolis-bold" style={{ fontSize: 17 }}>
           Photo
         </AppText>
-        <View style={{ width: 40 }} />
+        <View style={{ width: 44, height: 44 }} />
       </View>
 
-      {/* Full image */}
+      {/* Full image, centered like camera view */}
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Image
-          source={{ uri: imageUri }}
-          style={{ width, height: height * 0.5 }}
-          resizeMode="contain"
-        />
+        <View
+          style={{
+            width: width * 0.9,
+            height: height * 0.6,
+            borderRadius: 24,
+            overflow: 'hidden',
+          }}
+        >
+          <Image
+            source={{ uri: imageUri }}
+            style={{ width: '100%', height: '100%' }}
+            resizeMode="cover"
+          />
+        </View>
         {isMock ? (
           <View
             style={{
@@ -151,82 +159,78 @@ export function ImagePreviewContent({
         </View>
       ) : null}
 
-      {/* Actions: Download, Delete, Share */}
+      {/* Actions: Download, Delete, Share – styled like overlay buttons */}
       <View
         style={{
           flexDirection: 'row',
-          justifyContent: 'space-evenly',
+          justifyContent: 'center',
+          gap: 24,
           paddingHorizontal: 24,
           paddingBottom: 32,
-          gap: 16,
         }}
       >
-        <TouchableOpacity
-          onPress={handleDownload}
-          disabled={downloading}
-          style={{
-            flex: 1,
-            backgroundColor: bg,
-            paddingVertical: 14,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: 48,
-          }}
-        >
-          {downloading ? (
-            <ActivityIndicator size="small" color={textColor} />
-          ) : (
-            <View style={{ alignItems: 'center' }}>
-              <SolarFolderOpenBoldIcon width={22} height={22} color={textColor} />
-              <AppText style={{ color: textColor, fontSize: 13, fontWeight: '600', marginTop: 4 }}>
-                Download
-              </AppText>
-            </View>
-          )}
-        </TouchableOpacity>
+        <View style={{ alignItems: 'center', gap: 6 }}>
+          <RoundedButton
+            onPress={handleDownload}
+            disabled={downloading}
+            icon={
+              downloading ? (
+                <ActivityIndicator size="small" color={textColor} />
+              ) : (
+                <SolarDownloadBoldIcon width={20} height={20} color={textColor} />
+              )
+            }
+            className="bg-[rgba(0,0,0,0.85)] border border-[rgba(255,255,255,0.16)]"
+          />
+          <AppText
+            className="text-white/90 text-xs font-metropolis-medium"
+            style={{ marginTop: 0 }}
+          >
+            Download
+          </AppText>
+        </View>
 
         {allowDelete && onDelete ? (
-          <TouchableOpacity
-            onPress={handleDelete}
-            style={{
-              flex: 1,
-              backgroundColor: bg,
-              paddingVertical: 14,
-              borderRadius: 12,
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: 48,
-            }}
-          >
-            <View style={{ alignItems: 'center' }}>
-              <SolarArchiveMinimalisticBoldIcon width={22} height={22} color={mutedColor} />
-              <AppText style={{ color: mutedColor, fontSize: 13, fontWeight: '600', marginTop: 4 }}>
-                Delete
-              </AppText>
-            </View>
-          </TouchableOpacity>
-        ) : null}
-
-        <TouchableOpacity
-          onPress={handleShare}
-          style={{
-            flex: 1,
-            backgroundColor: bg,
-            paddingVertical: 14,
-            borderRadius: 12,
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: 48,
-          }}
-        >
-          <View style={{ alignItems: 'center' }}>
-            <SolarUsersGroupRoundedBoldIcon width={22} height={22} color={textColor} />
-            <AppText style={{ color: textColor, fontSize: 13, fontWeight: '600', marginTop: 4 }}>
-              Share
+          <View style={{ alignItems: 'center', gap: 6 }}>
+            <RoundedButton
+              onPress={handleDelete}
+              icon={
+                <SolarTrashBin2BoldDuotoneIcon
+                  width={20}
+                  height={20}
+                  color={textColor}
+                />
+              }
+              className="bg-[rgba(0,0,0,0.85)] border border-[rgba(255,255,255,0.16)]"
+            />
+            <AppText
+              className="text-white/90 text-xs font-metropolis-medium"
+              style={{ marginTop: 0 }}
+            >
+              Delete
             </AppText>
           </View>
-        </TouchableOpacity>
+        ) : null}
+
+        <View style={{ alignItems: 'center', gap: 6 }}>
+          <RoundedButton
+            onPress={handleShare}
+            icon={
+              <SolarShareBoldIcon
+                width={20}
+                height={20}
+                color={textColor}
+              />
+            }
+            className="bg-[rgba(0,0,0,0.85)] border border-[rgba(255,255,255,0.16)]"
+          />
+          <AppText
+            className="text-white/90 text-xs font-metropolis-medium"
+            style={{ marginTop: 0 }}
+          >
+            Share
+          </AppText>
+        </View>
       </View>
     </View>
   );

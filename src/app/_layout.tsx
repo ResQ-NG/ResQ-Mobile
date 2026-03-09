@@ -17,6 +17,8 @@ import { useFocusManager } from '@/lib/utils/react-query/focusManager';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { BottomSheetRegistry } from './(bottom-sheets)/registry';
+import { AppBannerHost } from '@/components/app-banner/AppBannerHost';
+import { AppToastHost } from '@/components/app-toast/AppToastHost';
 
 // We use only react-native-safe-area-context; this warning comes from a dependency.
 LogBox.ignoreLogs([
@@ -69,6 +71,8 @@ export default function RootLayout() {
           <BottomSheetModalProvider>
             <QueryClientProvider client={queryClient}>
               <KeyboardProvider>
+                <AppBannerHost />
+                <AppToastHost />
                 <BottomSheetRegistry />
                 <Stack screenOptions={{ headerShown: false }} />
               </KeyboardProvider>

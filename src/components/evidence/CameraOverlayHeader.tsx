@@ -11,17 +11,13 @@ import { useAppColorScheme } from '@/theme/colorMode';
 
 interface CameraOverlayHeaderProps {
   location?: string;
-  time?: string;
   avatarUri?: string;
-  onLocationPress?: () => void;
   onNotificationPress?: () => void;
 }
 
 export function CameraOverlayHeader({
   location = 'MARYLAND, LAGOS.',
-  time = '9:01:12 PM',
   avatarUri,
-  onLocationPress,
   onNotificationPress,
 }: CameraOverlayHeaderProps) {
   const insets = useSafeAreaInsets();
@@ -56,19 +52,8 @@ export function CameraOverlayHeader({
           >
             <RoundedButton
               onPress={onNotificationPress}
-              icon={<SolarBellBoldIcon width={20} height={20} color={iconColor} />}
-            />
-          </AppAnimatedView>
-
-          {/* Glass pill around action icons */}
-          <AppAnimatedView
-            entering={brandFadeInDown.delay(100)}
-            className="flex-row items-center gap-2 px-1 py-1 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)]"
-          >
-            <RoundedButton
-              onPress={onLocationPress}
               icon={
-                <SolarMapPointBoldIcon width={20} height={20} color={iconColor} />
+                <SolarBellBoldIcon width={20} height={20} color={iconColor} />
               }
             />
           </AppAnimatedView>
@@ -94,9 +79,16 @@ export function CameraOverlayHeader({
           className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
         >
           <View className="flex-row items-center gap-[6px]">
-            <SolarClockCircleBoldIcon width={14} height={14} color={iconColor} />
+            <SolarClockCircleBoldIcon
+              width={14}
+              height={14}
+              color={iconColor}
+            />
             <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
-              {time}
+              {new Date().toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </AppText>
           </View>
         </AppAnimatedView>

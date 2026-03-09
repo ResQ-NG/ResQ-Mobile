@@ -1,19 +1,39 @@
-import { View } from 'react-native';
-import { router } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
+import { Camera } from 'react-native-vision-camera';
 import { CameraOverlay } from '@/components/evidence/CameraOverlay';
+import { useMainCameraScreen } from '@/hooks/useMainCameraScreen';
 
 export default function MainScreen() {
-  const handleNavigateToNewReport = () => {
-    router.push('/screens/report-management');
-  };
+  const {
+    cameraRef,
+    device,
+    hasCameraAndMic,
+    handleToggleCameraPosition,
+    handleCapture,
+    handleAddFromGallery,
+    handleAddFile,
+    handleGalleryItemPress,
+  } = useMainCameraScreen();
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#1a1a1a' }}>
-      {/* Camera feed will live here */}
+    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+      {device && hasCameraAndMic && (
+        <Camera
+          ref={cameraRef}
+          style={StyleSheet.absoluteFill}
+          device={device}
+          isActive
+          photo
+        />
+      )}
+
       <CameraOverlay
         location="MARYLAND, LAGOS."
-        time="9:01:12 PM"
-        onNavigate={handleNavigateToNewReport}
+        onLens={handleToggleCameraPosition}
+        onCapture={handleCapture}
+        onAddMedia={handleAddFromGallery}
+        onAddFile={handleAddFile}
+        onGalleryItemPress={handleGalleryItemPress}
       />
     </View>
   );

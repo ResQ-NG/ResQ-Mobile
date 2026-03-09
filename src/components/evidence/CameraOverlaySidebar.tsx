@@ -5,8 +5,10 @@ import SolarBoltBoldIcon from '@/components/icons/solar/bolt-bold';
 import SolarVideocameraRecordBoldIcon from '@/components/icons/solar/videocamera-record-bold';
 import SolarMicrophoneBoldIcon from '@/components/icons/solar/microphone-bold';
 import SolarTextBoldIcon from '@/components/icons/solar/text-bold';
+
 import type { ComponentType } from 'react';
 import SolarSmartphoneRotateAngleBoldIcon from '../icons/solar/smartphone-rotate-angle-bold';
+import SolarFileBoldIcon from '../icons/solar/file-bold';
 
 type IconComponent = ComponentType<{
   width: number;
@@ -27,6 +29,7 @@ interface CameraOverlaySidebarProps {
   onMic?: () => void;
   onText?: () => void;
   onLens?: () => void;
+  onAddFile?: () => void;
 }
 
 export function CameraOverlaySidebar({
@@ -35,6 +38,7 @@ export function CameraOverlaySidebar({
   onMic,
   onText,
   onLens,
+  onAddFile,
 }: CameraOverlaySidebarProps) {
   const { theme } = useAppColorScheme();
   const buttons: SidebarButtonConfig[] = [
@@ -47,6 +51,7 @@ export function CameraOverlaySidebar({
     { key: 'mic', Icon: SolarMicrophoneBoldIcon, onPress: onMic },
     { key: 'text', Icon: SolarTextBoldIcon, onPress: onText },
     { key: 'lens', Icon: SolarSmartphoneRotateAngleBoldIcon, onPress: onLens },
+    { key: 'file', Icon: SolarFileBoldIcon, onPress: onAddFile },
   ];
 
   return (

@@ -2,25 +2,50 @@ import { useCallback } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { AppAnimatedSafeAreaView, AppAnimatedView, brandFadeIn } from '@/lib/animation';
+import {
+  AppAnimatedSafeAreaView,
+  AppAnimatedView,
+  brandFadeIn,
+} from '@/lib/animation';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { RoundedButton } from '@/components/ui/RoundedButton';
 import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
 import { useAppColorScheme } from '@/theme/colorMode';
 import { NewReportMediaStep } from '@/components/report-management/NewReportMediaStep';
+import { removeMedia } from '@/lib/utils/captured-media';
+import { useCapturedMediaStore } from '@/stores/captured-media-store';
 import { useReportDraftStore } from '@/stores/report-draft-store';
 
 export default function NewReportScreen() {
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
-  const mediaSlots = useReportDraftStore((s) => s.mediaSlots);
   const setMediaUris = useReportDraftStore((s) => s.setMediaUris);
+  const draftMediaSlots = useReportDraftStore((s) => s.mediaSlots);
+  const capturedMedia = useCapturedMediaStore((s) => s.items);
+
+  const mediaSlots =
+    capturedMedia.length > 0
+      ? capturedMedia.map((item) => ({ id: item.id, uri: item.uri }))
+      : draftMediaSlots;
 
   const handleBack = () => router.back();
   const handleNext = () => {
-    const uris = mediaSlots.map((s) => s.uri).filter((u): u is string => u != null);
+    const source = capturedMedia.length > 0 ? capturedMedia : mediaSlots;
+    const uris = source.map((s) => s.uri).filter((u): u is string => u != null);
     setMediaUris(uris);
     router.push('/screens/report-management/details');
+  };
+
+  const handleRemoveMedia = (slot: { id: string; uri: string | null }, index: number) => {
+    if (capturedMedia.length > 0) {
+      // When using captured media store, remove by id.
+      removeMedia(slot.id);
+      return;
+    }
+    // Fallback to draft store slots.
+    if (slot.uri) {
+      useReportDraftStore.getState().setMediaSlotUri(index, null);
+    }
   };
 
   const handlePreviewImage = useCallback((uri: string, index: number) => {
@@ -59,6 +84,7 @@ export default function NewReportScreen() {
         mediaSlots={mediaSlots}
         onSlotPress={() => {}}
         onPreviewImage={handlePreviewImage}
+        onRemoveMedia={handleRemoveMedia}
         onNextPress={handleNext}
         bottomInset={insets.bottom}
       />

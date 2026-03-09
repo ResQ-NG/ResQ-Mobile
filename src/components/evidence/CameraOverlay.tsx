@@ -6,19 +6,12 @@ import { CameraOverlaySidebar } from './CameraOverlaySidebar';
 import { CameraOverlayGalleryStrip } from './CameraOverlayGalleryStrip';
 import { CameraOverlayBottomBar } from './CameraOverlayBottomBar';
 
-interface GalleryItem {
-  uri: string;
-  id: string;
-}
-
 interface CameraOverlayProps {
   location?: string;
-  time?: string;
   avatarUri?: string;
-  galleryItems?: GalleryItem[];
   onCapture?: () => void;
   onAddMedia?: () => void;
-  onNavigate?: () => void;
+  onAddFile?: () => void;
   onLocationPress?: () => void;
   onNotificationPress?: () => void;
   onFlash?: () => void;
@@ -27,19 +20,16 @@ interface CameraOverlayProps {
   onMic?: () => void;
   onText?: () => void;
   onLens?: () => void;
-  onGalleryItemPress?: (item: GalleryItem) => void;
+  onGalleryItemPress?: (item: { id: string; uri: string }) => void;
   onMorePress?: () => void;
 }
 
 export function CameraOverlay({
   location,
-  time,
   avatarUri,
-  galleryItems = [],
   onCapture,
   onAddMedia,
-  onNavigate,
-  onLocationPress,
+  onAddFile,
   onNotificationPress,
   onFlash,
   onVideoToggle,
@@ -52,6 +42,7 @@ export function CameraOverlay({
 }: CameraOverlayProps) {
   const insets = useSafeAreaInsets();
 
+
   return (
     <View
       style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
@@ -59,9 +50,7 @@ export function CameraOverlay({
       {/* Header: avatar, location, time, action icons */}
       <CameraOverlayHeader
         location={location}
-        time={time}
         avatarUri={avatarUri}
-        onLocationPress={onLocationPress}
         onNotificationPress={onNotificationPress}
       />
 
@@ -73,6 +62,7 @@ export function CameraOverlay({
         onMic={onMic}
         onText={onText}
         onLens={onLens}
+        onAddFile={onAddFile}
       />
 
       {/* Bottom area: gallery strip + bottom bar — clears the floating tab bar */}
@@ -86,7 +76,6 @@ export function CameraOverlay({
         }}
       >
         <CameraOverlayGalleryStrip
-          items={galleryItems}
           onItemPress={onGalleryItemPress}
           onMorePress={onMorePress}
         />
@@ -94,7 +83,6 @@ export function CameraOverlay({
         <CameraOverlayBottomBar
           onCapture={onCapture}
           onAddMedia={onAddMedia}
-          onNavigate={onNavigate}
         />
       </View>
     </View>
