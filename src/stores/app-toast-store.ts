@@ -50,7 +50,7 @@ export const useAppToastStore = create<AppToastState & AppToastActions>()(
       const timeout = setTimeout(() => {
         get().setExiting(id);
       }, durationMs);
-
+      clearTimeout(timeout);
       return id;
     },
     setExiting: (id) =>

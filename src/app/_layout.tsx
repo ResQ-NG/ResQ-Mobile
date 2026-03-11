@@ -14,6 +14,7 @@ import { setupOnlineManager } from '@/lib/utils/react-query/onlineManager';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { StatusBar } from 'expo-status-bar';
 import { useFocusManager } from '@/lib/utils/react-query/focusManager';
+import { useWatchMeSessionBanner } from '@/hooks/useWatchMeSessionBanner';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { BottomSheetRegistry } from './(bottom-sheets)/registry';
@@ -48,6 +49,7 @@ function ThemeAwareStatusBar() {
 export default function RootLayout() {
   const { loaded, error } = useMetropolisFonts();
   useFocusManager();
+  useWatchMeSessionBanner();
 
   useEffect(() => {
     setupOnlineManager();

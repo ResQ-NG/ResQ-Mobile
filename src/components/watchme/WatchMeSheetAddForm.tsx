@@ -44,7 +44,7 @@ export function WatchMeSheetAddForm({
             keyboardType="phone-pad"
           />
         </FormField>
-        <FormField label="Relationship">
+        <FormField label="Relationship (optional)">
           <AppDropdown
             options={RELATIONSHIP_OPTIONS}
             value={relationship}

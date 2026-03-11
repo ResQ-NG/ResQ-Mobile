@@ -23,6 +23,9 @@ export const AppConfig = {
   MAPBOX_STYLE_URL:
     process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL ||
     Constants.expoConfig?.extra?.MAPBOX_STYLE_URL,
+  MAPBOX_STYLE_URL_DARK:
+    process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL_DARK ||
+    Constants.expoConfig?.extra?.MAPBOX_STYLE_URL_DARK,
 };
 
 // Debug helper - call this to see what values are loaded

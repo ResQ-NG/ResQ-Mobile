@@ -9,6 +9,8 @@ export type AppBanner = {
   actionLabel?: string;
   onActionPress?: () => void;
   variant?: AppBannerVariant;
+  /** When true, show a close (X) button so the user can dismiss the banner */
+  dismissable?: boolean;
 };
 
 type AppBannerState = {

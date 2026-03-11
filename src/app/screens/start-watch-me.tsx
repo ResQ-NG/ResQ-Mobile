@@ -8,6 +8,7 @@ import {
   StartWatchMeStep,
   type WatchMeContactGroup,
 } from '@/components/watchme';
+import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 
 const MOCK_GROUPS: WatchMeContactGroup[] = [
   {
@@ -45,9 +46,11 @@ export default function StartWatchMeScreen() {
     });
   };
 
+  const setSessionActive = useWatchMeContactsStore((s) => s.setSessionActive);
+
   const handleBack = () => router.back();
   const handleStartWatchMe = () => {
-    // TODO: start watch me session, then router.back() or navigate to map
+    setSessionActive(true);
     router.back();
   };
 

@@ -1,35 +1,81 @@
-import React, { useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { View, StyleSheet } from 'react-native';
 import MapboxGL from '@rnmapbox/maps';
 import { GlobalMapboxConfig } from '@/lib/third-party/mapbox/constants';
 import { AppConfig } from '@/lib/app-config';
 import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
-import SolarMapPointRotateBoldIcon from '@/components/icons/solar/map-point-rotate-bold';
 import { useFetchCoordinates } from '@/hooks/useFetchCoordinates';
-import { useThemeColors } from '@/context/ThemeContext';
+import { useTheme } from '@/context/ThemeContext';
+
+const MARKER_SIZE = 48;
 
 if (AppConfig.MAPBOX_ACCESS_TOKEN) {
   MapboxGL.setAccessToken(AppConfig.MAPBOX_ACCESS_TOKEN);
 }
 
-export const ExpandedMapView: React.FC = () => {
+export type WatchMapItem = {
+  id: string;
+  name: string;
+  avatarBgIndex?: number;
+  coordinates: [number, number];
+};
+
+type ExpandedMapViewProps = {
+  resetLocation: React.RefObject<(() => void) | null>;
+  /** Contacts currently sharing Watch Me on the map; when focused, only the focused one is shown */
+  watchesOnMap?: WatchMapItem[];
+  /** When set, map shows only this contact's marker and camera focuses on them */
+  focusedWatchId?: string | null;
+};
+
+export const ExpandedMapView: React.FC<ExpandedMapViewProps> = ({
+  resetLocation,
+  watchesOnMap = [],
+  focusedWatchId = null,
+}) => {
   const coordinates = useFetchCoordinates();
   const cameraRef = useRef<MapboxGL.Camera>(null);
-  const colors = useThemeColors();
+  const userMarkerRef = useRef<MapboxGL.PointAnnotation>(null);
+  const watchMarkerRefs = useRef<Record<string, MapboxGL.PointAnnotation | null>>({});
+  const { isDark } = useTheme();
 
-  const resetToUserLocation = () => {
-    if (cameraRef.current) {
-      cameraRef.current.setCamera({
-        centerCoordinate: coordinates,
-        zoomLevel: 16,
-        animationDuration: 1000,
-      });
+  const resetToUserLocation = useCallback(() => {
+    if (!cameraRef.current) return;
+    cameraRef.current.setCamera({
+      centerCoordinate: coordinates,
+      zoomLevel: 16,
+      animationDuration: 500,
+    });
+  }, [coordinates]);
+
+  useEffect(() => {
+    if (resetLocation) {
+      resetLocation.current = resetToUserLocation;
     }
-  };
+    return () => {
+      if (resetLocation) resetLocation.current = null;
+    };
+  }, [resetLocation, resetToUserLocation]);
+
+  const markersToShow =
+    focusedWatchId != null
+      ? watchesOnMap.filter((w) => w.id === focusedWatchId)
+      : watchesOnMap;
+
+  useEffect(() => {
+    if (focusedWatchId == null || !cameraRef.current) return;
+    const watch = watchesOnMap.find((w) => w.id === focusedWatchId);
+    if (!watch?.coordinates) return;
+    cameraRef.current.setCamera({
+      centerCoordinate: watch.coordinates,
+      zoomLevel: 16,
+      animationDuration: 500,
+    });
+  }, [focusedWatchId, watchesOnMap]);
 
   return (
     <View style={styles.container}>
-      <MapboxGL.MapView style={styles.map} {...GlobalMapboxConfig}>
+      <MapboxGL.MapView style={styles.map} {...GlobalMapboxConfig(isDark)}>
         <MapboxGL.Camera
           ref={cameraRef}
           followUserLocation={false}
@@ -39,32 +85,59 @@ export const ExpandedMapView: React.FC = () => {
           maxZoomLevel={50}
         />
 
-        {/* Route line */}
+        {/* User location marker – hide when focused on a contact so only that contact is on map */}
+        {focusedWatchId == null && (
+          <MapboxGL.PointAnnotation
+            ref={userMarkerRef}
+            id="user-location"
+            coordinate={coordinates}
+          >
+            <View
+              style={styles.userMarker}
+              onLayout={() => {
+                userMarkerRef.current?.refresh?.();
+                setTimeout(() => userMarkerRef.current?.refresh?.(), 150);
+              }}
+            >
+              <Avatar
+                altText="John Doe"
+                size={40}
+                backgroundColor={AVATAR_BACKGROUNDS[0]}
+              />
+            </View>
+          </MapboxGL.PointAnnotation>
+        )}
 
-        {/* User location marker */}
-        <MapboxGL.PointAnnotation id="user-location" coordinate={coordinates}>
-          <View style={styles.userMarker}>
-            <Avatar altText="John Doe" size={40} backgroundColor={AVATAR_BACKGROUNDS[0]} />
-          </View>
-        </MapboxGL.PointAnnotation>
+        {/* Contact Watch Me markers – only show when available on map; when focused, only that one */}
+        {markersToShow.map((watch) => (
+          <MapboxGL.PointAnnotation
+            key={watch.id}
+            ref={(r) => {
+              watchMarkerRefs.current[watch.id] = r;
+            }}
+            id={`watch-${watch.id}`}
+            coordinate={watch.coordinates}
+          >
+            <View
+              style={styles.userMarker}
+              onLayout={() => {
+                watchMarkerRefs.current[watch.id]?.refresh?.();
+                setTimeout(() => watchMarkerRefs.current[watch.id]?.refresh?.(), 150);
+              }}
+            >
+              <Avatar
+                altText={watch.name}
+                size={40}
+                backgroundColor={
+                  AVATAR_BACKGROUNDS[
+                    (watch.avatarBgIndex ?? 0) % AVATAR_BACKGROUNDS.length
+                  ]
+                }
+              />
+            </View>
+          </MapboxGL.PointAnnotation>
+        ))}
       </MapboxGL.MapView>
-
-      {/* Reset to user location button */}
-      <TouchableOpacity
-        style={[
-          styles.resetButton,
-          { backgroundColor: colors.surfaceBackground },
-        ]}
-        onPress={resetToUserLocation}
-        activeOpacity={0.8}
-        className="rounded-full"
-      >
-        <SolarMapPointRotateBoldIcon
-          width={24}
-          height={24}
-          color={colors.textMuted}
-        />
-      </TouchableOpacity>
 
       {/* Subtle overlay for depth */}
       <View pointerEvents="none" style={styles.overlay} />
@@ -96,6 +169,8 @@ const styles = StyleSheet.create({
     pointerEvents: 'none',
   },
   userMarker: {
+    width: MARKER_SIZE,
+    height: MARKER_SIZE,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -103,32 +178,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-  },
-  destinationMarker: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#EC6F52',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 6,
-  },
-  resetButton: {
-    position: 'absolute',
-    right: 16,
-    bottom: '40%',
-    width: 50,
-    height: 50,
-    borderRadius: 28,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 8,
-    zIndex: 10,
-    padding: 8,
   },
 });

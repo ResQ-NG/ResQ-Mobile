@@ -1,86 +1,105 @@
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AppAnimatedView, brandFadeInUp, brandFadeInDown } from '@/lib/animation';
-import { AppText } from '@/components/ui/AppText';
+import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
+import { AppButton } from '@/components/ui';
 import { TAB_BAR_HEIGHT } from '@/theme/constants';
-import { useAppColorScheme } from '@/theme/colorMode';
-import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
-import { AppButton, Avatar, AVATAR_BACKGROUNDS } from '../ui';
+import { ACTIVE_WATCHES_MOCK } from './types';
+import { WatchMeProfileCard } from './WatchMeProfileCard';
+import { WatchMeContactList } from './WatchMeContactList';
+import { WatchMeSidebar } from './WatchMeSidebar';
+import { WatchMeLocationPill } from './WatchMeLocationPill';
+import { WatchMeCloseButton } from './WatchMeCloseButton';
 
 interface WatchMeOverlayProps {
   location?: string;
-  reportsNearby?: number;
-  nearestCopy?: string;
-  onWatchPress?: () => void;
+  /** Controlled: which contact is selected (profile open + map focused on them when availableOnMap) */
+  selectedWatchId?: string | null;
+  onSelectContact: (id: string) => void;
+  onCloseProfile: () => void;
+  onStartWatchMe?: () => void;
+  onExpandPress?: () => void;
+  onResetLocation?: () => void;
 }
-
-const AVATAR_PLACEHOLDERS = [0, 1, 2, 3, 4];
 
 export function WatchMeOverlay({
   location = 'Maryland, Lagos.',
-  reportsNearby = 6,
-  nearestCopy = 'Nearest is 3 mins away',
-  onWatchPress,
+  selectedWatchId = null,
+  onSelectContact,
+  onCloseProfile,
+  onStartWatchMe,
+  onExpandPress,
+  onResetLocation,
 }: WatchMeOverlayProps) {
   const insets = useSafeAreaInsets();
-  const { theme } = useAppColorScheme();
   const bottomOffset = TAB_BAR_HEIGHT + insets.bottom + 16;
 
+  const selectedWatch = selectedWatchId
+    ? ACTIVE_WATCHES_MOCK.find((w) => w.id === selectedWatchId)
+    : null;
+
   return (
-    <View className="absolute inset-0">
-      {/* Center / mid-map location pill */}
-      <AppAnimatedView
-        entering={brandFadeInDown}
-        className="absolute self-center flex-row items-center gap-2 px-4 py-2 rounded-full bg-[rgba(255,255,255,0.92)] dark:bg-[rgba(18,18,18,0.9)] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.18)]"
-        style={{ bottom: 210 + bottomOffset }}
-      >
-        <SolarMapPointBoldIcon width={18} height={18} color={theme.primaryBlue} />
-        <AppText className="text-base font-metropolis-semibold text-primaryDark dark:text-primaryDark-dark">
-          {location}
-        </AppText>
-      </AppAnimatedView>
+    <View className="absolute inset-0" pointerEvents="box-none">
+      {selectedWatch ? (
+        <WatchMeCloseButton onPress={onCloseProfile} />
+      ) : null}
 
-      {/* Bottom card above tab bar */}
-      <AppAnimatedView
-        entering={brandFadeInUp.delay(80)}
-        className="absolute left-4 right-4 bg-[rgba(255,255,255,0.96)] dark:bg-[rgba(18,18,18,0.95)] border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.16)] px-5 pt-4 pb-5 items-center justify-center rounded-[3rem]"
-        style={{ bottom: bottomOffset }}
+      <WatchMeLocationPill location={location} />
+
+      {/* Bottom bar + Start Watch Me button in one anchored column so the button moves with the bar */}
+      <View
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: bottomOffset,
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          gap: 12,
+          zIndex: 20,
+        }}
       >
-        {/* Avatars row */}
-        <View className="flex-row -mr-2 mb-3 justify-center items-center">
-          {AVATAR_PLACEHOLDERS.map((i) => (
-            <AppAnimatedView
-              key={i}
-              entering={brandFadeInUp.delay(120 + i * 40)}
-              className="rounded-full overflow-hidden"
+        {onStartWatchMe && !selectedWatch ? (
+          <AppAnimatedView
+            entering={brandFadeInUp.delay(80)}
+            className="px-4"
+          >
+            <AppButton
+              variant="secondary"
+              size="lg"
+              className="w-full bg-success-green dark:bg-success-green-dark border-0"
+              labelClassName="text-white"
+              onPress={onStartWatchMe}
             >
-              <Avatar
-                size={48}
-                backgroundColor={AVATAR_BACKGROUNDS[i % AVATAR_BACKGROUNDS.length]}
-              />
-            </AppAnimatedView>
-          ))}
-        </View>
+              Start Watch Me
+            </AppButton>
+          </AppAnimatedView>
+        ) : null}
 
-        {/* Copy */}
-        <View className="mb-4 items-center justify-center">
-          <AppText className="text-base font-metropolis-semibold text-primaryDark dark:text-primaryDark-dark">
-            {reportsNearby} reports nearby
-          </AppText>
-          <AppText className="text-sm mt-1 text-captionDark dark:text-captionDark-dark">
-            {nearestCopy}
-          </AppText>
-        </View>
-        {/* Watch me CTA pill */}
-        <AppButton
-          variant="primary"
-          size="lg"
-          className="w-[50%] bg-success-green items-center justify-center"
-          onPress={onWatchPress}
+        <AppAnimatedView
+          entering={brandFadeInUp.delay(80)}
+          className="bg-[rgba(255,255,255,0.96)] dark:bg-[rgba(18,18,18,0.95)] border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.16)] px-5 rounded-[3rem]"
+          style={{
+            marginHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 20,
+          }}
         >
-          Watch me
-        </AppButton>
-      </AppAnimatedView>
+          {selectedWatch ? (
+            <WatchMeProfileCard watch={selectedWatch} />
+          ) : (
+            <WatchMeContactList
+              watches={ACTIVE_WATCHES_MOCK}
+              onSelectContact={onSelectContact}
+              onExpandPress={onExpandPress}
+            />
+          )}
+        </AppAnimatedView>
+      </View>
+
+      <WatchMeSidebar
+        onResetLocation={onResetLocation}
+        onExpandPress={onExpandPress}
+      />
     </View>
   );
 }

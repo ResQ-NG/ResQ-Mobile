@@ -3,43 +3,27 @@ import { View } from 'react-native';
 import { router } from 'expo-router';
 import { BaseBottomSheet } from '@/components/bottom-sheet';
 import { AppButton } from '@/components/ui/AppButton';
+import { showToast } from '@/lib/utils/app-toast';
 import {
   WatchMeSheetHeader,
   WatchMeSheetContactList,
   WatchMeSheetAddForm,
-  type EmergencyContact,
   type SheetView,
 } from '@/components/watchme';
 import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
+import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 
 const SNAP_POINTS = ['65%', '95%'];
 
-const MOCK_CONTACTS: EmergencyContact[] = [
-  {
-    id: '1',
-    name: 'Onyeche Inalegwu',
-    phone: '+234 265012083',
-    relationship: 'family',
-  },
-  {
-    id: '2',
-    name: 'Amira Danladi',
-    phone: '+234 937890465',
-    relationship: 'friend',
-  },
-  {
-    id: '3',
-    name: 'Olawale Uchendu',
-    phone: '+234 265012083',
-    relationship: 'work',
-  },
-];
-
 export function WatchMeContactsBottomSheet() {
   const { isOpen, close } = useWatchMeContactsSheetStore();
+  const {
+    contacts,
+    addContact: addContactToStore,
+    removeContact: removeContactFromStore,
+  } = useWatchMeContactsStore();
 
   const [view, setView] = useState<SheetView>('list');
-  const [contacts, setContacts] = useState<EmergencyContact[]>(MOCK_CONTACTS);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [relationship, setRelationship] = useState<string | null>(null);
@@ -65,23 +49,26 @@ export function WatchMeContactsBottomSheet() {
   }, [view, close, resetAddForm]);
 
   const handleSubmitAddContact = useCallback(() => {
-    if (!name.trim() || !phone.trim() || !relationship) return;
-    setContacts((prev) => [
-      ...prev,
-      {
-        id: String(Date.now()),
-        name: name.trim(),
-        phone: phone.trim(),
-        relationship,
-      },
-    ]);
+    if (!name.trim() || !phone.trim()) return;
+    addContactToStore({
+      name: name.trim(),
+      phone: phone.trim(),
+      ...(relationship ? { relationship } : {}),
+    });
     resetAddForm();
     setView('list');
-  }, [name, phone, relationship, resetAddForm]);
+  }, [name, phone, relationship, addContactToStore, resetAddForm]);
 
-  const handleRemoveContact = useCallback((id: string) => {
-    setContacts((prev) => prev.filter((c) => c.id !== id));
-  }, []);
+  const handleRemoveContact = useCallback(
+    (id: string) => {
+      removeContactFromStore(id);
+      showToast({
+        message: 'Contact removed.',
+        variant: 'success',
+      });
+    },
+    [removeContactFromStore]
+  );
 
   const handleLetsGo = useCallback(() => {
     close();

@@ -36,7 +36,10 @@ export default function NewReportScreen() {
     router.push('/screens/report-management/details');
   };
 
-  const handleRemoveMedia = (slot: { id: string; uri: string | null }, index: number) => {
+  const handleRemoveMedia = (
+    slot: { id: string; uri: string | null },
+    index: number
+  ) => {
     if (capturedMedia.length > 0) {
       // When using captured media store, remove by id.
       removeMedia(slot.id);
@@ -68,12 +71,19 @@ export default function NewReportScreen() {
           <RoundedButton
             onPress={handleBack}
             icon={
-              <SolarArrowLeftBrokenIcon width={20} height={20} color={theme.textMuted} />
+              <SolarArrowLeftBrokenIcon
+                width={20}
+                height={20}
+                color={theme.textMuted}
+              />
             }
             className="bg-white dark:bg-[#1a1a1a] border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.12)]"
             accessibilityLabel="Go back"
           />
-          <AppHeading level={4} className="text-primaryDark dark:text-primaryDark-dark">
+          <AppHeading
+            level={4}
+            className="text-primaryDark dark:text-primaryDark-dark"
+          >
             New report
           </AppHeading>
           <View style={{ width: 44, height: 44 }} />

@@ -9,7 +9,7 @@ export type EmergencyContact = {
   id: string;
   name: string;
   phone: string;
-  relationship: string;
+  relationship?: string;
 };
 
 type Props = {

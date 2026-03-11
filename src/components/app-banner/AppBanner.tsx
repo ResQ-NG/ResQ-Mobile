@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Pressable } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AppButton } from '@/components/ui/AppButton';
@@ -20,12 +20,6 @@ export function AppBannerView({ banner, onClose }: AppBannerProps) {
       className="absolute top-0 left-0 right-0 z-50"
       pointerEvents="box-none"
     >
-      <Pressable
-        onPress={onClose}
-        className="absolute top-0 left-0 right-0"
-        pointerEvents="box-none"
-      />
-
       <View className="">
         <LinearGradient
           colors={['#F56C13', '#F56C13', '#D1443A']}
@@ -33,12 +27,12 @@ export function AppBannerView({ banner, onClose }: AppBannerProps) {
           end={{ x: 1, y: 1 }}
           style={{ overflow: 'hidden', paddingTop: insets.top + 8 }}
         >
-          <View className="flex-row flex-start justify-between px-4 py-2.5">
+          <View className="flex-row flex-start justify-between px-4 py-2.5 items-start">
             <View className="pt-0.5 mr-2.5">
               <SolarInfoCircleBoldIcon width={20} height={20} color="#ffffff" />
             </View>
 
-            <View className="flex-1 mr-3">
+            <View className="flex-1 mr-3 min-w-0">
               <AppText className="text-white font-metropolis-semibold text-sm">
                 {banner.title}
               </AppText>
@@ -46,7 +40,7 @@ export function AppBannerView({ banner, onClose }: AppBannerProps) {
                 {banner.message}
               </AppText>
             </View>
-            <View className="">
+            <View className="flex-row items-center gap-2">
               {banner.actionLabel && (
                 <AppButton
                   size="md"
@@ -60,6 +54,17 @@ export function AppBannerView({ banner, onClose }: AppBannerProps) {
                 >
                   {banner.actionLabel}
                 </AppButton>
+              )}
+              {banner.dismissable && (
+                <TouchableOpacity
+                  onPress={onClose}
+                  hitSlop={12}
+                  className="w-8 h-8 rounded-full bg-white/20 items-center justify-center"
+                  accessibilityRole="button"
+                  accessibilityLabel="Dismiss"
+                >
+                  <AppText className="text-white text-lg font-metropolis-bold leading-5">×</AppText>
+                </TouchableOpacity>
               )}
             </View>
           </View>

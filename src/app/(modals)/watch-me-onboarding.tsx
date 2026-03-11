@@ -11,6 +11,7 @@ import { RoundedButton } from '@/components/ui/RoundedButton';
 import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
 import { useAppColorScheme } from '@/theme/colorMode';
 import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
+import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import {
   OnboardingFeatureRow,
   OnboardingFooter,
@@ -24,7 +25,15 @@ export default function WatchMeOnboardingScreen() {
   const insets = useSafeAreaInsets();
   const [step, setStep] = useState<1 | 2>(1);
 
-  const handleDismiss = () => router.back();
+  const setOnboardingDismissed = useWatchMeContactsStore(
+    (s) => s.setOnboardingDismissedByUser
+  );
+
+  const handleDismiss = () => {
+    setOnboardingDismissed(true);
+    router.back();
+  };
+
   const openContactsSheet = useWatchMeContactsSheetStore((s) => s.open);
 
   const handleContinue = () => {

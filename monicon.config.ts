@@ -53,6 +53,7 @@ export default {
     'solar:share-bold',
     'solar:download-bold',
     'solar:delete-bin-2-bold',
+    'solar:reel-bold',
 
   ],
   plugins: [
