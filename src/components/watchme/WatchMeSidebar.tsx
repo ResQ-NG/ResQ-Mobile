@@ -3,14 +3,16 @@ import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
 import { useAppColorScheme } from '@/theme/colorMode';
 import SolarMapPointRotateBoldIcon from '@/components/icons/solar/map-point-rotate-bold';
 import SolarUsersGroupRoundedBoldIcon from '@/components/icons/solar/users-group-rounded-bold';
-import SolarSettingsBoldIcon from '@/components/icons/solar/settings-bold';
 import MingcuteSearchLineIcon from '@/components/icons/mingcute/search-line';
-import SolarReelBoldIcon from '@/components/icons/solar/reel-bold';
 import { RoundedButton } from '@/components/ui/RoundedButton';
+import SolarSirenRoundedBoldIcon from '../icons/solar/siren-rounded-bold';
+import SolarPlayStreamBoldIcon from '../icons/solar/play-stream-bold';
 
 interface WatchMeSidebarProps {
   onResetLocation?: () => void;
   onExpandPress?: () => void;
+  onSosPress?: () => void;
+  onSearchPress?: () => void;
 }
 
 const GLASS_BUTTON_CLASS =
@@ -19,6 +21,8 @@ const GLASS_BUTTON_CLASS =
 export function WatchMeSidebar({
   onResetLocation,
   onExpandPress,
+  onSosPress,
+  onSearchPress,
 }: WatchMeSidebarProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useAppColorScheme();
@@ -46,7 +50,7 @@ export function WatchMeSidebar({
         className={GLASS_BUTTON_CLASS}
       />
       <RoundedButton
-        onPress={onExpandPress}
+        onPress={onSearchPress}
         icon={
           <MingcuteSearchLineIcon
             width={20}
@@ -70,7 +74,7 @@ export function WatchMeSidebar({
       <RoundedButton
         onPress={onExpandPress}
         icon={
-          <SolarReelBoldIcon
+          <SolarPlayStreamBoldIcon
             width={20}
             height={20}
             color={theme.iconOnAccent}
@@ -79,15 +83,15 @@ export function WatchMeSidebar({
         className={GLASS_BUTTON_CLASS}
       />
       <RoundedButton
-        onPress={onExpandPress}
+        onPress={onSosPress}
         icon={
-          <SolarSettingsBoldIcon
+          <SolarSirenRoundedBoldIcon
             width={20}
             height={20}
             color={theme.iconOnAccent}
           />
         }
-        className={GLASS_BUTTON_CLASS}
+        className="bg-accent-red dark:bg-accent-red-dark border border-red-400/50"
       />
     </AppAnimatedView>
   );

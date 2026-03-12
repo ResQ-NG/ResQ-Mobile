@@ -182,7 +182,7 @@ export function NewReportDetailsStep({
             multiline
             numberOfLines={4}
             textAlignVertical="top"
-            className="min-h-[100px]"
+            className="min-h-[100px] rounded-xl"
           />
           <View className="flex-row justify-between mt-1.5">
             <AppText

@@ -20,6 +20,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { BottomSheetRegistry } from './(bottom-sheets)/registry';
 import { AppBannerHost } from '@/components/app-banner/AppBannerHost';
 import { AppToastHost } from '@/components/app-toast/AppToastHost';
+import { AppModalHost } from '@/components/app-modal/AppModalHost';
 
 // We use only react-native-safe-area-context; this warning comes from a dependency.
 LogBox.ignoreLogs([
@@ -75,6 +76,7 @@ export default function RootLayout() {
               <KeyboardProvider>
                 <AppBannerHost />
                 <AppToastHost />
+                <AppModalHost />
                 <BottomSheetRegistry />
                 <Stack screenOptions={{ headerShown: false }} />
               </KeyboardProvider>

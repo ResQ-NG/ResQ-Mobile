@@ -55,6 +55,16 @@ export default {
     'solar:delete-bin-2-bold',
     'solar:reel-bold',
 
+
+    'mingcute:car-3-fill',
+    'solar:bus-bold',
+    'solar:tram-bold',
+    'solar:walking-bold',
+    'solar:bicycle-bold',
+    'solar:scooter-bold',
+
+    'solar:siren-rounded-bold',
+    'solar:play-stream-bold',
   ],
   plugins: [
     clean({ patterns: ['src/components/icons'] }),

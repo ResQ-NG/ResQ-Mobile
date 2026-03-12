@@ -1,6 +1,10 @@
 import { View } from 'react-native';
 import { AppText } from '@/components/ui/AppText';
-import { AppInput, AppDropdown } from '@/components/ui';
+import { AppInput, InlineSelect } from '@/components/ui';
+import SolarUsersGroupRoundedBoldIcon from '@/components/icons/solar/users-group-rounded-bold';
+import SolarUserSpeakBoldIcon from '@/components/icons/solar/user-speak-bold';
+import SolarFolderOpenBoldIcon from '@/components/icons/solar/folder-open-bold';
+import SolarInfoCircleBoldIcon from '@/components/icons/solar/info-circle-bold';
 
 export const RELATIONSHIP_OPTIONS = [
   { value: 'family', label: 'Family' },
@@ -45,11 +49,49 @@ export function WatchMeSheetAddForm({
           />
         </FormField>
         <FormField label="Relationship (optional)">
-          <AppDropdown
+          <InlineSelect
             options={RELATIONSHIP_OPTIONS}
             value={relationship}
-            onChange={onChangeRelationship}
+            onChange={(v) => onChangeRelationship(v)}
             placeholder="Select"
+            getIconForOption={(option, size, selected) => {
+              const iconSize = size === 'large' ? 20 : 16;
+              const commonProps = {
+                width: iconSize,
+                height: iconSize,
+              } as const;
+
+              switch (option.value) {
+                case 'family':
+                  return (
+                    <SolarUsersGroupRoundedBoldIcon
+                      {...commonProps}
+                      color={selected ? '#0B63F6' : '#6B7280'}
+                    />
+                  );
+                case 'friend':
+                  return (
+                    <SolarUserSpeakBoldIcon
+                      {...commonProps}
+                      color={selected ? '#0B63F6' : '#6B7280'}
+                    />
+                  );
+                case 'work':
+                  return (
+                    <SolarFolderOpenBoldIcon
+                      {...commonProps}
+                      color={selected ? '#0B63F6' : '#6B7280'}
+                    />
+                  );
+                default:
+                  return (
+                    <SolarInfoCircleBoldIcon
+                      {...commonProps}
+                      color={selected ? '#0B63F6' : '#6B7280'}
+                    />
+                  );
+              }
+            }}
           />
         </FormField>
       </View>

@@ -256,25 +256,32 @@ export const BaseBottomSheet = forwardRef<
             </View>
           )}
 
-          <BottomSheetScrollView
-            style={styles.scrollView}
-            contentContainerStyle={[
-              styles.scrollContent,
-              {
-                paddingHorizontal: horizontalPadding,
-                paddingTop: shouldShowHeader ? 0 : topPadding,
-                paddingBottom: bottomPadding,
-              },
-              contentContainerStyle,
+          <View
+            style={[
+              styles.scrollViewWrapper,
+              footer ? { marginBottom: footerHeight } : undefined,
             ]}
-            showsVerticalScrollIndicator={false}
-            nestedScrollEnabled={true}
-            keyboardShouldPersistTaps="handled"
-            bounces={true}
-            overScrollMode="auto"
           >
-            {children}
-          </BottomSheetScrollView>
+            <BottomSheetScrollView
+              style={styles.scrollView}
+              contentContainerStyle={[
+                styles.scrollContent,
+                {
+                  paddingHorizontal: horizontalPadding,
+                  paddingTop: shouldShowHeader ? 0 : topPadding,
+                  paddingBottom: bottomPadding,
+                },
+                contentContainerStyle,
+              ]}
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled={true}
+              keyboardShouldPersistTaps="handled"
+              bounces={true}
+              overScrollMode="auto"
+            >
+              {children}
+            </BottomSheetScrollView>
+          </View>
         </BottomSheetView>
       </BottomSheetModal>
     );
@@ -291,6 +298,9 @@ const styles = StyleSheet.create({
   headerContainer: {
     marginBottom: 0,
   },
+  scrollViewWrapper: {
+    flex: 1,
+  },
   scrollView: {
     flex: 1,
   },
@@ -298,7 +308,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     minHeight: '100%',
     overflow: 'visible',
-    zIndex: 9999,
   },
   footerContainer: {
     paddingTop: 16,

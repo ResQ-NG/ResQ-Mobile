@@ -13,6 +13,9 @@ export type { AppInputProps } from './AppInput';
 export { AppDropdown } from './AppDropdown';
 export type { AppDropdownProps, AppDropdownOption } from './AppDropdown';
 
+export { InlineSelect } from './InlineSelect';
+export type { InlineSelectProps, InlineSelectOption } from './InlineSelect';
+
 export { RoundedButton } from './RoundedButton';
 export type { RoundedButtonProps } from './RoundedButton';
 

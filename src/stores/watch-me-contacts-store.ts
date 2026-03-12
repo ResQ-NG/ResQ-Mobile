@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { EmergencyContact } from '@/components/watchme/WatchMeSheetContactList';
 
 type WatchMeContactsState = {
@@ -17,29 +19,42 @@ type WatchMeContactsActions = {
   setSessionActive: (active: boolean) => void;
 };
 
-export const useWatchMeContactsStore = create<
-  WatchMeContactsState & WatchMeContactsActions
->()((set) => ({
+const initialState: WatchMeContactsState = {
   contacts: [],
   onboardingDismissedByUser: false,
-  isSessionActive: true,
+  isSessionActive: false,
+};
 
-  setContacts: (contacts) => set({ contacts }),
+export const useWatchMeContactsStore = create<
+  WatchMeContactsState & WatchMeContactsActions
+>()(
+  persist(
+    (set) => ({
+      ...initialState,
 
-  addContact: (contact) =>
-    set((state) => ({
-      contacts: [
-        ...state.contacts,
-        { ...contact, id: String(Date.now()) },
-      ],
-    })),
+      setContacts: (contacts) => set({ contacts }),
 
-  removeContact: (id) =>
-    set((state) => ({
-      contacts: state.contacts.filter((c) => c.id !== id),
-    })),
+      addContact: (contact) =>
+        set((state) => ({
+          contacts: [
+            ...state.contacts,
+            { ...contact, id: String(Date.now()) },
+          ],
+        })),
 
-  setOnboardingDismissedByUser: (dismissed) =>
-    set({ onboardingDismissedByUser: dismissed }),
-  setSessionActive: (active) => set({ isSessionActive: active }),
-}));
+      removeContact: (id) =>
+        set((state) => ({
+          contacts: state.contacts.filter((c) => c.id !== id),
+        })),
+
+      setOnboardingDismissedByUser: (dismissed) =>
+        set({ onboardingDismissedByUser: dismissed }),
+      setSessionActive: (active) => set({ isSessionActive: active }),
+    }),
+    {
+      name: 'resq-watchme-contacts-store',
+      storage: createJSONStorage(() => AsyncStorage),
+    }
+  )
+);
+

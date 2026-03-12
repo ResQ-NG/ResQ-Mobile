@@ -1,6 +1,10 @@
 export { WatchMeOverlay } from './WatchMeOverlay';
 export { WatchMeHeader } from './WatchMeHeader';
-export { StartWatchMeStep } from './StartWatchMeStep';
+export {
+  StartWatchMeStep,
+  type TransportationMode,
+} from './StartWatchMeStep';
+export { CheckSafetyStep } from './CheckSafetyStep';
 export {
   WatchMeContactSection,
   type WatchMeContactGroup,
