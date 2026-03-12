@@ -53,7 +53,10 @@ export function CheckSafetyStep({
         keyboardShouldPersistTaps="handled"
       >
         {/* From */}
-        <AppAnimatedView entering={brandFadeInUp.delay(40)} className="mt-5 mb-5">
+        <AppAnimatedView
+          entering={brandFadeInUp.delay(40)}
+          className="mt-5 mb-5"
+        >
           <AppHeading
             level={6}
             className="text-primaryDark font-metropolis-semibold dark:text-primaryDark-dark mb-2"
@@ -88,8 +91,8 @@ export function CheckSafetyStep({
             style={{ backgroundColor: theme.surfaceBackground }}
           >
             <AppText className="text-sm text-captionDark dark:text-captionDark-dark">
-              We&apos;ll check how safe this route looks based on recent Watch Me
-              activity around it.
+              We&apos;ll check how safe this route looks based on recent Watch
+              Me activity around it.
             </AppText>
           </View>
         </AppAnimatedView>
@@ -114,4 +117,3 @@ export function CheckSafetyStep({
     </>
   );
 }
-

@@ -5,4 +5,6 @@ when i come back here i want to work on the
 
 
 
-- work on the check if the user is safe button. then the route not safe bottom sheet and style properly 
+- work on the check if the user is safe button. then the route not safe bottom sheet and style properly
+- work on the SOS and the emergency watch me trigger flow
+- work on the flow for showing the route safety status sheet and the issues list properly

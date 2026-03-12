@@ -73,9 +73,7 @@ export function CheckingSafetyBottomSheet() {
             />
           </Svg>
           <View style={styles.percentWrap}>
-            <AppText
-              className="text-xl font-metropolis-bold text-primaryDark dark:text-primaryDark-dark"
-            >
+            <AppText className="text-xl font-metropolis-bold text-primaryDark dark:text-primaryDark-dark">
               {Math.round(progress)}%
             </AppText>
           </View>

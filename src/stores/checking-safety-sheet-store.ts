@@ -24,7 +24,7 @@ export const useCheckingSafetySheetStore = create<
 >()((set) => ({
   ...initialState,
 
-  show: ({ message = 'Checking if you\'re safe...', progress = 0 } = {}) =>
+  show: ({ message = "Checking if you're safe...", progress = 0 } = {}) =>
     set({ isOpen: true, message, progress }),
 
   setProgress: (progress) => set({ progress }),

@@ -16,7 +16,10 @@ type AppToastState = {
 
 type AppToastActions = {
   showToast: (
-    toast: Omit<AppToast, 'id' | 'exiting'> & { id?: string; durationMs?: number }
+    toast: Omit<AppToast, 'id' | 'exiting'> & {
+      id?: string;
+      durationMs?: number;
+    }
   ) => string;
   hideToast: (id: string) => void;
   setExiting: (id: string) => void;
@@ -32,7 +35,11 @@ const DEFAULT_DURATION_MS = 2500;
 export const useAppToastStore = create<AppToastState & AppToastActions>()(
   (set, get) => ({
     ...initialState,
-    showToast: ({ id: maybeId, durationMs = DEFAULT_DURATION_MS, ...toast }) => {
+    showToast: ({
+      id: maybeId,
+      durationMs = DEFAULT_DURATION_MS,
+      ...toast
+    }) => {
       const id =
         maybeId ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 

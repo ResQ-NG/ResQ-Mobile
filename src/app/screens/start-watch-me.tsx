@@ -3,39 +3,28 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { AppAnimatedSafeAreaView } from '@/lib/animation';
 import { useAppColorScheme } from '@/theme/colorMode';
-import {
-  WatchMeHeader,
-  StartWatchMeStep,
-  type WatchMeContactGroup,
-} from '@/components/watchme';
+import { WatchMeHeader, StartWatchMeStep } from '@/components/watchme';
+import type { TransportationMode } from '@/components/watchme/StartWatchMeStep';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
+import { useWatchMeContactGroups } from '@/hooks/useWatchMeContactGroups';
+import { useRouteSafetyCheck } from '@/hooks/useRouteSafetyCheck';
+import { useUnsafeRouteSheetStore } from '@/stores/unsafe-route-sheet-store';
 
-const MOCK_GROUPS: WatchMeContactGroup[] = [
-  {
-    id: 'family',
-    name: 'Family members',
-    contacts: [
-      { id: '1', name: 'Mum', maskedPhone: '0803***4567', avatarBgIndex: 0 },
-      { id: '2', name: 'Brother Tunde', maskedPhone: '0701***8901', avatarBgIndex: 1 },
-    ],
-  },
-  {
-    id: 'work',
-    name: 'Work colleagues',
-    contacts: [
-      { id: '3', name: 'LizBee', maskedPhone: '0701***8901', avatarBgIndex: 2 },
-    ],
-  },
-];
+const SUCCESS_MESSAGE_DURATION_MS = 600;
 
 export default function StartWatchMeScreen() {
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
+  const groups = useWatchMeContactGroups();
+  const { checkRouteSafety, hideModal } = useRouteSafetyCheck();
+  const openRouteSafetyStatusSheet = useUnsafeRouteSheetStore((s) => s.open);
 
-  const [currentLocation, setCurrentLocation] = useState('');
   const [destination, setDestination] = useState('');
-  const [estimatedArrival, setEstimatedArrival] = useState('');
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set(['1', '2']));
+  const [transportation, setTransportation] = useState<TransportationMode | null>(
+    null
+  );
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isChecking, setIsChecking] = useState(false);
 
   const toggleContact = (id: string) => {
     setSelectedIds((prev) => {
@@ -49,9 +38,27 @@ export default function StartWatchMeScreen() {
   const setSessionActive = useWatchMeContactsStore((s) => s.setSessionActive);
 
   const handleBack = () => router.back();
-  const handleStartWatchMe = () => {
-    setSessionActive(true);
-    router.back();
+  const handleStartWatchMe = async () => {
+    if (isChecking) return;
+    setIsChecking(true);
+    try {
+      const { safe, issues } = await checkRouteSafety(destination);
+      await new Promise((r) => setTimeout(r, SUCCESS_MESSAGE_DURATION_MS));
+      hideModal();
+
+      openRouteSafetyStatusSheet({
+        fromLabel: 'Current location',
+        toLabel: destination || 'Destination',
+        issues: issues ?? [],
+      });
+
+      if (safe) {
+        setSessionActive(true);
+        router.back();
+      }
+    } finally {
+      setIsChecking(false);
+    }
   };
 
   return (
@@ -62,17 +69,16 @@ export default function StartWatchMeScreen() {
       header={<WatchMeHeader onBack={handleBack} />}
     >
       <StartWatchMeStep
-        currentLocation={currentLocation}
         destination={destination}
-        estimatedArrival={estimatedArrival}
-        onCurrentLocationChange={setCurrentLocation}
         onDestinationChange={setDestination}
-        onEstimatedArrivalChange={setEstimatedArrival}
-        groups={MOCK_GROUPS}
+        transportation={transportation}
+        onTransportationChange={setTransportation}
+        groups={groups}
         selectedIds={selectedIds}
         onToggleContact={toggleContact}
         onViewMorePress={() => {}}
         onStartPress={handleStartWatchMe}
+        isStarting={isChecking}
         bottomInset={insets.bottom}
       />
     </AppAnimatedSafeAreaView>

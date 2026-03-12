@@ -60,11 +60,7 @@ export function DestinationSearchInput({
           borderBottomWidth: showSuggestions ? 0 : 1,
         }}
       >
-        <SolarMapPointBoldIcon
-          width={20}
-          height={20}
-          color={theme.textMuted}
-        />
+        <SolarMapPointBoldIcon width={20} height={20} color={theme.textMuted} />
         <TextInput
           value={value}
           onChangeText={onChangeText}
