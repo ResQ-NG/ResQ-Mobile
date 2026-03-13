@@ -13,7 +13,7 @@ interface CameraOverlayProps {
   onAddMedia?: () => void;
   onAddFile?: () => void;
   onLocationPress?: () => void;
-  onNotificationPress?: () => void;
+  onSosPress?: () => void;
   onFlash?: () => void;
   onVideoToggle?: () => void;
   onFlip?: () => void;
@@ -30,7 +30,7 @@ export function CameraOverlay({
   onCapture,
   onAddMedia,
   onAddFile,
-  onNotificationPress,
+  onSosPress,
   onFlash,
   onVideoToggle,
   onFlip,
@@ -50,7 +50,7 @@ export function CameraOverlay({
       <CameraOverlayHeader
         location={location}
         avatarUri={avatarUri}
-        onNotificationPress={onNotificationPress}
+        onSosPress={onSosPress}
       />
 
       {/* Right sidebar: flash, video, flip, mic, text, lens */}

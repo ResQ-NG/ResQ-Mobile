@@ -1,3 +1,5 @@
+import React from 'react';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
 import { useAppColorScheme } from '@/theme/colorMode';
@@ -7,6 +9,13 @@ import MingcuteSearchLineIcon from '@/components/icons/mingcute/search-line';
 import { RoundedButton } from '@/components/ui/RoundedButton';
 import SolarSirenRoundedBoldIcon from '../icons/solar/siren-rounded-bold';
 import SolarPlayStreamBoldIcon from '../icons/solar/play-stream-bold';
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
 
 interface WatchMeSidebarProps {
   onResetLocation?: () => void;
@@ -26,6 +35,27 @@ export function WatchMeSidebar({
 }: WatchMeSidebarProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useAppColorScheme();
+
+  const sosRippleScale = useSharedValue(1);
+  const sosRippleOpacity = useSharedValue(0.6);
+
+  React.useEffect(() => {
+    sosRippleScale.value = withRepeat(
+      withTiming(1.4, { duration: 1400, easing: Easing.out(Easing.quad) }),
+      -1,
+      true
+    );
+    sosRippleOpacity.value = withRepeat(
+      withTiming(0, { duration: 1400, easing: Easing.out(Easing.quad) }),
+      -1,
+      true
+    );
+  }, [sosRippleScale, sosRippleOpacity]);
+
+  const sosRippleStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: sosRippleScale.value }],
+    opacity: sosRippleOpacity.value,
+  }));
 
   return (
     <AppAnimatedView
@@ -82,17 +112,31 @@ export function WatchMeSidebar({
         }
         className={GLASS_BUTTON_CLASS}
       />
-      <RoundedButton
-        onPress={onSosPress}
-        icon={
-          <SolarSirenRoundedBoldIcon
-            width={20}
-            height={20}
-            color={theme.iconOnAccent}
-          />
-        }
-        className="bg-accent-red dark:bg-accent-red-dark border border-red-400/50"
-      />
+      <View className="relative">
+        <Animated.View
+          style={[
+            {
+              position: 'absolute',
+              inset: -6,
+              borderRadius: 999,
+              borderWidth: 1,
+              borderColor: 'rgba(239,68,68,0.6)',
+            },
+            sosRippleStyle,
+          ]}
+        />
+        <RoundedButton
+          onPress={onSosPress}
+          icon={
+            <SolarSirenRoundedBoldIcon
+              width={20}
+              height={20}
+              color={theme.iconOnAccent}
+            />
+          }
+          className="bg-accent-red dark:bg-accent-red-dark border border-red-400/50"
+        />
+      </View>
     </AppAnimatedView>
   );
 }

@@ -1,10 +1,8 @@
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { AppText } from '@/components/ui/AppText';
 import { Avatar, AppButton, AVATAR_BACKGROUNDS } from '@/components/ui';
-import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
-import { useAppColorScheme } from '@/theme/colorMode';
 import type { ActiveWatch } from './types';
-import { getStatusBadgeBg, getStatusBadgeLabel } from './types';
+import { getWatchBadgeBg, getWatchBadgeLabel } from './types';
 import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
 
 interface WatchMeContactListProps {
@@ -18,8 +16,6 @@ export function WatchMeContactList({
   onSelectContact,
   onExpandPress,
 }: WatchMeContactListProps) {
-  const { theme } = useAppColorScheme();
-
   return (
     <>
       {watches.length > 0 ? (
@@ -45,9 +41,8 @@ export function WatchMeContactList({
           >
             {watches.map((watch, index) => {
               const bgIndex = watch.avatarBgIndex ?? index;
-              const badgeBg = getStatusBadgeBg(watch.status);
-              const badgeLabel = getStatusBadgeLabel(watch.status);
-              const onMap = watch.availableOnMap === true;
+              const badgeBg = getWatchBadgeBg(watch);
+              const badgeLabel = getWatchBadgeLabel(watch);
               return (
                 <TouchableOpacity
                   key={watch.id}
@@ -91,23 +86,8 @@ export function WatchMeContactList({
                       className="text-[10px] text-captionDark dark:text-captionDark-dark"
                       numberOfLines={1}
                     >
-                      {watch.lastCheckLabel}
+                      Last safe: {watch.lastOkayAt ?? watch.lastCheckLabel}
                     </AppText>
-                    {onMap && (
-                      <View className="flex-row items-center gap-1 mt-0.5">
-                        <SolarMapPointBoldIcon
-                          width={10}
-                          height={10}
-                          color={theme.primaryBlue}
-                        />
-                        <AppText
-                          className="text-[10px] text-primaryBlue font-metropolis-medium"
-                          numberOfLines={1}
-                        >
-                          On map
-                        </AppText>
-                      </View>
-                    )}
                   </View>
                 </TouchableOpacity>
               );

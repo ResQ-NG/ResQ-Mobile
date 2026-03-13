@@ -70,7 +70,9 @@ export default function WatchMeScreen() {
       <WatchMeOverlay
         watches={activeWatches}
         selectedWatchId={selectedWatchId}
-        onSelectContact={(id) => setSelectedWatchId(id)}
+        onSelectContact={(id) => {
+          router.push({ pathname: '/(modals)/watch-me-status', params: { id } });
+        }}
         onCloseProfile={() => setSelectedWatchId(null)}
         onStartWatchMe={() => handleStartWatchMe()}
         onExpandPress={openContactsSheet}

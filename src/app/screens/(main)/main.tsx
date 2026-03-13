@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+import { router } from 'expo-router';
 import { Camera } from 'react-native-vision-camera';
 import { CameraOverlay } from '@/components/evidence/CameraOverlay';
 import { useMainCameraScreen } from '@/hooks/useMainCameraScreen';
@@ -34,6 +35,7 @@ export default function MainScreen() {
         onAddMedia={handleAddFromGallery}
         onAddFile={handleAddFile}
         onGalleryItemPress={handleGalleryItemPress}
+        onSosPress={() => router.push('/screens/report-management')}
       />
     </View>
   );

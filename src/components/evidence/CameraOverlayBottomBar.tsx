@@ -1,4 +1,5 @@
 import { TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 import {
   AppAnimatedView,
   brandFadeInUp,
@@ -7,22 +8,25 @@ import {
   withSpring,
 } from '@/lib/animation';
 import SolarGalleryAddBoldIcon from '@/components/icons/solar/gallery-add-bold';
+import SolarInfoCircleBoldIcon from '@/components/icons/solar/info-circle-bold';
 import SolarMapArrowRightBoldIcon from '@/components/icons/solar/map-arrow-right-bold';
 import { useAppColorScheme } from '@/theme/colorMode';
-import { router } from 'expo-router';
+import { useCapturedMediaStore } from '@/stores/captured-media-store';
 
 interface CameraOverlayBottomBarProps {
   onCapture?: () => void;
   onAddMedia?: () => void;
-  onNavigate?: () => void;
+  onInfoPress?: () => void;
 }
 
 export function CameraOverlayBottomBar({
   onCapture,
   onAddMedia,
+  onInfoPress,
 }: CameraOverlayBottomBarProps) {
   const { theme } = useAppColorScheme();
   const scale = useSharedValue(1);
+  const hasMedia = useCapturedMediaStore((s) => s.items.length) > 0;
 
   const shutterStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -35,6 +39,14 @@ export function CameraOverlayBottomBar({
   const handlePressOut = () => {
     scale.value = withSpring(1, { damping: 15, stiffness: 300 });
     onCapture?.();
+  };
+
+  const handleRightPress = () => {
+    if (hasMedia) {
+      router.push('/screens/report-management');
+    } else {
+      onInfoPress?.();
+    }
   };
 
   return (
@@ -70,18 +82,29 @@ export function CameraOverlayBottomBar({
         </AppAnimatedView>
       </AppAnimatedView>
 
-      {/* Navigate / compass */}
+      {/* Right: info when no media, send when there is media */}
       <AppAnimatedView entering={brandFadeInUp.delay(120)}>
         <TouchableOpacity
-          onPress={() => router.push('/screens/report-management')}
-          className="w-[52px] h-[52px] rounded-full bg-white items-center justify-center"
+          onPress={handleRightPress}
+          className="w-[52px] h-[52px] rounded-full items-center justify-center border-[1.5px] border-[rgba(255,255,255,0.2)]"
+          style={{
+            backgroundColor: hasMedia ? '#fff' : 'rgba(80,80,80,0.55)',
+          }}
         >
-          <SolarMapArrowRightBoldIcon
-            width={24}
-            height={24}
-            color={'#F00033'}
-            style={{ transform: [{ rotate: '-40deg' }] }}
-          />
+          {hasMedia ? (
+            <SolarMapArrowRightBoldIcon
+              width={24}
+              height={24}
+              color="#F00033"
+              style={{ transform: [{ rotate: '-40deg' }] }}
+            />
+          ) : (
+            <SolarInfoCircleBoldIcon
+              width={24}
+              height={24}
+              color={theme.iconOnAccent}
+            />
+          )}
         </TouchableOpacity>
       </AppAnimatedView>
     </AppAnimatedView>

@@ -18,7 +18,7 @@ export function WatchMeLocationPill({ location }: WatchMeLocationPillProps) {
       className="px-4 py-2 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] flex-row items-center gap-1"
       style={{
         position: 'absolute',
-        right: 16,
+        left: 16,
         top: insets.top + 16,
       }}
     >

@@ -7,7 +7,7 @@ import SolarBoltBoldIcon from '@/components/icons/solar/bolt-bold';
 import SolarSmartphoneRotateAngleBoldIcon from '@/components/icons/solar/smartphone-rotate-angle-bold';
 import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
 import type { ActiveWatch } from './types';
-import { getStatusBadgeBg, getStatusBadgeLabel } from './types';
+import { getWatchBadgeBg, getWatchBadgeLabel } from './types';
 
 interface WatchMeProfileCardProps {
   watch: ActiveWatch;
@@ -15,8 +15,8 @@ interface WatchMeProfileCardProps {
 
 export function WatchMeProfileCard({ watch }: WatchMeProfileCardProps) {
   const { theme } = useAppColorScheme();
-  const badgeBg = getStatusBadgeBg(watch.status);
-  const badgeLabel = getStatusBadgeLabel(watch.status);
+  const badgeBg = getWatchBadgeBg(watch);
+  const badgeLabel = getWatchBadgeLabel(watch);
 
   return (
     <View className="pb-1">
@@ -62,18 +62,16 @@ export function WatchMeProfileCard({ watch }: WatchMeProfileCardProps) {
             </AppText>
           </View>
         ) : null}
-        {watch.lastOkayAt ? (
-          <View className="flex-row items-center gap-2">
-            <SolarClockCircleBoldIcon
-              width={16}
-              height={16}
-              color={theme.textMuted}
-            />
-            <AppText className="text-sm text-captionDark dark:text-captionDark-dark">
-              Last okay: {watch.lastOkayAt}
-            </AppText>
-          </View>
-        ) : null}
+        <View className="flex-row items-center gap-2">
+          <SolarClockCircleBoldIcon
+            width={16}
+            height={16}
+            color={theme.textMuted}
+          />
+          <AppText className="text-sm text-captionDark dark:text-captionDark-dark">
+            Last safe ping: {watch.lastOkayAt ?? '—'}
+          </AppText>
+        </View>
         <View className="flex-row items-center gap-2">
           <View
             style={{
