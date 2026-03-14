@@ -5,7 +5,11 @@ import { ExpandedMapView } from '@/components/maps/ExpandedMapView';
 import { WatchMeOverlay } from '@/components/watchme/WatchMeOverlay';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import { useActiveWatches } from '@/hooks/useActiveWatches';
-import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
+import { useSosConfirmSheetStore } from '@/stores/sos-confirm-sheet-store';
+import { useAppModalStore } from '@/stores/app-modal-store';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
+
+const SOS_LOADING_DURATION_MS = 1200;
 
 export default function WatchMeScreen() {
   const resetLocation = useRef<(() => void) | null>(null);
@@ -14,7 +18,22 @@ export default function WatchMeScreen() {
   const onboardingDismissedByUser = useWatchMeContactsStore(
     (s) => s.onboardingDismissedByUser
   );
-  const openContactsSheet = useWatchMeContactsSheetStore((s) => s.open);
+  const navigateToContacts = usePreventDoublePress(() =>
+    router.push('/screens/start-watch-me/contacts')
+  );
+  const openSosConfirmSheet = useSosConfirmSheetStore((s) => s.open);
+  const { showLoading, setProgress, hide: hideAppModal } = useAppModalStore();
+  const handleSosPress = usePreventDoublePress(openSosConfirmSheet);
+  const handleSosLongPress = usePreventDoublePress(() => {
+    showLoading({ message: 'Starting Watch Me session...', progress: 0 });
+    setTimeout(() => setProgress(40), 400);
+    setTimeout(() => setProgress(80), 800);
+    setTimeout(() => {
+      setProgress(100);
+      router.push('/screens/sos');
+      hideAppModal();
+    }, SOS_LOADING_DURATION_MS);
+  });
   const activeWatches = useActiveWatches();
 
   const shouldShowOnboarding =
@@ -26,13 +45,13 @@ export default function WatchMeScreen() {
     }
   }, [shouldShowOnboarding]);
 
-  const handleStartWatchMe = () => {
+  const handleStartWatchMe = usePreventDoublePress(() => {
     if (shouldShowOnboarding) {
       router.push('/(modals)/watch-me-onboarding');
     } else {
       router.push('/screens/start-watch-me');
     }
-  };
+  });
 
   const watchesOnMap = useMemo(
     () =>
@@ -52,9 +71,13 @@ export default function WatchMeScreen() {
     resetLocation.current?.();
   };
 
-  const handleSearchSafety = () => {
+  const handleSearchSafety = usePreventDoublePress(() => {
     router.push('/screens/check-safety');
-  };
+  });
+
+  const handleSelectContact = usePreventDoublePress((id: string) => {
+    router.push({ pathname: '/(modals)/watch-me-status', params: { id } });
+  });
 
   if (shouldShowOnboarding) {
     return null;
@@ -70,14 +93,13 @@ export default function WatchMeScreen() {
       <WatchMeOverlay
         watches={activeWatches}
         selectedWatchId={selectedWatchId}
-        onSelectContact={(id) => {
-          router.push({ pathname: '/(modals)/watch-me-status', params: { id } });
-        }}
+        onSelectContact={handleSelectContact}
         onCloseProfile={() => setSelectedWatchId(null)}
         onStartWatchMe={() => handleStartWatchMe()}
-        onExpandPress={openContactsSheet}
+        onExpandPress={navigateToContacts}
         onResetLocation={handleResetLocation}
-        onSosPress={() => router.push('/screens/report-management')}
+        onSosPress={handleSosPress}
+        onSosLongPress={handleSosLongPress}
         onSearchPress={handleSearchSafety}
       />
     </View>

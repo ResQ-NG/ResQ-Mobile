@@ -12,3 +12,7 @@ export function AttentionShake({
   const style = useShakeAttention({ delayMs });
   return <Animated.View style={style}>{children}</Animated.View>;
 }
+
+export default function _AttentionShakeRoute() {
+  return null;
+}

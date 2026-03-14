@@ -128,3 +128,7 @@ export function IncomingCallBottomSheet() {
     </BaseBottomSheet>
   );
 }
+
+export default function _IncomingCallBottomSheetRoute() {
+  return null;
+}

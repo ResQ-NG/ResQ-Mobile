@@ -2,6 +2,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useMemo, useRef, useState } from 'react';
 import { FlatList, type ViewToken, useWindowDimensions } from 'react-native';
 import { ImagePreviewContent } from '@/components/report-management/ImagePreviewContent';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { getCapturedMedia, removeMedia } from '@/lib/utils/captured-media';
 import { showToast } from '@/lib/utils/app-toast';
 import { useReportDraftStore } from '@/stores/report-draft-store';
@@ -61,7 +62,7 @@ export default function ImagePreviewScreen() {
     }
   ).current;
 
-  const handleClose = () => router.back();
+  const handleClose = usePreventDoublePress(() => router.back());
 
   const handleDeleteAt = (slotIndex: number) => {
     setMediaSlotUri(slotIndex, null);
@@ -72,7 +73,7 @@ export default function ImagePreviewScreen() {
   };
 
   // Default single-image preview (used for captured-media previews, etc.)
-  const handleDelete = () => {
+  const handleDelete = usePreventDoublePress(() => {
     if (Number.isNaN(index)) return;
     if (mode === 'media') {
       handleDeleteAt(index);
@@ -89,7 +90,12 @@ export default function ImagePreviewScreen() {
         variant: 'success',
       });
     }
-  };
+  });
+
+  const handleDeleteAtWrapped = usePreventDoublePress((slotIndex: number) => {
+    handleDeleteAt(slotIndex);
+    handleClose();
+  });
 
   // When opened from the report media step, let users swipe left/right through all media.
   if (mode === 'media' && filledSlots.length > 0) {
@@ -113,7 +119,9 @@ export default function ImagePreviewScreen() {
             isMock={false}
             onClose={handleClose}
             onDelete={
-              allowDelete ? () => handleDeleteAt(item.originalIndex) : undefined
+              allowDelete
+                ? () => handleDeleteAtWrapped(item.originalIndex)
+                : undefined
             }
             allowDelete={allowDelete}
           />

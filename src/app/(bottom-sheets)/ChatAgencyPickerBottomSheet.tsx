@@ -13,7 +13,7 @@ function avatarColorIndex(name: string): number {
   return sum % AVATAR_BACKGROUNDS.length;
 }
 
-export function ChatAgencyPickerBottomSheet() {
+export default function ChatAgencyPickerBottomSheet() {
   const { isOpen, close } = useChatAgencyPickerSheetStore();
   const agencyNames = useInChatStore((s) => s.agencyNames);
   const selectAgencyForChat = useInChatStore((s) => s.selectAgencyForChat);

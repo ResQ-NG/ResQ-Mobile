@@ -168,3 +168,7 @@ export function RouteSafetyStatusSheet() {
     </BaseBottomSheet>
   );
 }
+
+export default function _RouteSafetySheetRoute() {
+  return null;
+}

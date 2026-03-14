@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { BaseBottomSheet } from '@/components/bottom-sheet';
@@ -12,11 +12,13 @@ import {
 } from '@/components/watchme';
 import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 
 const SNAP_POINTS = ['65%', '95%'];
 
 export function WatchMeContactsBottomSheet() {
-  const { isOpen, close } = useWatchMeContactsSheetStore();
+  const { isOpen, close, openWithAddView, clearOpenWithAddView } =
+    useWatchMeContactsSheetStore();
   const {
     contacts,
     addContact: addContactToStore,
@@ -24,6 +26,14 @@ export function WatchMeContactsBottomSheet() {
   } = useWatchMeContactsStore();
 
   const [view, setView] = useState<SheetView>('list');
+
+  // When opened with openForAdd (e.g. from contacts page), show add form
+  useEffect(() => {
+    if (isOpen && openWithAddView) {
+      setView('add');
+      clearOpenWithAddView();
+    }
+  }, [isOpen, openWithAddView, clearOpenWithAddView]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [relationship, setRelationship] = useState<string | null>(null);
@@ -34,21 +44,26 @@ export function WatchMeContactsBottomSheet() {
     setRelationship(null);
   }, []);
 
-  const handleClose = useCallback(() => {
-    setView('list');
-    close();
-  }, [close]);
-
-  const handleCancel = useCallback(() => {
-    if (view === 'add') {
-      resetAddForm();
+  const handleClose = usePreventDoublePress(
+    useCallback(() => {
       setView('list');
-    } else {
       close();
-    }
-  }, [view, close, resetAddForm]);
+    }, [close])
+  );
 
-  const handleSubmitAddContact = useCallback(() => {
+  const handleCancel = usePreventDoublePress(
+    useCallback(() => {
+      if (view === 'add') {
+        resetAddForm();
+        setView('list');
+      } else {
+        close();
+      }
+    }, [view, close, resetAddForm])
+  );
+
+  const handleSubmitAddContact = usePreventDoublePress(
+    useCallback(() => {
     if (!name.trim() || !phone.trim()) return;
     addContactToStore({
       name: name.trim(),
@@ -57,7 +72,8 @@ export function WatchMeContactsBottomSheet() {
     });
     resetAddForm();
     setView('list');
-  }, [name, phone, relationship, addContactToStore, resetAddForm]);
+  }, [name, phone, relationship, addContactToStore, resetAddForm])
+  );
 
   const handleRemoveContact = useCallback(
     (id: string) => {
@@ -70,10 +86,12 @@ export function WatchMeContactsBottomSheet() {
     [removeContactFromStore]
   );
 
-  const handleLetsGo = useCallback(() => {
-    close();
-    setTimeout(() => router.push('/screens/start-watch-me'), 200);
-  }, [close]);
+  const handleLetsGo = usePreventDoublePress(
+    useCallback(() => {
+      close();
+      setTimeout(() => router.push('/screens/start-watch-me'), 200);
+    }, [close])
+  );
 
   const footer =
     view === 'list' ? (
@@ -135,4 +153,8 @@ export function WatchMeContactsBottomSheet() {
       )}
     </BaseBottomSheet>
   );
+}
+
+export default function _WatchMeContactsBottomSheetRoute() {
+  return null;
 }

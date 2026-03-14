@@ -9,7 +9,7 @@ import { useSosActiveStore } from '@/stores/sos-active-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { AppAnimatedView, brandFadeIn, brandFadeInUp } from '@/lib/animation';
 
-export function EndSosConfirmBottomSheet() {
+export default function EndSosConfirmBottomSheet() {
   const { isOpen, close } = useEndSosConfirmSheetStore();
 
   const handleCancel = () => close();

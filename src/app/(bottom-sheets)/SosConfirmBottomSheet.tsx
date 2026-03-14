@@ -18,7 +18,7 @@ import {
 import { useEffect } from 'react';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 
-export function SosConfirmBottomSheet() {
+export default function SosConfirmBottomSheet() {
   const { isOpen, close } = useSosConfirmSheetStore();
   const contacts = useWatchMeContactsStore((s) => s.contacts);
   const pulse = useSharedValue(1);

@@ -38,3 +38,7 @@ export function EvidenceThumbnail({
     </AppAnimatedView>
   );
 }
+
+export default function _EvidenceThumbnailRoute() {
+  return null;
+}

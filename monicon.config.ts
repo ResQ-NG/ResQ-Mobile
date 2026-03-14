@@ -69,6 +69,13 @@ export default {
     // SOS agencies: call and chat
     'solar:phone-calling-rounded-bold',
     'solar:chat-round-dots-bold',
+
+    // Calls and chat
+    'solar:close-circle-bold', // end call / end chat / dismiss
+    'solar:speaker-bold', // speaker (in-call)
+    'solar:plain-2-bold', // send message
+    'solar:minimize-square-2-bold', // compress / minimize (call & chat screen)
+    'solar:maximize-square-2-bold', // expand (floating banner: open call/chat)
   ],
   plugins: [
     clean({ patterns: ['src/components/icons'] }),

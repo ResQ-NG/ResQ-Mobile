@@ -7,7 +7,7 @@ import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import LottieView from 'lottie-react-native';
 
-export function EndWatchMeConfirmBottomSheet() {
+export default function EndWatchMeConfirmBottomSheet() {
   const { isOpen, close } = useEndWatchMeConfirmStore();
   const setSessionActive = useWatchMeContactsStore((s) => s.setSessionActive);
 

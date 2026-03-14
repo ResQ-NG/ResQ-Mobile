@@ -12,7 +12,7 @@ const RING_R = (RING_SIZE - RING_STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RING_R;
 const START_FROM_TOP = CIRCUMFERENCE / 4;
 
-export function CheckingSafetyBottomSheet() {
+export default function CheckingSafetyBottomSheet() {
   const { isOpen, progress, message, hide } = useCheckingSafetySheetStore();
   const { theme } = useAppColorScheme();
 

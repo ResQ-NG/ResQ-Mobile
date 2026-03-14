@@ -39,3 +39,7 @@ export function EvidenceNoteCard({
     </AppAnimatedView>
   );
 }
+
+export default function _EvidenceNoteCardRoute() {
+  return null;
+}

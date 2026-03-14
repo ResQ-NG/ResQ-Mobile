@@ -18,7 +18,7 @@ import { useWatchMeSessionBanner } from '@/hooks/useWatchMeSessionBanner';
 import { useSosBanner } from '@/hooks/useSosBanner';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { BottomSheetRegistry } from './(bottom-sheets)/registry';
+import BottomSheetRegistry from './(bottom-sheets)/registry';
 import { AppBannerHost } from '@/components/app-banner/AppBannerHost';
 import { AppToastHost } from '@/components/app-toast/AppToastHost';
 import { AppModalHost } from '@/components/app-modal/AppModalHost';
