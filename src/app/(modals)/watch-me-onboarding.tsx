@@ -12,6 +12,7 @@ import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken
 import { useAppColorScheme } from '@/theme/colorMode';
 import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import {
   OnboardingFeatureRow,
   OnboardingFooter,
@@ -29,20 +30,20 @@ export default function WatchMeOnboardingScreen() {
     (s) => s.setOnboardingDismissedByUser
   );
 
-  const handleDismiss = () => {
+  const handleDismiss = usePreventDoublePress(() => {
     setOnboardingDismissed(true);
     router.back();
-  };
+  });
 
   const openContactsSheet = useWatchMeContactsSheetStore((s) => s.open);
 
-  const handleContinue = () => {
+  const handleContinue = usePreventDoublePress(() => {
     if (step === 1) {
       setStep(2);
     } else {
       setTimeout(() => openContactsSheet(), 100);
     }
-  };
+  });
 
   const features =
     step === 1 ? WATCH_ME_STEP_1_FEATURES : WATCH_ME_STEP_2_FEATURES;

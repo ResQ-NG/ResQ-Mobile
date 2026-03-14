@@ -65,6 +65,10 @@ export default {
 
     'solar:siren-rounded-bold',
     'solar:play-stream-bold',
+
+    // SOS agencies: call and chat
+    'solar:phone-calling-rounded-bold',
+    'solar:chat-round-dots-bold',
   ],
   plugins: [
     clean({ patterns: ['src/components/icons'] }),

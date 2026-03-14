@@ -4,6 +4,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, useCameraDevice } from 'react-native-vision-camera';
 import { useCameraMicPermissionsBanner } from '@/hooks/useCameraMicPermissionsBanner';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { addMedia, getCapturedMedia } from '@/lib/utils/captured-media';
 
 export function useMainCameraScreen() {
@@ -73,20 +74,22 @@ export function useMainCameraScreen() {
     }
   };
 
-  const handleGalleryItemPress = (item: { id: string; uri: string }) => {
-    const items = getCapturedMedia();
-    const index = items.findIndex((m) => m.id === item.id);
+  const handleGalleryItemPress = usePreventDoublePress(
+    (item: { id: string; uri: string }) => {
+      const items = getCapturedMedia();
+      const index = items.findIndex((m) => m.id === item.id);
 
-    router.push({
-      pathname: '/(modals)/image-preview',
-      params: {
-        uri: item.uri,
-        mode: 'details',
-        index: index >= 0 ? String(index) : 'NaN',
-        allowDelete: 'true',
-      },
-    } as Parameters<typeof router.push>[0]);
-  };
+      router.push({
+        pathname: '/(modals)/image-preview',
+        params: {
+          uri: item.uri,
+          mode: 'details',
+          index: index >= 0 ? String(index) : 'NaN',
+          allowDelete: 'true',
+        },
+      } as Parameters<typeof router.push>[0]);
+    }
+  );
 
   return {
     cameraRef,

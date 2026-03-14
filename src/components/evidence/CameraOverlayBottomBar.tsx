@@ -7,6 +7,7 @@ import {
   useAnimatedStyle,
   withSpring,
 } from '@/lib/animation';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import SolarGalleryAddBoldIcon from '@/components/icons/solar/gallery-add-bold';
 import SolarInfoCircleBoldIcon from '@/components/icons/solar/info-circle-bold';
 import SolarMapArrowRightBoldIcon from '@/components/icons/solar/map-arrow-right-bold';
@@ -17,12 +18,15 @@ interface CameraOverlayBottomBarProps {
   onCapture?: () => void;
   onAddMedia?: () => void;
   onInfoPress?: () => void;
+  /** When true, show only the shutter button (e.g. SOS evidence screen). */
+  shutterOnly?: boolean;
 }
 
 export function CameraOverlayBottomBar({
   onCapture,
   onAddMedia,
   onInfoPress,
+  shutterOnly = false,
 }: CameraOverlayBottomBarProps) {
   const { theme } = useAppColorScheme();
   const scale = useSharedValue(1);
@@ -41,38 +45,36 @@ export function CameraOverlayBottomBar({
     onCapture?.();
   };
 
-  const handleRightPress = () => {
+  const handleRightPress = usePreventDoublePress(() => {
     if (hasMedia) {
       router.push('/screens/report-management');
     } else {
       onInfoPress?.();
     }
-  };
+  });
 
   return (
     <AppAnimatedView
       entering={brandFadeInUp.delay(80)}
-      className="flex-row items-center justify-between px-8"
+      className={`flex-row items-center ${shutterOnly ? 'justify-center' : 'justify-between px-8'}`}
     >
-      {/* Add media */}
-      <AppAnimatedView entering={brandFadeInUp.delay(120)}>
-        <TouchableOpacity
-          onPress={onAddMedia}
-          className="w-[52px] h-[52px] rounded-[14px] bg-[rgba(80,80,80,0.55)] items-center justify-center border-[1.5px] border-[rgba(255,255,255,0.2)]"
-        >
-          <SolarGalleryAddBoldIcon
-            width={22}
-            height={22}
-            color={theme.iconOnAccent}
-          />
-        </TouchableOpacity>
-      </AppAnimatedView>
+      {!shutterOnly && (
+        <AppAnimatedView entering={brandFadeInUp.delay(120)}>
+          <TouchableOpacity
+            onPress={onAddMedia}
+            className="w-[52px] h-[52px] rounded-[14px] bg-[rgba(80,80,80,0.55)] items-center justify-center border-[1.5px] border-[rgba(255,255,255,0.2)]"
+          >
+            <SolarGalleryAddBoldIcon
+              width={22}
+              height={22}
+              color={theme.iconOnAccent}
+            />
+          </TouchableOpacity>
+        </AppAnimatedView>
+      )}
 
-      {/* Shutter — spring scale is a runtime animated style, must stay as style prop */}
       <AppAnimatedView entering={brandFadeInUp} style={shutterStyle}>
-        {/* Outer ring */}
         <AppAnimatedView className="w-[92px] h-[92px] rounded-full items-center justify-center border-[3px] border-[rgba(255,255,255,0.35)]">
-          {/* Inner shutter button */}
           <TouchableOpacity
             activeOpacity={1}
             onPressIn={handlePressIn}
@@ -82,31 +84,32 @@ export function CameraOverlayBottomBar({
         </AppAnimatedView>
       </AppAnimatedView>
 
-      {/* Right: info when no media, send when there is media */}
-      <AppAnimatedView entering={brandFadeInUp.delay(120)}>
-        <TouchableOpacity
-          onPress={handleRightPress}
-          className="w-[52px] h-[52px] rounded-full items-center justify-center border-[1.5px] border-[rgba(255,255,255,0.2)]"
-          style={{
-            backgroundColor: hasMedia ? '#fff' : 'rgba(80,80,80,0.55)',
-          }}
-        >
-          {hasMedia ? (
-            <SolarMapArrowRightBoldIcon
-              width={24}
-              height={24}
-              color="#F00033"
-              style={{ transform: [{ rotate: '-40deg' }] }}
-            />
-          ) : (
-            <SolarInfoCircleBoldIcon
-              width={24}
-              height={24}
-              color={theme.iconOnAccent}
-            />
-          )}
-        </TouchableOpacity>
-      </AppAnimatedView>
+      {!shutterOnly && (
+        <AppAnimatedView entering={brandFadeInUp.delay(120)}>
+          <TouchableOpacity
+            onPress={handleRightPress}
+            className="w-[52px] h-[52px] rounded-full items-center justify-center border-[1.5px] border-[rgba(255,255,255,0.2)]"
+            style={{
+              backgroundColor: hasMedia ? '#fff' : 'rgba(80,80,80,0.55)',
+            }}
+          >
+            {hasMedia ? (
+              <SolarMapArrowRightBoldIcon
+                width={24}
+                height={24}
+                color="#F00033"
+                style={{ transform: [{ rotate: '-40deg' }] }}
+              />
+            ) : (
+              <SolarInfoCircleBoldIcon
+                width={24}
+                height={24}
+                color={theme.iconOnAccent}
+              />
+            )}
+          </TouchableOpacity>
+        </AppAnimatedView>
+      )}
     </AppAnimatedView>
   );
 }

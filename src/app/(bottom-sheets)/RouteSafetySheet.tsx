@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { BaseBottomSheet } from '@/components/bottom-sheet';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppText } from '@/components/ui/AppText';
 import { useUnsafeRouteSheetStore } from '@/stores/unsafe-route-sheet-store';
@@ -26,10 +27,12 @@ export function RouteSafetyStatusSheet() {
       ? `People using Watch Me have recently reported issues going from ${fromLabel} to ${toLabel}.`
       : 'People using Watch Me have recently reported issues along this route.';
 
-  const handleViewStories = () => {
+  const handleViewStories = usePreventDoublePress(() => {
     close();
     router.push('/screens/community');
-  };
+  });
+
+  const handleGotIt = usePreventDoublePress(close);
 
   const footer = (
     <View className="px-4 gap-3 w-full">
@@ -41,7 +44,7 @@ export function RouteSafetyStatusSheet() {
       >
         View broadcasts
       </AppButton>
-      <AppButton variant="primary" size="lg" className="w-full" onPress={close}>
+      <AppButton variant="primary" size="lg" className="w-full" onPress={handleGotIt}>
         Got it
       </AppButton>
     </View>

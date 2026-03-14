@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
 import { useAppColorScheme } from '@/theme/colorMode';
@@ -20,7 +20,9 @@ import Animated, {
 interface WatchMeSidebarProps {
   onResetLocation?: () => void;
   onExpandPress?: () => void;
+  /** Tap: show confirmation sheet. Long-press: dispatch immediately (no confirmation). */
   onSosPress?: () => void;
+  onSosLongPress?: () => void;
   onSearchPress?: () => void;
 }
 
@@ -31,6 +33,7 @@ export function WatchMeSidebar({
   onResetLocation,
   onExpandPress,
   onSosPress,
+  onSosLongPress,
   onSearchPress,
 }: WatchMeSidebarProps) {
   const insets = useSafeAreaInsets();
@@ -125,17 +128,20 @@ export function WatchMeSidebar({
             sosRippleStyle,
           ]}
         />
-        <RoundedButton
+        <Pressable
           onPress={onSosPress}
-          icon={
-            <SolarSirenRoundedBoldIcon
-              width={20}
-              height={20}
-              color={theme.iconOnAccent}
-            />
-          }
-          className="bg-accent-red dark:bg-accent-red-dark border border-red-400/50"
-        />
+          onLongPress={onSosLongPress}
+          style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}
+          className="w-12 h-12 rounded-full bg-accent-red dark:bg-accent-red-dark border border-red-400/50 items-center justify-center"
+          accessibilityRole="button"
+          accessibilityLabel="SOS — tap to confirm, hold to send immediately"
+        >
+          <SolarSirenRoundedBoldIcon
+            width={20}
+            height={20}
+            color={theme.iconOnAccent}
+          />
+        </Pressable>
       </View>
     </AppAnimatedView>
   );

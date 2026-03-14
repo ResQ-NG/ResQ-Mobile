@@ -17,6 +17,7 @@ import {
 } from '@/lib/animation';
 import LottieView from 'lottie-react-native';
 import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 
 export default function EnableLocationScreen() {
   const { theme } = useAppColorScheme();
@@ -24,22 +25,22 @@ export default function EnableLocationScreen() {
     (s) => s.setLocationModalVisible
   );
 
-  const handleDismiss = () => {
+  const handleDismiss = usePreventDoublePress(() => {
     setLocationModalVisible(false);
     router.back();
-  };
+  });
 
-  const handleRequestPermission = async () => {
+  const handleRequestPermission = usePreventDoublePress(async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status === 'granted') {
       setLocationModalVisible(false);
       router.back();
     }
-  };
+  });
 
-  const handleOpenSettings = () => {
+  const handleOpenSettings = usePreventDoublePress(() => {
     Linking.openSettings();
-  };
+  });
 
   return (
     <AppAnimatedSafeAreaView

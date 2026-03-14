@@ -24,6 +24,7 @@ interface WatchMeOverlayProps {
   onExpandPress?: () => void;
   onResetLocation?: () => void;
   onSosPress?: () => void;
+  onSosLongPress?: () => void;
   onSearchPress?: () => void;
   onNotificationPress?: () => void;
 }
@@ -38,6 +39,7 @@ export function WatchMeOverlay({
   onExpandPress,
   onResetLocation,
   onSosPress,
+  onSosLongPress,
   onSearchPress,
   onNotificationPress,
 }: WatchMeOverlayProps) {
@@ -131,6 +133,7 @@ export function WatchMeOverlay({
         onResetLocation={onResetLocation}
         onExpandPress={onExpandPress}
         onSosPress={onSosPress}
+        onSosLongPress={onSosLongPress}
         onSearchPress={onSearchPress}
       />
     </View>

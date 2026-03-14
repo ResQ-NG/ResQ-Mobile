@@ -3,8 +3,26 @@ import { router } from 'expo-router';
 import { Camera } from 'react-native-vision-camera';
 import { CameraOverlay } from '@/components/evidence/CameraOverlay';
 import { useMainCameraScreen } from '@/hooks/useMainCameraScreen';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
+import { useSosConfirmSheetStore } from '@/stores/sos-confirm-sheet-store';
+import { useAppModalStore } from '@/stores/app-modal-store';
+
+const SOS_LOADING_DURATION_MS = 1200;
 
 export default function MainScreen() {
+  const openSosConfirmSheet = useSosConfirmSheetStore((s) => s.open);
+  const { showLoading, setProgress, hide: hideAppModal } = useAppModalStore();
+  const handleSosPress = usePreventDoublePress(openSosConfirmSheet);
+  const handleSosLongPress = usePreventDoublePress(() => {
+    showLoading({ message: 'Starting Watch Me session...', progress: 0 });
+    setTimeout(() => setProgress(40), 400);
+    setTimeout(() => setProgress(80), 800);
+    setTimeout(() => {
+      setProgress(100);
+      router.push('/screens/sos');
+      hideAppModal();
+    }, SOS_LOADING_DURATION_MS);
+  });
   const {
     cameraRef,
     device,
@@ -35,7 +53,8 @@ export default function MainScreen() {
         onAddMedia={handleAddFromGallery}
         onAddFile={handleAddFile}
         onGalleryItemPress={handleGalleryItemPress}
-        onSosPress={() => router.push('/screens/report-management')}
+        onSosPress={handleSosPress}
+        onSosLongPress={handleSosLongPress}
       />
     </View>
   );

@@ -15,12 +15,14 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { StatusBar } from 'expo-status-bar';
 import { useFocusManager } from '@/lib/utils/react-query/focusManager';
 import { useWatchMeSessionBanner } from '@/hooks/useWatchMeSessionBanner';
+import { useSosBanner } from '@/hooks/useSosBanner';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { BottomSheetRegistry } from './(bottom-sheets)/registry';
 import { AppBannerHost } from '@/components/app-banner/AppBannerHost';
 import { AppToastHost } from '@/components/app-toast/AppToastHost';
 import { AppModalHost } from '@/components/app-modal/AppModalHost';
+import { InCallHost } from '@/components/in-call';
 
 // We use only react-native-safe-area-context; this warning comes from a dependency.
 LogBox.ignoreLogs([
@@ -51,6 +53,7 @@ export default function RootLayout() {
   const { loaded, error } = useMetropolisFonts();
   useFocusManager();
   useWatchMeSessionBanner();
+  useSosBanner();
 
   useEffect(() => {
     setupOnlineManager();
@@ -77,6 +80,7 @@ export default function RootLayout() {
                 <AppBannerHost />
                 <AppToastHost />
                 <AppModalHost />
+                <InCallHost />
                 <BottomSheetRegistry />
                 <Stack screenOptions={{ headerShown: false }} />
               </KeyboardProvider>

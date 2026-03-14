@@ -6,7 +6,7 @@ import type { RouteIssue } from '@/stores/unsafe-route-sheet-store';
 const CHECK_DURATION_MS = 2500;
 
 /** Simulate unsafe route ~90% of the time for demo; replace with real API result. */
-const SIMULATE_UNSAFE_CHANCE = 0.9;
+const SIMULATE_UNSAFE_CHANCE = 0.5;
 
 const MOCK_UNSAFE_ISSUES: RouteIssue[] = [
   { id: '1', label: 'Unsuccessful Watch Me sessions', count: 4 },

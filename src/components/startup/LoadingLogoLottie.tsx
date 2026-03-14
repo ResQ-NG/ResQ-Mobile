@@ -11,7 +11,10 @@ export default function LoadingLogoLottie({
   onSplashScreenAnimationFinished: () => void;
 }) {
   return (
-    <AppAnimatedSafeAreaView className="flex-1 items-center justify-center bg-white dark:bg-black">
+    <AppAnimatedSafeAreaView
+      className="flex-1 items-center justify-center bg-white dark:bg-black"
+      edges={[]}
+    >
       <View style={styles.container}>
         <LottieView
           source={require('@assets/lottie/logo.json')}
@@ -31,8 +34,10 @@ export default function LoadingLogoLottie({
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%',
   },
   lottie: {
     width: LOGO_SIZE,

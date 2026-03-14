@@ -4,9 +4,8 @@ import { AppButton } from '@/components/ui/AppButton';
 import { showToast } from '@/lib/utils/app-toast';
 import { useEndWatchMeConfirmStore } from '@/stores/end-watch-me-confirm-store';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import LottieView from 'lottie-react-native';
-
-
 
 export function EndWatchMeConfirmBottomSheet() {
   const { isOpen, close } = useEndWatchMeConfirmStore();
@@ -14,14 +13,14 @@ export function EndWatchMeConfirmBottomSheet() {
 
   const handleCancel = () => close();
 
-  const handleEndSession = () => {
+  const handleEndSession = usePreventDoublePress(() => {
     setSessionActive(false);
     close();
     showToast({
       message: 'Watch Me session ended',
       variant: 'success',
     });
-  };
+  });
 
   const footer = (
     <View className="px-4 gap-3 w-full flex-row">

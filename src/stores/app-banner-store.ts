@@ -11,6 +11,8 @@ export type AppBanner = {
   variant?: AppBannerVariant;
   /** When true, show a close (X) button so the user can dismiss the banner */
   dismissable?: boolean;
+  /** When false, pressing the action does not dismiss the banner (default true) */
+  actionDismissesBanner?: boolean;
 };
 
 type AppBannerState = {

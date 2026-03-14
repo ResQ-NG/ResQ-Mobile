@@ -1,7 +1,7 @@
-import { useCallback } from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import {
   AppAnimatedSafeAreaView,
   AppAnimatedView,
@@ -11,7 +11,7 @@ import { AppHeading } from '@/components/ui/AppHeading';
 import { RoundedButton } from '@/components/ui/RoundedButton';
 import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
 import { useAppColorScheme } from '@/theme/colorMode';
-import { NewReportMediaStep } from '@/components/report-management/NewReportMediaStep';
+import { NewReportMediaStep } from './components';
 import { removeMedia } from '@/lib/utils/captured-media';
 import { useCapturedMediaStore } from '@/stores/captured-media-store';
 import { useReportDraftStore } from '@/stores/report-draft-store';
@@ -28,13 +28,13 @@ export default function NewReportScreen() {
       ? capturedMedia.map((item) => ({ id: item.id, uri: item.uri }))
       : draftMediaSlots;
 
-  const handleBack = () => router.back();
-  const handleNext = () => {
+  const handleBack = usePreventDoublePress(() => router.back());
+  const handleNext = usePreventDoublePress(() => {
     const source = capturedMedia.length > 0 ? capturedMedia : mediaSlots;
     const uris = source.map((s) => s.uri).filter((u): u is string => u != null);
     setMediaUris(uris);
     router.push('/screens/report-management/details');
-  };
+  });
 
   const handleRemoveMedia = (
     slot: { id: string; uri: string | null },
@@ -51,12 +51,12 @@ export default function NewReportScreen() {
     }
   };
 
-  const handlePreviewImage = useCallback((uri: string, index: number) => {
+  const handlePreviewImage = usePreventDoublePress((uri: string, index: number) => {
     router.push({
       pathname: '/(modals)/image-preview',
       params: { uri, mode: 'media', index: String(index) },
     } as Parameters<typeof router.push>[0]);
-  }, []);
+  });
 
   return (
     <AppAnimatedSafeAreaView

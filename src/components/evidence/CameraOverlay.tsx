@@ -9,11 +9,14 @@ import { CameraOverlayBottomBar } from './CameraOverlayBottomBar';
 interface CameraOverlayProps {
   location?: string;
   avatarUri?: string;
+  /** When set, header shows back button instead of avatar/SOS (e.g. SOS evidence). */
+  onBack?: () => void;
   onCapture?: () => void;
   onAddMedia?: () => void;
   onAddFile?: () => void;
   onLocationPress?: () => void;
   onSosPress?: () => void;
+  onSosLongPress?: () => void;
   onFlash?: () => void;
   onVideoToggle?: () => void;
   onFlip?: () => void;
@@ -22,15 +25,23 @@ interface CameraOverlayProps {
   onLens?: () => void;
   onGalleryItemPress?: (item: { id: string; uri: string }) => void;
   onMorePress?: () => void;
+  /** When false, hide gallery strip (e.g. SOS evidence screen). Default true. */
+  showGalleryStrip?: boolean;
+  /** When set, use this for bottom offset instead of TAB_BAR_HEIGHT + insets (e.g. screens without tab bar). */
+  bottomOffset?: number;
+  /** When true, bottom bar shows only shutter (no add media, no right button). Default false. */
+  shutterOnly?: boolean;
 }
 
 export function CameraOverlay({
   location,
   avatarUri,
+  onBack,
   onCapture,
   onAddMedia,
   onAddFile,
   onSosPress,
+  onSosLongPress,
   onFlash,
   onVideoToggle,
   onFlip,
@@ -39,21 +50,26 @@ export function CameraOverlay({
   onLens,
   onGalleryItemPress,
   onMorePress,
+  showGalleryStrip = true,
+  bottomOffset,
+  shutterOnly = false,
 }: CameraOverlayProps) {
   const insets = useSafeAreaInsets();
+  const bottom =
+    bottomOffset ?? TAB_BAR_HEIGHT + insets.bottom + 20;
 
   return (
     <View
       style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
     >
-      {/* Header: avatar, location, time, action icons */}
       <CameraOverlayHeader
         location={location}
         avatarUri={avatarUri}
+        onBack={onBack}
         onSosPress={onSosPress}
+        onSosLongPress={onSosLongPress}
       />
 
-      {/* Right sidebar: flash, video, flip, mic, text, lens */}
       <CameraOverlaySidebar
         onFlash={onFlash}
         onVideoToggle={onVideoToggle}
@@ -64,22 +80,27 @@ export function CameraOverlay({
         onAddFile={onAddFile}
       />
 
-      {/* Bottom area: gallery strip + bottom bar — clears the floating tab bar */}
       <View
         style={{
           position: 'absolute',
-          bottom: TAB_BAR_HEIGHT + insets.bottom + 20,
+          bottom,
           left: 0,
           right: 0,
-          gap: 16,
+          gap: showGalleryStrip ? 16 : 0,
         }}
       >
-        <CameraOverlayGalleryStrip
-          onItemPress={onGalleryItemPress}
-          onMorePress={onMorePress}
-        />
+        {showGalleryStrip && (
+          <CameraOverlayGalleryStrip
+            onItemPress={onGalleryItemPress}
+            onMorePress={onMorePress}
+          />
+        )}
 
-        <CameraOverlayBottomBar onCapture={onCapture} onAddMedia={onAddMedia} />
+        <CameraOverlayBottomBar
+          onCapture={onCapture}
+          onAddMedia={onAddMedia}
+          shutterOnly={shutterOnly}
+        />
       </View>
     </View>
   );

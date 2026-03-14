@@ -107,7 +107,9 @@ export function AppBannerView({
                   labelClassName="text-xs font-metropolis-semibold text-primary-dark"
                   onPress={() => {
                     banner.onActionPress?.();
-                    onClose();
+                    if (banner.actionDismissesBanner !== false) {
+                      onClose();
+                    }
                   }}
                 >
                   {banner.actionLabel}

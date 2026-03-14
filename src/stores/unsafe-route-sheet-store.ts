@@ -23,14 +23,10 @@ type UnsafeRouteSheetActions = {
 };
 
 const initialState: UnsafeRouteSheetState = {
-  isOpen: true,
+  isOpen: false,
   fromLabel: 'Current location',
   toLabel: '',
-  issues: [
-    { id: '1', label: 'Unsuccessful Watch Me sessions', count: 4 },
-    { id: '2', label: 'Recorded auto accident', count: 1 },
-    { id: '3', label: 'Late check-ins reported', count: 2 },
-  ],
+  issues: [],
 };
 
 export const useUnsafeRouteSheetStore = create<
