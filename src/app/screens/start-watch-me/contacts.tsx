@@ -50,7 +50,7 @@ export default function WatchMeContactsScreen() {
         />
       }
       footer={
-        <View className="mt-4 px-2">
+        <View className="px-2" style={{ paddingBottom: insets.bottom }}>
           <AppButton
             variant="primary"
             size="lg"

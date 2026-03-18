@@ -11,8 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { AppText } from '@/components/ui/AppText';
 import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui/Avatar';
-import SolarMinimizeSquare2BoldIcon from '@/components/icons/solar/minimize-square-2-bold';
-import SolarCloseCircleBoldIcon from '@/components/icons/solar/close-circle-bold';
+import MingcuteArrowDownLineIcon from '@/components/icons/mingcute/arrow-down-line';
+import MingcuteCloseLineIcon from '@/components/icons/mingcute/close-line';
 import SolarPlain2BoldIcon from '@/components/icons/solar/plain-2-bold';
 import { useInChatStore } from '@/stores/in-chat-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
@@ -61,7 +61,7 @@ export default function ChatScreen() {
           className="w-10 h-10 rounded-full bg-black/10 dark:bg-white/10 items-center justify-center"
           accessibilityLabel="Minimize chat"
         >
-          <SolarMinimizeSquare2BoldIcon width={22} height={22} color={theme.textMuted} />
+          <MingcuteArrowDownLineIcon width={22} height={22} color={theme.textMuted} />
         </TouchableOpacity>
         <View className="flex-row items-center gap-2 flex-1 justify-center">
           <Avatar
@@ -79,7 +79,7 @@ export default function ChatScreen() {
           className="w-10 h-10 rounded-full bg-black/10 dark:bg-white/10 items-center justify-center"
           accessibilityLabel="End chat"
         >
-          <SolarCloseCircleBoldIcon width={22} height={22} color={theme.textMuted} />
+          <MingcuteCloseLineIcon width={22} height={22} color={theme.textMuted} />
         </TouchableOpacity>
       </View>
 

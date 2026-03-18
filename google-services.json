@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "58325232857",
+    "project_id": "resq-notification",
+    "storage_bucket": "resq-notification.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58325232857:android:c385e1f2cd07aeebe862c8",
+        "android_client_info": {
+          "package_name": "app.resq.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmkvQ7XZFZ5BATPUElwqwadrxsCOQWCQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

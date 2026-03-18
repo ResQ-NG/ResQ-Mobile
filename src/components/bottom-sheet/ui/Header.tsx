@@ -1,13 +1,8 @@
 import React from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import { SvgXml, type SvgProps } from "react-native-svg";
 import { AppText } from "@/components/ui/AppText";
 import { useThemeColors } from "@/context/ThemeContext";
-
-function CloseIcon(props: Omit<SvgProps, "xml">) {
-  const xml = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M6.4 19L5 17.6l5.6-5.6L5 6.4L6.4 5l5.6 5.6L17.6 5L19 6.4L13.4 12l5.6 5.6l-1.4 1.4l-5.6-5.6z"/></svg>`;
-  return <SvgXml xml={xml} {...props} />;
-}
+import MingcuteCloseLineIcon from "@/components/icons/mingcute/close-line";
 
 export interface BottomSheetHeaderProps {
   title: string;
@@ -52,7 +47,7 @@ export function BottomSheetHeader({
             { backgroundColor: colors.surfaceBackground },
           ]}
         >
-          <CloseIcon
+          <MingcuteCloseLineIcon
             width={18}
             height={18}
             color={colors.textMuted}

@@ -70,6 +70,7 @@ export default function CheckSafetyScreen() {
           subtitle="See how safe a route looks before you go."
         />
       }
+        
     >
       <CheckSafetyStep
         origin={origin}
@@ -85,4 +86,3 @@ export default function CheckSafetyScreen() {
     </AppAnimatedSafeAreaView>
   );
 }
-

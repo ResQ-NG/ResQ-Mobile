@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import SolarMicrophoneBoldIcon from '@/components/icons/solar/microphone-bold';
-import SolarSpeakerBoldIcon from '@/components/icons/solar/speaker-bold';
-import SolarCloseCircleBoldIcon from '@/components/icons/solar/close-circle-bold';
-import SolarMinimizeSquare2BoldIcon from '@/components/icons/solar/minimize-square-2-bold';
+import MingcuteArrowDownLineIcon from '@/components/icons/mingcute/arrow-down-line';
+import MingcuteMicrophoneLineIcon from '@/components/icons/mingcute/microphone-line';
+import MingcuteSpeakerLineIcon from '@/components/icons/mingcute/speaker-line';
+import MingcuteVideoCameraLineIcon from '@/components/icons/mingcute/video-camera-line';
+import MingcutePhoneOffFillIcon from '@/components/icons/mingcute/phone-off-fill';
 import { AppText } from '@/components/ui/AppText';
 import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui/Avatar';
 import { useInCallStore } from '@/stores/in-call-store';
@@ -25,7 +26,8 @@ function formatDuration(ms: number): string {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
-const END_CALL_BUTTON_SIZE = 72;
+const CONTROL_BUTTON_SIZE = 52;
+const END_CALL_SIZE = 64;
 
 export default function InCallScreen() {
   const insets = useSafeAreaInsets();
@@ -41,6 +43,7 @@ export default function InCallScreen() {
   const [durationMs, setDurationMs] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
+  const [isVideoOn, setIsVideoOn] = useState(false);
 
   useEffect(() => {
     if (!isActive || !startedAt) return;
@@ -63,26 +66,22 @@ export default function InCallScreen() {
   const iconColor = theme.textMuted;
   const topPad = insets.top + 12;
   const bottomPad = insets.bottom + 24;
-  const horizontalPad = 24;
+  const horizontalPad = 20;
 
   return (
     <View
       className="flex-1 bg-white dark:bg-[#1a1a1a]"
       style={{ paddingTop: topPad, paddingBottom: bottomPad, paddingHorizontal: horizontalPad }}
     >
-      {/* Header: minimize left, duration right */}
-      <View className="flex-row items-center justify-between mb-6">
+      {/* Header: minimize (arrow down), duration */}
+      <View className="flex-row items-center justify-between mb-8">
         <TouchableOpacity
           onPress={handleMinimize}
           hitSlop={12}
-          className="w-12 h-12 rounded-full items-center justify-center border border-black/12 dark:border-white/15 bg-black/12 dark:bg-white/15"
+          className="w-11 h-11 rounded-full items-center justify-center bg-black/10 dark:bg-white/10"
           accessibilityLabel="Minimize call"
         >
-          <SolarMinimizeSquare2BoldIcon
-            width={24}
-            height={24}
-            color={theme.iconOnAccent}
-          />
+          <MingcuteArrowDownLineIcon width={22} height={22} color={iconColor} />
         </TouchableOpacity>
         <AppText className="text-sm font-metropolis-semibold text-captionDark dark:text-captionDark-dark tabular-nums">
           {formatDuration(durationMs)}
@@ -90,60 +89,90 @@ export default function InCallScreen() {
         <View className="w-11" />
       </View>
 
-      {/* Content: avatar + name */}
+      {/* Content: avatar + name + call type */}
       <View className="flex-1 items-center justify-center">
         <Avatar
-          size={112}
+          size={100}
           altText={callerName ?? 'Call'}
           backgroundColor={AVATAR_BACKGROUNDS[avatarColorIndex(callerName)]}
-          className="mb-4"
+          className="mb-3"
         />
-        <AppText className="text-xl font-metropolis-bold text-primaryDark dark:text-primaryDark-dark text-center">
+        <AppText className="text-lg font-metropolis-bold text-primaryDark dark:text-primaryDark-dark text-center">
           {callerName ?? 'Call in progress'}
         </AppText>
-        <AppText className="text-sm font-metropolis-medium text-captionDark dark:text-captionDark-dark mt-1">
-          In call
+        <AppText className="text-sm font-metropolis-medium text-captionDark dark:text-captionDark-dark mt-0.5">
+          {isVideoOn ? 'Video call' : 'Voice call'}
         </AppText>
       </View>
 
-      {/* Controls: mute + speaker row, then end call */}
-      <View className="items-center gap-6">
-        <View className="flex-row items-center justify-center gap-8">
+      {/* Controls: mute, video, speaker row; end call below */}
+      <View className="items-center gap-5">
+        <View className="flex-row items-center justify-center gap-6">
           <TouchableOpacity
             onPress={() => setIsMuted((m) => !m)}
-            className="items-center gap-2"
+            className="items-center gap-1.5"
             accessibilityLabel={isMuted ? 'Unmute' : 'Mute'}
           >
             <View
-              className="w-14 h-14 rounded-full items-center justify-center bg-black/8 dark:bg-white/8"
-              style={isMuted ? { backgroundColor: 'rgba(239,68,68,0.2)' } : undefined}
+              className="rounded-full items-center justify-center bg-black/8 dark:bg-white/8"
+              style={[
+                { width: CONTROL_BUTTON_SIZE, height: CONTROL_BUTTON_SIZE },
+                isMuted && { backgroundColor: 'rgba(239,68,68,0.18)' },
+              ]}
             >
-              <SolarMicrophoneBoldIcon
-                width={26}
-                height={26}
+              <MingcuteMicrophoneLineIcon
+                width={24}
+                height={24}
                 color={isMuted ? '#ef4444' : iconColor}
               />
             </View>
-            <AppText className="text-xs font-metropolis-medium text-captionDark dark:text-captionDark-dark">
+            <AppText className="text-[11px] font-metropolis-medium text-captionDark dark:text-captionDark-dark">
               {isMuted ? 'Unmute' : 'Mute'}
             </AppText>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setIsVideoOn((v) => !v)}
+            className="items-center gap-1.5"
+            accessibilityLabel={isVideoOn ? 'Switch to voice' : 'Switch to video'}
+          >
+            <View
+              className="rounded-full items-center justify-center bg-black/8 dark:bg-white/8"
+              style={[
+                { width: CONTROL_BUTTON_SIZE, height: CONTROL_BUTTON_SIZE },
+                isVideoOn && { backgroundColor: 'rgba(37,99,235,0.18)' },
+              ]}
+            >
+              <MingcuteVideoCameraLineIcon
+                width={24}
+                height={24}
+                color={isVideoOn ? '#2563eb' : iconColor}
+              />
+            </View>
+            <AppText className="text-[11px] font-metropolis-medium text-captionDark dark:text-captionDark-dark">
+              {isVideoOn ? 'Video on' : 'Video'}
+            </AppText>
+          </TouchableOpacity>
+
           <TouchableOpacity
             onPress={() => setIsSpeakerOn((s) => !s)}
-            className="items-center gap-2"
+            className="items-center gap-1.5"
             accessibilityLabel={isSpeakerOn ? 'Speaker off' : 'Speaker on'}
           >
             <View
-              className="w-14 h-14 rounded-full items-center justify-center bg-black/8 dark:bg-white/8"
-              style={isSpeakerOn ? { backgroundColor: 'rgba(37,99,235,0.2)' } : undefined}
+              className="rounded-full items-center justify-center bg-black/8 dark:bg-white/8"
+              style={[
+                { width: CONTROL_BUTTON_SIZE, height: CONTROL_BUTTON_SIZE },
+                isSpeakerOn && { backgroundColor: 'rgba(37,99,235,0.18)' },
+              ]}
             >
-              <SolarSpeakerBoldIcon
-                width={26}
-                height={26}
+              <MingcuteSpeakerLineIcon
+                width={24}
+                height={24}
                 color={isSpeakerOn ? '#2563eb' : iconColor}
               />
             </View>
-            <AppText className="text-xs font-metropolis-medium text-captionDark dark:text-captionDark-dark">
+            <AppText className="text-[11px] font-metropolis-medium text-captionDark dark:text-captionDark-dark">
               {isSpeakerOn ? 'Speaker on' : 'Speaker'}
             </AppText>
           </TouchableOpacity>
@@ -152,11 +181,11 @@ export default function InCallScreen() {
         <TouchableOpacity
           onPress={handleEndCall}
           activeOpacity={0.85}
-          className="rounded-full bg-red-500 dark:bg-red-600 items-center justify-center mt-2"
-          style={{ width: END_CALL_BUTTON_SIZE, height: END_CALL_BUTTON_SIZE }}
+          className="rounded-full bg-red-500 dark:bg-red-600 items-center justify-center mt-1"
+          style={{ width: END_CALL_SIZE, height: END_CALL_SIZE }}
           accessibilityLabel="End call"
         >
-          <SolarCloseCircleBoldIcon width={32} height={32} color="#fff" />
+          <MingcutePhoneOffFillIcon width={28} height={28} color="#fff" />
         </TouchableOpacity>
       </View>
     </View>

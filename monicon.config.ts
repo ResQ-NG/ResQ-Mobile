@@ -71,11 +71,18 @@ export default {
     'solar:chat-round-dots-bold',
 
     // Calls and chat
-    'solar:close-circle-bold', // end call / end chat / dismiss
-    'solar:speaker-bold', // speaker (in-call)
+    'solar:close-circle-bold', // end chat / dismiss (chat & banner)
+    'solar:speaker-bold',
     'solar:plain-2-bold', // send message
-    'solar:minimize-square-2-bold', // compress / minimize (call & chat screen)
-    'solar:maximize-square-2-bold', // expand (floating banner: open call/chat)
+    'solar:minimize-square-2-bold',
+    'solar:maximize-square-2-bold',
+    // In-call: Mingcute (cleaner call UI)
+    'mingcute:phone-off-fill', // end call
+    'mingcute:arrow-down-line', // minimize call
+    'mingcute:video-camera-line', // switch to video
+    'mingcute:microphone-line', // mute
+    'mingcute:speaker-line', // speaker
+    'mingcute:close-line', // close
   ],
   plugins: [
     clean({ patterns: ['src/components/icons'] }),

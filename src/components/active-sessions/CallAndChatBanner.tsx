@@ -11,7 +11,7 @@ import Animated, {
 import SolarPhoneCallingRoundedBoldIcon from '@/components/icons/solar/phone-calling-rounded-bold';
 import SolarChatRoundDotsBoldIcon from '@/components/icons/solar/chat-round-dots-bold';
 import SolarMaximizeSquare2BoldIcon from '@/components/icons/solar/maximize-square-2-bold';
-import SolarCloseCircleBoldIcon from '@/components/icons/solar/close-circle-bold';
+import MingcuteCloseLineIcon from '@/components/icons/mingcute/close-line';
 import { AppText } from '@/components/ui/AppText';
 import { useInCallStore } from '@/stores/in-call-store';
 import { useInChatStore } from '@/stores/in-chat-store';
@@ -170,7 +170,7 @@ export function CallAndChatBanner() {
               className="w-8 h-8 rounded-full bg-white/15 items-center justify-center ml-2"
               accessibilityLabel="End call"
             >
-              <SolarCloseCircleBoldIcon width={18} height={18} color="#fff" />
+              <MingcuteCloseLineIcon width={18} height={18} color="#fff" />
             </TouchableOpacity>
           </View>
         )}
@@ -220,7 +220,7 @@ export function CallAndChatBanner() {
               className="w-8 h-8 rounded-full bg-white/15 items-center justify-center ml-2"
               accessibilityLabel="Dismiss chat"
             >
-              <SolarCloseCircleBoldIcon width={18} height={18} color="#fff" />
+              <MingcuteCloseLineIcon width={18} height={18} color="#fff" />
             </TouchableOpacity>
           </View>
         )}

@@ -23,7 +23,9 @@ import { AppBannerHost } from '@/components/app-banner/AppBannerHost';
 import { AppToastHost } from '@/components/app-toast/AppToastHost';
 import { AppModalHost } from '@/components/app-modal/AppModalHost';
 import { InCallHost } from '@/components/in-call';
+import { registerGlobals } from '@livekit/react-native';
 
+registerGlobals();
 // We use only react-native-safe-area-context; this warning comes from a dependency.
 LogBox.ignoreLogs([
   "SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead.",

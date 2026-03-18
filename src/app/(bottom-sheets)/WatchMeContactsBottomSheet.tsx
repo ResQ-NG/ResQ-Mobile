@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { router } from 'expo-router';
+import { router, usePathname } from 'expo-router';
 import { BaseBottomSheet } from '@/components/bottom-sheet';
 import { AppButton } from '@/components/ui/AppButton';
 import { showToast } from '@/lib/utils/app-toast';
@@ -17,6 +17,7 @@ import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 const SNAP_POINTS = ['65%', '95%'];
 
 export function WatchMeContactsBottomSheet() {
+  const pathname = usePathname();
   const { isOpen, close, openWithAddView, clearOpenWithAddView } =
     useWatchMeContactsSheetStore();
   const {
@@ -53,26 +54,43 @@ export function WatchMeContactsBottomSheet() {
 
   const handleCancel = usePreventDoublePress(
     useCallback(() => {
+      if (pathname === '/screens/start-watch-me/contacts') {
+        close();
+      }
       if (view === 'add') {
         resetAddForm();
         setView('list');
       } else {
         close();
       }
-    }, [view, close, resetAddForm])
+    }, [view, close, resetAddForm, pathname])
   );
 
   const handleSubmitAddContact = usePreventDoublePress(
     useCallback(() => {
-    if (!name.trim() || !phone.trim()) return;
-    addContactToStore({
-      name: name.trim(),
-      phone: phone.trim(),
-      ...(relationship ? { relationship } : {}),
-    });
-    resetAddForm();
-    setView('list');
-  }, [name, phone, relationship, addContactToStore, resetAddForm])
+      if (!name.trim() || !phone.trim()) return;
+      addContactToStore({
+        name: name.trim(),
+        phone: phone.trim(),
+        ...(relationship ? { relationship } : {}),
+      });
+      resetAddForm();
+
+      if (pathname === '/screens/start-watch-me/contacts') {
+        close();
+        return;
+      } else {
+        close();
+      }
+    }, [
+      name,
+      phone,
+      relationship,
+      addContactToStore,
+      resetAddForm,
+      pathname,
+      close,
+    ])
   );
 
   const handleRemoveContact = useCallback(
