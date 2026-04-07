@@ -1,18 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
+  cancelAnimation,
   Easing,
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AppText } from '@/components/ui/AppText';
 import type { AppToast as AppToastType } from '@/stores/app-toast-store';
-import { scheduleOnRN } from 'react-native-worklets';
 
 const SLIDE_DURATION_MS = 280;
 const FADE_OUT_DURATION_MS = 320;
+
+/** Horizontal shake keyframes for error toasts (ms per step). */
+const SHAKE_STEPS_MS = 42;
 
 interface AppToastViewProps {
   toast: AppToastType;
@@ -21,9 +26,18 @@ interface AppToastViewProps {
 
 export function AppToastView({ toast, onClose }: AppToastViewProps) {
   const translateY = useSharedValue(-24);
+  const translateX = useSharedValue(0);
   const opacity = useSharedValue(0);
 
-  // Enter: slide in + fade in
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  /** Stable for runOnJS — reads latest handler from ref. */
+  const runDismiss = useCallback(() => {
+    onCloseRef.current();
+  }, []);
+
+  // Enter: slide in + fade in; error also shakes horizontally
   useEffect(() => {
     translateY.value = withTiming(0, {
       duration: SLIDE_DURATION_MS,
@@ -33,12 +47,31 @@ export function AppToastView({ toast, onClose }: AppToastViewProps) {
       duration: SLIDE_DURATION_MS,
       easing: Easing.out(Easing.cubic),
     });
-  }, [translateY, opacity]);
 
-  // Exit: fade out then remove
+    if (toast.variant === 'error') {
+      const d = SHAKE_STEPS_MS;
+      const ease = Easing.out(Easing.quad);
+      translateX.value = withSequence(
+        withTiming(11, { duration: d, easing: ease }),
+        withTiming(-11, { duration: d, easing: ease }),
+        withTiming(8, { duration: d, easing: ease }),
+        withTiming(-8, { duration: d, easing: ease }),
+        withTiming(4, { duration: d, easing: ease }),
+        withTiming(-4, { duration: d, easing: ease }),
+        withTiming(0, { duration: d * 1.5, easing: Easing.out(Easing.cubic) })
+      );
+    }
+
+    return () => {
+      cancelAnimation(translateX);
+    };
+  }, [translateY, translateX, opacity, toast.variant]);
+
+  // Exit: fade out then remove (cancel in-flight fade if deps change / unmount)
   useEffect(() => {
     if (!toast.exiting) return;
 
+    cancelAnimation(opacity);
     opacity.value = withTiming(
       0,
       {
@@ -47,14 +80,21 @@ export function AppToastView({ toast, onClose }: AppToastViewProps) {
       },
       (finished) => {
         if (finished) {
-          scheduleOnRN(() => onClose());
+          runOnJS(runDismiss)();
         }
       }
     );
-  }, [toast.exiting, opacity, onClose]);
+
+    return () => {
+      cancelAnimation(opacity);
+    };
+  }, [toast.exiting, opacity, runDismiss]);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+    transform: [
+      { translateX: translateX.value },
+      { translateY: translateY.value },
+    ],
     opacity: opacity.value,
   }));
 

@@ -32,6 +32,17 @@ const initialState: AppToastState = {
 
 const DEFAULT_DURATION_MS = 2500;
 
+/** Auto-dismiss timers — cleared on hideToast so setExiting never runs after removal. */
+const dismissTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+function clearDismissTimer(id: string) {
+  const t = dismissTimers.get(id);
+  if (t !== undefined) {
+    clearTimeout(t);
+    dismissTimers.delete(id);
+  }
+}
+
 export const useAppToastStore = create<AppToastState & AppToastActions>()(
   (set, get) => ({
     ...initialState,
@@ -54,9 +65,12 @@ export const useAppToastStore = create<AppToastState & AppToastActions>()(
         ],
       }));
 
-      setTimeout(() => {
+      clearDismissTimer(id);
+      const timer = setTimeout(() => {
+        dismissTimers.delete(id);
         get().setExiting(id);
       }, durationMs);
+      dismissTimers.set(id, timer);
       return id;
     },
     setExiting: (id) =>
@@ -65,10 +79,17 @@ export const useAppToastStore = create<AppToastState & AppToastActions>()(
           t.id === id ? { ...t, exiting: true } : t
         ),
       })),
-    hideToast: (id) =>
+    hideToast: (id) => {
+      clearDismissTimer(id);
       set((state) => ({
         toasts: state.toasts.filter((t) => t.id !== id),
-      })),
-    clearToasts: () => set(initialState),
+      }));
+    },
+    clearToasts: () => {
+      for (const id of Array.from(dismissTimers.keys())) {
+        clearDismissTimer(id);
+      }
+      set(initialState);
+    },
   })
 );

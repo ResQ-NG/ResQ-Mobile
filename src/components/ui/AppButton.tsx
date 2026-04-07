@@ -1,5 +1,11 @@
-import { Pressable, PressableProps } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  PressableProps,
+  View,
+} from 'react-native';
 import { cn } from '@/lib/cn';
+import { useAppColorScheme } from '@/theme/colorMode';
 import { AppText } from './AppText';
 
 type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'outline' | 'ghost';
@@ -32,6 +38,8 @@ export type AppButtonProps = PressableProps & {
   size?: ButtonSize;
   className?: string;
   labelClassName?: string;
+  /** Shows a spinner and blocks presses while true. */
+  loading?: boolean;
   children: React.ReactNode;
 };
 
@@ -42,35 +50,55 @@ export function AppButton({
   labelClassName = '',
   children,
   disabled,
+  loading = false,
   ...rest
 }: AppButtonProps) {
+  const { theme } = useAppColorScheme();
+  const isDisabled = Boolean(disabled) || loading;
+
   const combined = cn(
     'items-center justify-center rounded-full',
     variantStyles[variant],
     sizeStyles[size],
-    disabled && 'opacity-60',
+    disabled && !loading && 'opacity-60',
     className
   );
 
   const labelCombined = cn(
     labelColorStyles[variant],
     'font-metropolis-semibold',
+    loading && 'opacity-90',
     labelClassName
   );
 
   const labelSize =
     size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base';
 
+  const spinnerColor =
+    variant === 'primary' || variant === 'accent'
+      ? theme.iconOnAccent
+      : theme.primaryBlue;
+
   return (
     <Pressable
-      className={combined}
-      disabled={disabled}
-      accessibilityRole="button"
       {...rest}
+      className={combined}
+      disabled={isDisabled}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
-      <AppText variant="body" className={`${labelSize} ${labelCombined}`}>
-        {children}
-      </AppText>
+      <View className="flex-row items-center justify-center gap-2">
+        {loading ? (
+          <ActivityIndicator
+            color={spinnerColor}
+            size="small"
+            accessibilityLabel="Loading"
+          />
+        ) : null}
+        <AppText variant="body" className={`${labelSize} ${labelCombined}`}>
+          {children}
+        </AppText>
+      </View>
     </Pressable>
   );
 }

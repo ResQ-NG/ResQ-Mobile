@@ -1,4 +1,11 @@
-import { TextInput, TextInputProps, View } from 'react-native';
+import { useState } from 'react';
+import {
+  Pressable,
+  TextInput,
+  TextInputProps,
+  View,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { cn } from '@/lib/cn';
 import { useAppColorScheme } from '@/theme/colorMode';
 
@@ -8,6 +15,8 @@ const BORDER_CLASS =
 export type AppInputProps = TextInputProps & {
   /** Optional left icon (e.g. map pin) */
   leftIcon?: React.ReactNode;
+  /** When set with a password field, shows eye control to show/hide text */
+  showPasswordToggle?: boolean;
   /** Container className; input uses rounded-2xl and theme bg by default */
   className?: string;
   /** Input text className */
@@ -16,16 +25,25 @@ export type AppInputProps = TextInputProps & {
 
 export function AppInput({
   leftIcon,
+  showPasswordToggle = false,
   className = '',
   inputClassName = '',
   placeholderTextColor,
   style,
+  secureTextEntry: secureTextEntryProp,
   ...rest
 }: AppInputProps) {
   const { theme } = useAppColorScheme();
   const placeholderColor = placeholderTextColor ?? theme.textMuted;
+  const [passwordHidden, setPasswordHidden] = useState(true);
 
-  if (leftIcon) {
+  const effectiveSecure = showPasswordToggle
+    ? passwordHidden
+    : Boolean(secureTextEntryProp);
+
+  const useRow = Boolean(leftIcon || showPasswordToggle);
+
+  if (useRow) {
     const { style: inputStyle, ...restInputProps } = rest as TextInputProps;
     return (
       <View
@@ -39,7 +57,7 @@ export function AppInput({
           style as object,
         ]}
       >
-        {leftIcon}
+        {leftIcon ?? null}
         <TextInput
           placeholderTextColor={placeholderColor}
           className={cn(
@@ -51,8 +69,25 @@ export function AppInput({
             inputStyle as object,
           ]}
           textAlignVertical="center"
+          secureTextEntry={effectiveSecure}
           {...restInputProps}
         />
+        {showPasswordToggle ? (
+          <Pressable
+            onPress={() => setPasswordHidden((h) => !h)}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel={
+              passwordHidden ? 'Show password' : 'Hide password'
+            }
+          >
+            <Ionicons
+              name={passwordHidden ? 'eye-outline' : 'eye-off-outline'}
+              size={22}
+              color={theme.textMuted}
+            />
+          </Pressable>
+        ) : null}
       </View>
     );
   }
@@ -67,6 +102,7 @@ export function AppInput({
         inputClassName
       )}
       style={[{ backgroundColor: theme.surfaceBackground }, style]}
+      secureTextEntry={effectiveSecure}
       {...rest}
     />
   );
