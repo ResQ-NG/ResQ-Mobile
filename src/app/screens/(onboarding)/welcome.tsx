@@ -24,7 +24,7 @@ export default function WelcomeScreen() {
       progressWidth.value = withTiming('100%', { duration: 400 });
       setStep(2);
     } else {
-      router.replace('/screens/main');
+      router.replace('/screens/(onboarding)/get-started');
     }
   };
 

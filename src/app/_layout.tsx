@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { LogBox } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useMetropolisFonts } from '@/hooks/useMetropolisFonts';
+import { useAuthOnboardingGate } from '@/hooks/useAuthOnboardingGate';
 import { debugAppConfig } from '@/lib/app-config';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
@@ -56,18 +57,19 @@ export default function RootLayout() {
   useFocusManager();
   useWatchMeSessionBanner();
   useSosBanner();
+  const { hydrated: authHydrated } = useAuthOnboardingGate();
 
   useEffect(() => {
     setupOnlineManager();
   }, []);
 
   useEffect(() => {
-    if (loaded || error) {
+    if ((loaded || error) && authHydrated) {
       SplashScreen.hideAsync();
     }
-  }, [loaded, error]);
+  }, [loaded, error, authHydrated]);
 
-  if (!loaded && !error) {
+  if ((!loaded && !error) || !authHydrated) {
     return null;
   }
 
@@ -84,7 +86,12 @@ export default function RootLayout() {
                 <AppModalHost />
                 <InCallHost />
                 <BottomSheetRegistry />
-                <Stack screenOptions={{ headerShown: false }} />
+                <Stack
+                  screenOptions={{
+                    headerShown: false,
+                    animation: 'fade',
+                  }}
+                />
               </KeyboardProvider>
             </QueryClientProvider>
           </BottomSheetModalProvider>
