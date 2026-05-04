@@ -1,45 +1,48 @@
-import {
-  AuthUser,
-  GoogleUser,
-} from "@/atoms/persisted-atoms/auth-atoms/authUserAtom";
+import type { AuthUserProfile } from '@/network/modules/auth/types';
+import { isPlainRecord } from '@/network/config/type-guards';
 
-export const convertGoogleUserToAuthUser = (
-  googleUser: GoogleUser
-): AuthUser => {
-  return {
-    id: null as unknown as string | number,
-    google_id: googleUser.id,
-    email: googleUser.email,
-    name: googleUser.name,
-    profile_picture_url: googleUser.photo,
-    first_name: googleUser.givenName,
-    last_name: googleUser.familyName,
-    date_of_birth: null,
-    home_address: null,
-    city: null,
-    state: null,
-    zip_code: null,
-    account_status: "active",
-    role: "user",
-  };
-};
+/** Unwraps `GET .../profile` whether the API returns the user flat or under `user`. */
+export function normalizeProfileApiResponse(response: unknown): AuthUserProfile {
+  if (!isPlainRecord(response)) {
+    throw new Error('Invalid profile response');
+  }
+  const nested = response.user;
+  if (isPlainRecord(nested) && typeof nested.email === 'string') {
+    return nested as unknown as AuthUserProfile;
+  }
+  if (typeof response.email === 'string' && typeof response.first_name === 'string') {
+    return response as unknown as AuthUserProfile;
+  }
+  throw new Error('Invalid profile response shape');
+}
 
-export const formatSocialSecurityNumber = (
-  socialSecurityNumber: string
-): string => {
-  return socialSecurityNumber.length === 9
-    ? `${socialSecurityNumber.slice(0, 3)}-${socialSecurityNumber.slice(3, 5)}-${socialSecurityNumber.slice(5)}`
-    : socialSecurityNumber;
-};
+export type AuthProfileNameFields = Pick<
+  AuthUserProfile,
+  'first_name' | 'last_name' | 'email'
+>;
+
+export function formatAuthProfileDisplayName(profile: AuthProfileNameFields): string {
+  const parts = [profile.first_name, profile.last_name]
+    .map((s) => s?.trim())
+    .filter(Boolean);
+  if (parts.length > 0) return parts.join(' ');
+  return profile.email;
+}
+
+export function formatAuthProfileMemberSinceLabel(createdAt: string): string {
+  const d = new Date(createdAt);
+  if (Number.isNaN(d.getTime())) return 'Member';
+  return `Member since ${d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+}
 
 export const formatPhoneNumber = (phoneNumber: string): string => {
-  return phoneNumber.startsWith("+") ? phoneNumber : `+1${phoneNumber}`;
+  return phoneNumber.startsWith('+') ? phoneNumber : `+1${phoneNumber}`;
 };
 
 export const formatDate = (date: string): string => {
-  return new Date(date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 };

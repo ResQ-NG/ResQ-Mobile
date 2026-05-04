@@ -17,9 +17,20 @@ export interface LoginWithIdentifierRequest {
   phone_number?: string;
   nin?: string;
 }
+export interface AvatarPreset {
+  style: string;
+  seed: string;
+  preview_url: string;
+}
+
+export interface UpdateProfileInformationRequest {
+  first_name: string;
+  last_name: string;
+  avatar_url: string;
+}
 
 export interface AuthUserProfile {
-  avatar_url: string;
+  avatar_url?: string | null;
   created_at: string;
   email: string;
   first_name: string;
@@ -62,3 +73,7 @@ export interface VerifyIdentifierOtpRequest {
 
 /** OTP verify often returns the same shape as login; adjust if your API differs. */
 export type VerifyIdentifierOtpResponse = LoginWithIdentifierResponse;
+
+export interface AuthUserProfileResponse {
+  user: AuthUserProfile;
+}

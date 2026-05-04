@@ -206,7 +206,8 @@ export const BaseBottomSheet = forwardRef<
     const horizontalPadding = contentPadding.horizontal ?? 16;
     const topPadding = contentPadding.top ?? 16;
 
-    const footerHeight = footer ? 72 + insets.bottom : 0;
+    /** Pinned footer (e.g. two `lg` buttons + gaps + padding); must match real footer height or content is clipped. */
+    const footerHeight = footer ? 168 + insets.bottom : 0;
     const baseBottomPadding = contentPadding.bottom ?? 16;
     const bottomPadding = footer
       ? Math.max(baseBottomPadding, footerHeight + 16)

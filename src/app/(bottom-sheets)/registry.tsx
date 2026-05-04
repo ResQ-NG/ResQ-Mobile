@@ -6,6 +6,9 @@ import SosConfirmBottomSheet from './SosConfirmBottomSheet';
 import EndSosConfirmBottomSheet from './EndSosConfirmBottomSheet';
 import { IncomingCallBottomSheet } from './IncomingCallBottomSheet';
 import ChatAgencyPickerBottomSheet from './ChatAgencyPickerBottomSheet';
+import DeleteEmergencyContactConfirmBottomSheet from './DeleteEmergencyContactConfirmBottomSheet';
+import AvatarPresetPickerBottomSheet from './AvatarPresetPickerBottomSheet';
+import InviteContactBottomSheet from './InviteContactBottomSheet';
 
 export default function BottomSheetRegistry() {
   return (
@@ -18,6 +21,9 @@ export default function BottomSheetRegistry() {
       <EndSosConfirmBottomSheet />
       <IncomingCallBottomSheet />
       <ChatAgencyPickerBottomSheet />
+      <DeleteEmergencyContactConfirmBottomSheet />
+      <AvatarPresetPickerBottomSheet />
+      <InviteContactBottomSheet />
     </>
   );
 }

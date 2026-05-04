@@ -9,6 +9,8 @@ import { CameraOverlayBottomBar } from './CameraOverlayBottomBar';
 interface CameraOverlayProps {
   location?: string;
   avatarUri?: string;
+  /** Accessibility / initials when no photo (e.g. from profile). */
+  avatarAltText?: string;
   /** When set, header shows back button instead of avatar/SOS (e.g. SOS evidence). */
   onBack?: () => void;
   onCapture?: () => void;
@@ -38,6 +40,7 @@ interface CameraOverlayProps {
 export function CameraOverlay({
   location,
   avatarUri,
+  avatarAltText,
   onBack,
   onCapture,
   onAddMedia,
@@ -68,6 +71,7 @@ export function CameraOverlay({
       <CameraOverlayHeader
         location={location}
         avatarUri={avatarUri}
+        avatarAltText={avatarAltText}
         onBack={onBack}
         onSosPress={onSosPress}
         onSosLongPress={onSosLongPress}

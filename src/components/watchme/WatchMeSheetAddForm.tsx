@@ -1,34 +1,44 @@
-import { View } from 'react-native';
+import type { ReactNode } from 'react';
+import type { KeyboardTypeOptions, TextInputProps } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { AppText } from '@/components/ui/AppText';
-import { AppInput, InlineSelect } from '@/components/ui';
-import SolarUsersGroupRoundedBoldIcon from '@/components/icons/solar/users-group-rounded-bold';
-import SolarUserSpeakBoldIcon from '@/components/icons/solar/user-speak-bold';
-import SolarFolderOpenBoldIcon from '@/components/icons/solar/folder-open-bold';
-import SolarInfoCircleBoldIcon from '@/components/icons/solar/info-circle-bold';
-
-export const RELATIONSHIP_OPTIONS = [
-  { value: 'family', label: 'Family' },
-  { value: 'friend', label: 'Friend' },
-  { value: 'work', label: 'Work' },
-  { value: 'other', label: 'Other' },
-];
+import { AppInput, InlineSelect, type InlineSelectOption } from '@/components/ui';
 
 type Props = {
   name: string;
-  phone: string;
+  contact: string;
   relationship: string | null;
   onChangeName: (v: string) => void;
-  onChangePhone: (v: string) => void;
+  onChangeContact: (v: string) => void;
   onChangeRelationship: (v: string | null) => void;
+  relationshipOptions: InlineSelectOption[];
+  relationshipsLoading?: boolean;
+  contactFieldLabel: string;
+  contactPlaceholder: string;
+  contactKeyboardType: KeyboardTypeOptions;
+  contactTextContentType: TextInputProps['textContentType'];
+  contactAutoCorrect?: boolean;
+  /** Shown under the email/phone field (e.g. invalid hint). */
+  contactHint?: string | null;
+  contactLeftIcon?: ReactNode;
 };
 
 export function WatchMeSheetAddForm({
   name,
-  phone,
+  contact,
   relationship,
   onChangeName,
-  onChangePhone,
+  onChangeContact,
   onChangeRelationship,
+  relationshipOptions,
+  relationshipsLoading,
+  contactFieldLabel,
+  contactPlaceholder,
+  contactKeyboardType,
+  contactTextContentType,
+  contactAutoCorrect = true,
+  contactHint,
+  contactLeftIcon,
 }: Props) {
   return (
     <View className="px-4">
@@ -40,59 +50,40 @@ export function WatchMeSheetAddForm({
             onChangeText={onChangeName}
           />
         </FormField>
-        <FormField label="Phone number">
+        <FormField label={contactFieldLabel}>
           <AppInput
-            placeholder="Enter"
-            value={phone}
-            onChangeText={onChangePhone}
-            keyboardType="phone-pad"
+            placeholder={contactPlaceholder}
+            value={contact}
+            onChangeText={onChangeContact}
+            keyboardType={contactKeyboardType}
+            textContentType={contactTextContentType}
+            autoCapitalize="none"
+            autoCorrect={contactAutoCorrect}
+            leftIcon={contactLeftIcon}
           />
+          {contactHint ? (
+            <AppText className="text-xs text-captionDark dark:text-captionDark-dark mt-2 px-0.5">
+              {contactHint}
+            </AppText>
+          ) : null}
         </FormField>
-        <FormField label="Relationship (optional)">
-          <InlineSelect
-            options={RELATIONSHIP_OPTIONS}
-            value={relationship}
-            onChange={(v) => onChangeRelationship(v)}
-            placeholder="Select"
-            getIconForOption={(option, size, selected) => {
-              const iconSize = size === 'large' ? 20 : 16;
-              const commonProps = {
-                width: iconSize,
-                height: iconSize,
-              } as const;
-
-              switch (option.value) {
-                case 'family':
-                  return (
-                    <SolarUsersGroupRoundedBoldIcon
-                      {...commonProps}
-                      color={selected ? '#0B63F6' : '#6B7280'}
-                    />
-                  );
-                case 'friend':
-                  return (
-                    <SolarUserSpeakBoldIcon
-                      {...commonProps}
-                      color={selected ? '#0B63F6' : '#6B7280'}
-                    />
-                  );
-                case 'work':
-                  return (
-                    <SolarFolderOpenBoldIcon
-                      {...commonProps}
-                      color={selected ? '#0B63F6' : '#6B7280'}
-                    />
-                  );
-                default:
-                  return (
-                    <SolarInfoCircleBoldIcon
-                      {...commonProps}
-                      color={selected ? '#0B63F6' : '#6B7280'}
-                    />
-                  );
-              }
-            }}
-          />
+        <FormField label="Relationship">
+          {relationshipsLoading ? (
+            <View className="min-h-[48px] items-center justify-center rounded-full border border-[rgba(0,0,0,0.08)] dark:border-[rgba(255,255,255,0.1)]">
+              <ActivityIndicator />
+            </View>
+          ) : relationshipOptions.length === 0 ? (
+            <AppText className="text-sm text-captionDark dark:text-captionDark-dark">
+              Could not load relationship options. Try again later.
+            </AppText>
+          ) : (
+            <InlineSelect
+              options={relationshipOptions}
+              value={relationship}
+              onChange={(v) => onChangeRelationship(v)}
+              placeholder="Select"
+            />
+          )}
         </FormField>
       </View>
     </View>

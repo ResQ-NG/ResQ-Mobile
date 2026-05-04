@@ -24,8 +24,7 @@ const REPORT_ICON_SIZE = 26;
 
 export function AppTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const { theme, themeName } = useAppColorScheme();
-  const isDark = themeName === 'dark';
+  const { theme, isDark } = useAppColorScheme();
 
   const activeColor = theme.iconOnAccent;
   const inactiveColor = theme.textMuted;

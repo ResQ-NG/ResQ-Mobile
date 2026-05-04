@@ -4,6 +4,7 @@ import MapboxGL from '@rnmapbox/maps';
 import { GlobalMapboxConfig } from '@/lib/third-party/mapbox/constants';
 import { AppConfig } from '@/lib/app-config';
 import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
+import { useCurrentUserProfileAvatar } from '@/hooks/useCurrentUserProfileAvatar';
 import { useFetchCoordinates } from '@/hooks/useFetchCoordinates';
 import { useTheme } from '@/context/ThemeContext';
 
@@ -34,9 +35,13 @@ export const ExpandedMapView: React.FC<ExpandedMapViewProps> = ({
   focusedWatchId = null,
 }) => {
   const coordinates = useFetchCoordinates();
+  const { avatarUri: userAvatarUri, displayName: userDisplayName } =
+    useCurrentUserProfileAvatar();
   const cameraRef = useRef<MapboxGL.Camera>(null);
   const userMarkerRef = useRef<MapboxGL.PointAnnotation>(null);
-  const watchMarkerRefs = useRef<Record<string, MapboxGL.PointAnnotation | null>>({});
+  const watchMarkerRefs = useRef<
+    Record<string, MapboxGL.PointAnnotation | null>
+  >({});
   const { isDark } = useTheme();
 
   const resetToUserLocation = useCallback(() => {
@@ -100,8 +105,9 @@ export const ExpandedMapView: React.FC<ExpandedMapViewProps> = ({
               }}
             >
               <Avatar
-                altText="John Doe"
+                altText={userDisplayName}
                 size={40}
+                source={userAvatarUri ? { uri: userAvatarUri } : undefined}
                 backgroundColor={AVATAR_BACKGROUNDS[0]}
               />
             </View>
@@ -122,7 +128,10 @@ export const ExpandedMapView: React.FC<ExpandedMapViewProps> = ({
               style={styles.userMarker}
               onLayout={() => {
                 watchMarkerRefs.current[watch.id]?.refresh?.();
-                setTimeout(() => watchMarkerRefs.current[watch.id]?.refresh?.(), 150);
+                setTimeout(
+                  () => watchMarkerRefs.current[watch.id]?.refresh?.(),
+                  150
+                );
               }}
             >
               <Avatar

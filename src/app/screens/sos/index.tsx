@@ -18,13 +18,13 @@ import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken
 import SolarEyeBoldIcon from '@/components/icons/solar/eye-bold';
 import SolarPhoneCallingRoundedBoldIcon from '@/components/icons/solar/phone-calling-rounded-bold';
 import SolarChatRoundDotsBoldIcon from '@/components/icons/solar/chat-round-dots-bold';
-import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import { useSosEvidenceStore } from '@/stores/sos-evidence-store';
 import { useSosActiveStore } from '@/stores/sos-active-store';
 import { useEndSosConfirmSheetStore } from '@/stores/end-sos-confirm-sheet-store';
 import { useInCallStore } from '@/stores/in-call-store';
 import { useInChatStore } from '@/stores/in-chat-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
+import { useGetEmergencyContacts } from '@/network/modules/emergency-contacts/queries';
 import {
   AttentionShake,
   EvidencePlaceholder,
@@ -65,7 +65,7 @@ export default function SosScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [activeSince] = useState(() => Date.now());
-  const contacts = useWatchMeContactsStore((s) => s.contacts);
+  const { data: contacts = [] } = useGetEmergencyContacts();
   const { items: evidenceItems, removeMedia } = useSosEvidenceStore();
 
   const handleBack = usePreventDoublePress(() => router.back());

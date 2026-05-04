@@ -10,7 +10,8 @@ export type GetStartedContactMode = 'neutral' | 'email' | 'phone';
 
 export type GetStartedLeftIconVariant = 'mail' | 'ng-flag';
 
-function normalizeNgNationalFromInput(text: string): string {
+/** Strip to 10 Nigerian national digits (same rules as onboarding identifier). */
+export function normalizeNgNationalFromInput(text: string): string {
   let digits = text.replace(/\D/g, '');
   if (digits.startsWith(GET_STARTED_NG_CC)) {
     digits = digits.slice(GET_STARTED_NG_CC.length);
@@ -19,11 +20,12 @@ function normalizeNgNationalFromInput(text: string): string {
   return digits.slice(0, 10);
 }
 
-function formatPhoneDisplay(nationalDigits: string): string {
+/** Display format +234-XXXXXXXXXX (matches onboarding phone field). */
+export function formatNgMobileDisplayForInput(nationalDigits: string): string {
   return `${GET_STARTED_NG_E164_PREFIX_DASH}${nationalDigits}`;
 }
 
-function detectContactMode(value: string): GetStartedContactMode {
+export function detectContactMode(value: string): GetStartedContactMode {
   const t = value.trimStart();
   if (t.length === 0) return 'neutral';
   if (t.includes('@') || /[a-zA-Z]/.test(t)) return 'email';
@@ -42,7 +44,7 @@ function detectContactMode(value: string): GetStartedContactMode {
   return 'phone';
 }
 
-function nationalFromStoredPhone(stored: string): string {
+export function nationalFromStoredPhone(stored: string): string {
   if (stored.startsWith(GET_STARTED_NG_E164_PREFIX_DASH)) {
     return stored
       .slice(GET_STARTED_NG_E164_PREFIX_DASH.length)
@@ -67,7 +69,7 @@ export function isValidNgMobileNational(national: string): boolean {
   return national.length === 10 && /^[789]/.test(national);
 }
 
-function stripLeadingNgPrefixForEmail(text: string): string {
+export function stripLeadingNgPrefixForEmail(text: string): string {
   const t = text.trimStart();
   if (t.startsWith(GET_STARTED_NG_E164_PREFIX_DASH)) {
     return t.slice(GET_STARTED_NG_E164_PREFIX_DASH.length).trimStart();
@@ -82,6 +84,23 @@ function stripLeadingNgPrefixForEmail(text: string): string {
     }
   }
   return t;
+}
+
+/** Normalizes onboarding-style identifier input (email or NG mobile) for controlled fields. */
+export function applyContactIdentifierInputChange(text: string): string {
+  const nextMode = detectContactMode(text);
+  if (nextMode === 'phone') {
+    const nationalDigits = normalizeNgNationalFromInput(text);
+    return formatNgMobileDisplayForInput(nationalDigits);
+  }
+  if (nextMode === 'neutral') {
+    const d = text.replace(/\D/g, '');
+    if (d === GET_STARTED_NG_CC) {
+      return '';
+    }
+    return text;
+  }
+  return stripLeadingNgPrefixForEmail(text);
 }
 
 export function useGetStartedContact() {
@@ -104,25 +123,7 @@ export function useGetStartedContact() {
   }, [contact, mode, national]);
 
   const handleContactChange = useCallback((text: string) => {
-    const nextMode = detectContactMode(text);
-
-    if (nextMode === 'phone') {
-      const nationalDigits = normalizeNgNationalFromInput(text);
-      setContact(formatPhoneDisplay(nationalDigits));
-      return;
-    }
-
-    if (nextMode === 'neutral') {
-      const d = text.replace(/\D/g, '');
-      if (d === GET_STARTED_NG_CC) {
-        setContact('');
-        return;
-      }
-      setContact(text);
-      return;
-    }
-
-    setContact(stripLeadingNgPrefixForEmail(text));
+    setContact(applyContactIdentifierInputChange(text));
   }, []);
 
   const showPhoneHint =

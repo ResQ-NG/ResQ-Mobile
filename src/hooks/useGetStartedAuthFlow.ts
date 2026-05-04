@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import type {
   CheckIdentifierRequest,
@@ -12,6 +13,7 @@ import {
   useVerifyIdentifierOtp,
 } from '@/network/modules/auth/queries';
 import { useAuthTokenStore } from '@/stores/auth-token-store';
+import { AuthKeys } from '@/network/modules/auth/keys';
 import { showToast } from '@/lib/utils/app-toast';
 import {
   isValidGetStartedEmail,
@@ -53,6 +55,7 @@ function buildCheckPayload(
 }
 
 export function useGetStartedAuthFlow() {
+  const queryClient = useQueryClient();
   const contactApi = useGetStartedContact();
   const setToken = useAuthTokenStore((s) => s.setToken);
 
@@ -99,6 +102,7 @@ export function useGetStartedAuthFlow() {
       const token = pickAuthTokenFromAuthResponse(data);
       if (token) {
         setToken(token);
+        void queryClient.invalidateQueries({ queryKey: [AuthKeys.UserProfile] });
         showToast({ message: successMessage, variant: 'success' });
         router.replace('/screens/main');
         return;
@@ -108,7 +112,7 @@ export function useGetStartedAuthFlow() {
         variant: 'error',
       });
     },
-    [setToken]
+    [queryClient, setToken]
   );
 
   const checkMutation = useCheckIdentifier({
@@ -138,6 +142,7 @@ export function useGetStartedAuthFlow() {
       const token = pickAuthTokenFromAuthResponse(data);
       if (token) {
         setToken(token);
+        void queryClient.invalidateQueries({ queryKey: [AuthKeys.UserProfile] });
         showToast({ message: 'Account created.', variant: 'success' });
         router.replace('/screens/main');
         return;

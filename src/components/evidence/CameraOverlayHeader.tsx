@@ -21,6 +21,7 @@ import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken
 interface CameraOverlayHeaderProps {
   location?: string;
   avatarUri?: string;
+  avatarAltText?: string;
   /** When set, show back button instead of avatar and hide SOS (e.g. SOS evidence screen). */
   onBack?: () => void;
   /** Tap: show confirmation sheet. Long-press: dispatch immediately. */
@@ -31,6 +32,7 @@ interface CameraOverlayHeaderProps {
 export function CameraOverlayHeader({
   location = 'GETTING LOCATION…',
   avatarUri,
+  avatarAltText = 'You',
   onBack,
   onSosPress,
   onSosLongPress,
@@ -86,6 +88,7 @@ export function CameraOverlayHeader({
           >
             <Avatar
               size={52}
+              altText={avatarAltText}
               source={avatarUri ? { uri: avatarUri } : undefined}
               backgroundColor={AVATAR_BACKGROUNDS[1]}
             />

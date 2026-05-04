@@ -53,7 +53,8 @@ export interface StartWatchMeStepProps {
   groups: WatchMeContactGroup[];
   selectedIds: Set<string>;
   onToggleContact: (id: string) => void;
-  onViewMorePress: () => void;
+  onSelectRelationshipGroup: (groupId: string) => void;
+  onAddContactPress: () => void;
   onStartPress: () => void;
   isStarting?: boolean;
   bottomInset?: number;
@@ -67,7 +68,8 @@ export default function StartWatchMeStep({
   groups,
   selectedIds,
   onToggleContact,
-  onViewMorePress,
+  onSelectRelationshipGroup,
+  onAddContactPress,
   onStartPress,
   isStarting = false,
   bottomInset = 0,
@@ -171,7 +173,9 @@ export default function StartWatchMeStep({
           groups={groups}
           selectedIds={selectedIds}
           onToggleContact={onToggleContact}
-          onViewMorePress={onViewMorePress}
+          onSelectRelationshipGroup={onSelectRelationshipGroup}
+          onAddContactPress={onAddContactPress}
+          inviteBadgeMuted
           enteringDelay={200}
         />
       </AppAnimatedScrollView>

@@ -1,5 +1,5 @@
-import { useColorScheme } from 'react-native';
 import { AppAnimatedView, brandFadeIn } from '@/lib/animation';
+import { useIsDark } from '@/context/ThemeContext';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { RoundedButton } from '@/components/ui/RoundedButton';
 import MingcuteSearchLineIcon from '@/components/icons/mingcute/search-line';
@@ -9,7 +9,7 @@ interface BroadcastHeaderProps {
 }
 
 export function BroadcastHeader({ onSearchPress }: BroadcastHeaderProps) {
-  const isDark = useColorScheme() === 'dark';
+  const isDark = useIsDark();
 
   return (
     <AppAnimatedView

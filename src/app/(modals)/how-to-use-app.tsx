@@ -173,7 +173,7 @@ export default function HowToUseAppModal() {
                     stats={step.stats}
                     gradientLight={step.hero.gradientLight}
                     gradientDark={step.hero.gradientDark}
-                    isDark={themeName === 'dark'}
+                    isDark={false}
                     iconColor={
                       step.hero.iconVariant === 'accent'
                         ? theme.accentRed

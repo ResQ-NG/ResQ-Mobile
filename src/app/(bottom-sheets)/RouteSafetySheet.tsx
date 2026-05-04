@@ -20,7 +20,7 @@ const SNAP_POINTS = ['75%', '98%'];
 export function RouteSafetyStatusSheet() {
   const { isOpen, close, fromLabel, toLabel, issues } =
     useUnsafeRouteSheetStore();
-  const { theme, themeName } = useAppColorScheme();
+  const { theme, isDark } = useAppColorScheme();
 
   const description =
     fromLabel && toLabel
@@ -143,10 +143,9 @@ export function RouteSafetyStatusSheet() {
               className="flex-row items-center gap-3 px-4 py-3"
               style={{
                 borderTopWidth: index === 0 ? 0 : 1,
-                borderTopColor:
-                  themeName === 'dark'
-                    ? 'rgba(255,255,255,0.08)'
-                    : 'rgba(0,0,0,0.06)',
+                borderTopColor: isDark
+                  ? 'rgba(255,255,255,0.08)'
+                  : 'rgba(0,0,0,0.06)',
               }}
             >
               <View className="w-8 h-8 rounded-full bg-accent-red/10 dark:bg-accent-red-dark/10 items-center justify-center">

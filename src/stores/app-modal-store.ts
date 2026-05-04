@@ -50,11 +50,7 @@ export const useAppModalStore = create<AppModalStore & AppModalActions>()(
         sharingMessage: undefined,
       }),
 
-    showSharing: ({
-      message = 'Sharing',
-      title,
-      sharingMessage,
-    }) =>
+    showSharing: ({ message = 'Sharing', title, sharingMessage }) =>
       set({
         isOpen: true,
         state: 'sharing',

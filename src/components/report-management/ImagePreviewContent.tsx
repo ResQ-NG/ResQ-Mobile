@@ -43,7 +43,7 @@ export function ImagePreviewContent({
   onDelete,
   allowDelete = true,
 }: ImagePreviewContentProps) {
-  const { themeName } = useAppColorScheme();
+  const { isDark } = useAppColorScheme();
   const { width, height } = useWindowDimensions();
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -88,7 +88,6 @@ export function ImagePreviewContent({
     onClose();
   };
 
-  const isDark = themeName === 'dark';
   const textColor = isDark ? '#e5e5e5' : '#1a1a1a';
 
   return (

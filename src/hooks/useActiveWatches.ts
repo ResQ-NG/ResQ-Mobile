@@ -1,7 +1,11 @@
 import { useMemo } from 'react';
-import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import { useUserLocationStore } from '@/stores/user-location-store';
-import type { ActiveWatch, MapCoordinate, WatchStatus } from '@/components/watchme/types';
+import { useGetEmergencyContacts } from '@/network/modules/emergency-contacts/queries';
+import type {
+  ActiveWatch,
+  MapCoordinate,
+  WatchStatus,
+} from '@/components/watchme/types';
 
 /** Offset from the user’s current map center so demo markers don’t stack. */
 const OFFSET_PER_INDEX = 0.008;
@@ -23,7 +27,14 @@ const LAST_OKAY_OPTIONS = [
   '2 hrs ago',
   'Earlier today',
 ];
-const DESTINATIONS = ['Home', 'Office', 'Lekki Phase 1', 'Victoria Island', 'Airport', ''];
+const DESTINATIONS = [
+  'Home',
+  'Office',
+  'Lekki Phase 1',
+  'Victoria Island',
+  'Airport',
+  '',
+];
 const DEVICE_INFOS = ['iPhone 15', 'Android', 'iPhone 14', ''];
 
 /**
@@ -32,7 +43,7 @@ const DEVICE_INFOS = ['iPhone 15', 'Android', 'iPhone 14', ''];
  * API can replace this later.
  */
 export function useActiveWatches(): ActiveWatch[] {
-  const contacts = useWatchMeContactsStore((s) => s.contacts);
+  const { data: contacts = [] } = useGetEmergencyContacts();
   const baseLng = useUserLocationStore((s) => s.coordinates[0]);
   const baseLat = useUserLocationStore((s) => s.coordinates[1]);
 
@@ -48,9 +59,10 @@ export function useActiveWatches(): ActiveWatch[] {
         const inSosMode = (seed >> 4) % 100 < 18; // ~18% in SOS for variety
         const lastOkayAt = LAST_OKAY_OPTIONS[seed % LAST_OKAY_OPTIONS.length];
         const destination = DESTINATIONS[(seed >> 8) % DESTINATIONS.length];
-        const isMoving = ((seed >> 12) % 2) === 1;
+        const isMoving = (seed >> 12) % 2 === 1;
         const batteryPercent = 70 + ((seed >> 16) % 31);
-        const deviceInfo = DEVICE_INFOS[(seed >> 20) % DEVICE_INFOS.length] || undefined;
+        const deviceInfo =
+          DEVICE_INFOS[(seed >> 20) % DEVICE_INFOS.length] || undefined;
         return {
           id: c.id,
           name: c.name,
@@ -63,6 +75,8 @@ export function useActiveWatches(): ActiveWatch[] {
           batteryPercent,
           deviceInfo,
           avatarBgIndex: index,
+          avatarUrl: c.avatarUrl,
+          isAppUser: c.isAppUser,
           availableOnMap: true,
           coordinates,
         };

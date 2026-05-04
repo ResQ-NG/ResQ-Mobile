@@ -55,7 +55,8 @@ export const DARK_THEME_TOKENS: AppThemeTokens = {
 export function useAppColorScheme() {
   const colorScheme = useColorScheme();
   const themeName: AppThemeName = colorScheme === 'dark' ? 'dark' : 'light';
-  const theme = themeName === 'dark' ? DARK_THEME_TOKENS : LIGHT_THEME_TOKENS;
+  const isDark = themeName === 'dark';
+  const theme = isDark ? DARK_THEME_TOKENS : LIGHT_THEME_TOKENS;
 
-  return { themeName, theme };
+  return { themeName, theme, isDark };
 }

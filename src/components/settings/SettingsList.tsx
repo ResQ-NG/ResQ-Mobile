@@ -24,6 +24,7 @@ export function SettingsList({
   onHelpPress,
 }: SettingsListProps) {
   const { theme } = useAppColorScheme();
+
   const iconOnColor = theme.iconOnAccent;
   const iconMuted = theme.textMuted;
 

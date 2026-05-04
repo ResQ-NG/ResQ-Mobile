@@ -1,37 +1,79 @@
 import { useMemo } from 'react';
-import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
+import { useGetEmergencyContacts } from '@/network/modules/emergency-contacts/queries';
 import type { WatchMeContactGroup } from '@/components/watchme/WatchMeContactSection';
 import type { WatchMeContact } from '@/components/watchme/WatchMeContactCard';
+import {
+  formatEmergencyContactReachabilityLine,
+  type UiEmergencyContact,
+} from '@/network/modules/emergency-contacts/utils';
 
-function maskPhone(phone: string): string {
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length <= 4) return '****';
-  return `${'*'.repeat(digits.length - 4)}${digits.slice(-4)}`;
+const OTHER_GROUP_ID = 'relationship-other';
+const OTHER_GROUP_NAME = 'Other contacts';
+
+function groupKeyForContact(c: UiEmergencyContact): string {
+  if (c.relationshipId != null) {
+    return `relationship-${c.relationshipId}`;
+  }
+  const label = c.relationshipLabel?.trim();
+  if (label) {
+    return `relationship-label-${label}`;
+  }
+  return OTHER_GROUP_ID;
+}
+
+function groupTitleForContact(c: UiEmergencyContact): string {
+  const label = c.relationshipLabel?.trim();
+  if (label) return label;
+  return OTHER_GROUP_NAME;
 }
 
 /**
  * Returns contact groups for the Start Watch Me step.
- * Uses the user's Watch Me contacts from the store; single group "Your contacts".
+ * Groups emergency contacts by relationship; contacts without one go under "Other contacts".
  */
 export function useWatchMeContactGroups(): WatchMeContactGroup[] {
-  const contacts = useWatchMeContactsStore((s) => s.contacts);
+  const { data: contacts = [] } = useGetEmergencyContacts();
 
   return useMemo(() => {
     if (contacts.length === 0) return [];
 
-    const watchMeContacts: WatchMeContact[] = contacts.map((c, index) => ({
-      id: c.id,
-      name: c.name,
-      maskedPhone: maskPhone(c.phone),
-      avatarBgIndex: index,
-    }));
+    type Bucket = { title: string; items: WatchMeContact[] };
+    const buckets = new Map<string, Bucket>();
 
-    return [
-      {
-        id: 'your-contacts',
-        name: 'Your contacts',
-        contacts: watchMeContacts,
-      },
-    ];
+    contacts.forEach((c, index) => {
+      const key = groupKeyForContact(c);
+      const title = groupTitleForContact(c);
+      const watchContact: WatchMeContact = {
+        id: c.id,
+        name: c.name,
+        maskedPhone: formatEmergencyContactReachabilityLine(c),
+        avatarSource: c.avatarUrl ? { uri: c.avatarUrl } : null,
+        avatarBgIndex: index,
+        isAppUser: c.isAppUser,
+      };
+
+      let bucket = buckets.get(key);
+      if (!bucket) {
+        bucket = { title, items: [] };
+        buckets.set(key, bucket);
+      }
+      bucket.items.push(watchContact);
+    });
+
+    const groups: WatchMeContactGroup[] = [...buckets.entries()].map(
+      ([id, { title, items }]) => ({
+        id,
+        name: title,
+        contacts: items,
+      })
+    );
+
+    groups.sort((a, b) => {
+      if (a.id === OTHER_GROUP_ID) return 1;
+      if (b.id === OTHER_GROUP_ID) return -1;
+      return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    });
+
+    return groups;
   }, [contacts]);
 }

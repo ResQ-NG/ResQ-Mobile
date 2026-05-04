@@ -9,6 +9,10 @@ export type ActiveWatch = {
   lastCheckLabel: string;
   status: WatchStatus;
   avatarBgIndex?: number;
+  /** Profile image when provided by emergency contacts API */
+  avatarUrl?: string | null;
+  /** Contact has a ResQ account (receives in-app notifications). */
+  isAppUser?: boolean;
   destination?: string;
   lastOkayAt?: string;
   isMoving?: boolean;

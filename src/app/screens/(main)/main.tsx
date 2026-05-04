@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { Camera } from 'react-native-vision-camera';
 import { CameraOverlay } from '@/components/evidence/CameraOverlay';
+import { useCurrentUserProfileAvatar } from '@/hooks/useCurrentUserProfileAvatar';
 import { useMainCameraScreen } from '@/hooks/useMainCameraScreen';
 import { useUserLocationStore } from '@/stores/user-location-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
@@ -11,6 +12,7 @@ import { useAppModalStore } from '@/stores/app-modal-store';
 const SOS_LOADING_DURATION_MS = 1200;
 
 export default function MainScreen() {
+  const { avatarUri, displayName } = useCurrentUserProfileAvatar();
   const locationLabel = useUserLocationStore((s) => s.addressLabel);
   const openSosConfirmSheet = useSosConfirmSheetStore((s) => s.open);
   const { showLoading, setProgress, hide: hideAppModal } = useAppModalStore();
@@ -53,6 +55,8 @@ export default function MainScreen() {
 
       <CameraOverlay
         location={locationLabel}
+        avatarUri={avatarUri}
+        avatarAltText={displayName}
         onLens={handleToggleCameraPosition}
         onCapture={handleCapture}
         onAddMedia={handleAddFromGallery}

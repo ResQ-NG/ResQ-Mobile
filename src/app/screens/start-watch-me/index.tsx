@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { AppAnimatedSafeAreaView } from '@/lib/animation';
@@ -9,6 +9,7 @@ import {
   type TransportationMode,
 } from './components';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
+import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
 import { useWatchMeContactGroups } from '@/hooks/useWatchMeContactGroups';
 import { useRouteSafetyCheck } from '@/hooks/useRouteSafetyCheck';
 import { useUnsafeRouteSheetStore } from '@/stores/unsafe-route-sheet-store';
@@ -20,6 +21,9 @@ export default function StartWatchMeScreen() {
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
   const groups = useWatchMeContactGroups();
+  const openAddContactSheet = useWatchMeContactsSheetStore(
+    (s) => s.openForAdd
+  );
   const { checkRouteSafety, hideModal } = useRouteSafetyCheck();
   const openRouteSafetyStatusSheet = useUnsafeRouteSheetStore((s) => s.open);
 
@@ -39,9 +43,28 @@ export default function StartWatchMeScreen() {
     });
   };
 
+  const selectRelationshipGroup = useCallback(
+    (groupId: string) => {
+      const group = groups.find((g) => g.id === groupId);
+      if (!group || group.contacts.length === 0) return;
+      setSelectedIds((prev) => {
+        const allInThisGroup =
+          prev.size === group.contacts.length &&
+          group.contacts.every((c) => prev.has(c.id));
+        if (allInThisGroup) return new Set<string>();
+        return new Set(group.contacts.map((c) => c.id));
+      });
+    },
+    [groups]
+  );
+
+  const handleSelectRelationshipGroup =
+    usePreventDoublePress(selectRelationshipGroup);
+
   const setSessionActive = useWatchMeContactsStore((s) => s.setSessionActive);
 
   const handleBack = usePreventDoublePress(() => router.back());
+  const handleAddContactPress = usePreventDoublePress(openAddContactSheet);
   const handleStartWatchMe = usePreventDoublePress(async () => {
     if (isChecking) return;
     setIsChecking(true);
@@ -80,7 +103,8 @@ export default function StartWatchMeScreen() {
         groups={groups}
         selectedIds={selectedIds}
         onToggleContact={toggleContact}
-        onViewMorePress={() => {}}
+        onSelectRelationshipGroup={handleSelectRelationshipGroup}
+        onAddContactPress={handleAddContactPress}
         onStartPress={handleStartWatchMe}
         isStarting={isChecking}
         bottomInset={insets.bottom}

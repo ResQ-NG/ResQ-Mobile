@@ -1,5 +1,6 @@
 import { View, Image, type ImageSourcePropType } from 'react-native';
 import { cn } from '@/lib/cn';
+import { dicebearUriToRasterImageUri } from '@/lib/third-party/dicebear';
 import { useThemeColors } from '@/context/ThemeContext';
 import { AppText } from './AppText';
 
@@ -45,6 +46,16 @@ function getInitials(altText: string): string {
 
 const AVATAR_BORDER_WIDTH = 4;
 
+function normalizeImageSource(source: ImageSourcePropType): ImageSourcePropType {
+  if (typeof source === 'object' && source !== null && 'uri' in source) {
+    const uri = source.uri;
+    if (typeof uri === 'string' && uri.length > 0) {
+      return { uri: dicebearUriToRasterImageUri(uri) };
+    }
+  }
+  return source;
+}
+
 export function Avatar({
   size = 40,
   source,
@@ -53,10 +64,17 @@ export function Avatar({
   className,
 }: AvatarProps) {
   const colors = useThemeColors();
-  const effectiveSource =
+  const rawSource =
     source != null && (typeof source !== 'object' || !('uri' in source) || !!source.uri)
       ? source
       : DEFAULT_AVATAR_SOURCE;
+  const effectiveSource =
+    typeof rawSource === 'object' &&
+    rawSource !== null &&
+    'uri' in rawSource &&
+    typeof rawSource.uri === 'string'
+      ? normalizeImageSource(rawSource)
+      : rawSource;
   const initials = altText ? getInitials(altText) : '';
 
   return (

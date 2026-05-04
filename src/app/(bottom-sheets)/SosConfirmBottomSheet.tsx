@@ -5,7 +5,6 @@ import { AppButton } from '@/components/ui/AppButton';
 import { AppText } from '@/components/ui/AppText';
 import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui/Avatar';
 import { useSosConfirmSheetStore } from '@/stores/sos-confirm-sheet-store';
-import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import { AppAnimatedView, brandFadeInUp, brandFadeIn } from '@/lib/animation';
 import LottieView from 'lottie-react-native';
 import {
@@ -17,10 +16,11 @@ import {
 } from 'react-native-reanimated';
 import { useEffect } from 'react';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
+import { useGetEmergencyContacts } from '@/network/modules/emergency-contacts/queries';
 
 export default function SosConfirmBottomSheet() {
   const { isOpen, close } = useSosConfirmSheetStore();
-  const contacts = useWatchMeContactsStore((s) => s.contacts);
+  const { data: contacts = [] } = useGetEmergencyContacts();
   const pulse = useSharedValue(1);
 
   useEffect(() => {
@@ -50,7 +50,10 @@ export default function SosConfirmBottomSheet() {
   });
 
   const footer = (
-    <AppAnimatedView entering={brandFadeInUp.delay(200)} className="px-4 gap-3 w-full">
+    <AppAnimatedView
+      entering={brandFadeInUp.delay(200)}
+      className="px-4 gap-3 w-full"
+    >
       <AppButton
         variant="primary"
         size="lg"
@@ -81,10 +84,7 @@ export default function SosConfirmBottomSheet() {
       contentPadding={{ horizontal: 16, top: 0, bottom: 0 }}
     >
       <AppAnimatedView className="items-center px-2 pb-32">
-        <AppAnimatedView
-          entering={brandFadeInUp.delay(100)}
-          style={pulseStyle}
-        >
+        <AppAnimatedView entering={brandFadeInUp.delay(100)} style={pulseStyle}>
           <LottieView
             source={require('@assets/lottie/alert.json')}
             autoPlay
