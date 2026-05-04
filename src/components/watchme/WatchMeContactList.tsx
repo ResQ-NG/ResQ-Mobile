@@ -4,6 +4,9 @@ import { Avatar, AppButton, AVATAR_BACKGROUNDS } from '@/components/ui';
 import type { ActiveWatch } from './types';
 import { getWatchBadgeBg, getWatchBadgeLabel } from './types';
 import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
+import { useAppColorScheme } from '@/theme/colorMode';
+
+const PLACEHOLDER_SLOTS = 4;
 
 interface WatchMeContactListProps {
   watches: ActiveWatch[];
@@ -16,6 +19,8 @@ export function WatchMeContactList({
   onSelectContact,
   onExpandPress,
 }: WatchMeContactListProps) {
+  const { theme } = useAppColorScheme();
+
   return (
     <>
       {watches.length > 0 ? (
@@ -108,7 +113,55 @@ export function WatchMeContactList({
           )}
         </AppAnimatedView>
       ) : (
-        <></>
+        <AppAnimatedView
+          entering={brandFadeInUp.delay(80)}
+          className="bg-[rgba(255,255,255,0.96)] dark:bg-[rgba(18,18,18,0.95)] border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.16)] px-5 rounded-[3rem]"
+          style={{
+            marginHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 18,
+          }}
+        >
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              paddingHorizontal: 12,
+              gap: 12,
+              alignItems: 'center',
+              minHeight: 88,
+            }}
+            className="w-full"
+          >
+            {Array.from({ length: PLACEHOLDER_SLOTS }).map((_, i) => (
+              <View key={`watch-placeholder-${i}`} className="items-center mx-1">
+                <View
+                  className="rounded-full border-2 border-dashed"
+                  style={{
+                    width: 44,
+                    height: 44,
+                    borderColor: theme.textMuted,
+                    borderStyle: 'dashed',
+                    opacity: 0.55,
+                  }}
+                />
+                <AppText
+                  className="text-[10px] font-metropolis-medium text-captionDark dark:text-captionDark-dark mt-2"
+                  numberOfLines={1}
+                >
+                  —
+                </AppText>
+              </View>
+            ))}
+          </ScrollView>
+          <AppText
+            variant="caption"
+            className="text-center text-captionDark dark:text-captionDark-dark mt-1 px-2"
+          >
+            People you’re watching will appear here. Add contacts to get
+            started.
+          </AppText>
+        </AppAnimatedView>
       )}
     </>
   );

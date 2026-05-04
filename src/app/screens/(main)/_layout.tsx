@@ -1,7 +1,10 @@
 import { Tabs } from 'expo-router';
 import { AppTabBar } from '@/components/navigation/AppTabBar';
+import { useSyncUserLocation } from '@/hooks/useSyncUserLocation';
 
 export default function MainLayout() {
+  useSyncUserLocation();
+
   return (
     <Tabs
       tabBar={(props) => <AppTabBar {...props} />}

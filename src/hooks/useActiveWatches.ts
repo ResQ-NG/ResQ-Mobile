@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
+import { useUserLocationStore } from '@/stores/user-location-store';
 import type { ActiveWatch, MapCoordinate, WatchStatus } from '@/components/watchme/types';
 
-/** Dummy location base (Lagos). Each contact gets a slight offset so markers don't stack. */
-const DUMMY_BASE: MapCoordinate = [3.3792, 6.5244];
+/** Offset from the user’s current map center so demo markers don’t stack. */
 const OFFSET_PER_INDEX = 0.008;
 
 /** Stable numeric hash from string (for deterministic "random" per contact). */
@@ -33,14 +33,16 @@ const DEVICE_INFOS = ['iPhone 15', 'Android', 'iPhone 14', ''];
  */
 export function useActiveWatches(): ActiveWatch[] {
   const contacts = useWatchMeContactsStore((s) => s.contacts);
+  const baseLng = useUserLocationStore((s) => s.coordinates[0]);
+  const baseLat = useUserLocationStore((s) => s.coordinates[1]);
 
   return useMemo(
     () =>
       contacts.map((c, index) => {
         const seed = hashId(c.id);
         const coordinates: MapCoordinate = [
-          DUMMY_BASE[0] + index * OFFSET_PER_INDEX,
-          DUMMY_BASE[1] + index * OFFSET_PER_INDEX,
+          baseLng + index * OFFSET_PER_INDEX,
+          baseLat + index * OFFSET_PER_INDEX,
         ];
         const status = STATUSES[seed % STATUSES.length];
         const inSosMode = (seed >> 4) % 100 < 18; // ~18% in SOS for variety
@@ -65,6 +67,6 @@ export function useActiveWatches(): ActiveWatch[] {
           coordinates,
         };
       }),
-    [contacts]
+    [contacts, baseLng, baseLat]
   );
 }

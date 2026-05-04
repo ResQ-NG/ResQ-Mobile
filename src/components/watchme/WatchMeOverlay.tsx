@@ -30,7 +30,7 @@ interface WatchMeOverlayProps {
 }
 
 export function WatchMeOverlay({
-  location = 'Maryland, Lagos.',
+  location = 'Getting location…',
   watches,
   selectedWatchId: _selectedWatchId = null,
   onSelectContact,

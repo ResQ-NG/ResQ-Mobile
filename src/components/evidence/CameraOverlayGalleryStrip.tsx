@@ -1,4 +1,4 @@
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import {
   AppAnimatedView,
   AppAnimatedImage,
@@ -18,12 +18,14 @@ interface CameraOverlayGalleryStripProps {
   onMorePress?: () => void;
 }
 
+const PLACEHOLDER_MEDIA_SLOTS = 5;
+
 export function CameraOverlayGalleryStrip({
   onItemPress,
   onMorePress,
 }: CameraOverlayGalleryStripProps) {
   const items = useCapturedMediaStore((state) => state.items);
-
+  const showPlaceholders = items.length === 0;
 
   return (
     <AppAnimatedView
@@ -36,23 +38,37 @@ export function CameraOverlayGalleryStrip({
         contentContainerStyle={{ gap: 4, paddingRight: 4 }}
         className="flex-1"
       >
-        {items.map((item, index) => (
-          <AppAnimatedView
-            key={item.id}
-            entering={brandFadeInUp.delay(index * 40)}
-          >
-            <TouchableOpacity
-              onPress={() => onItemPress?.(item)}
-              className="w-16 h-16 rounded-[10px] overflow-hidden border-[1.5px] border-[rgba(255,255,255,0.25)]"
-            >
-              <AppAnimatedImage
-                source={{ uri: item.uri }}
-                className="w-full h-full"
-                resizeMode="cover"
-              />
-            </TouchableOpacity>
-          </AppAnimatedView>
-        ))}
+        {showPlaceholders
+          ? Array.from({ length: PLACEHOLDER_MEDIA_SLOTS }).map((_, index) => (
+              <AppAnimatedView
+                key={`media-placeholder-${index}`}
+                entering={brandFadeInUp.delay(index * 40)}
+              >
+                <View
+                  className="w-16 h-16 rounded-[10px] border-[1.5px] border-dashed border-[rgba(255,255,255,0.22)] bg-[rgba(255,255,255,0.06)]"
+                  style={{ borderStyle: 'dashed' }}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                />
+              </AppAnimatedView>
+            ))
+          : items.map((item, index) => (
+              <AppAnimatedView
+                key={item.id}
+                entering={brandFadeInUp.delay(index * 40)}
+              >
+                <TouchableOpacity
+                  onPress={() => onItemPress?.(item)}
+                  className="w-16 h-16 rounded-[10px] overflow-hidden border-[1.5px] border-[rgba(255,255,255,0.25)]"
+                >
+                  <AppAnimatedImage
+                    source={{ uri: item.uri }}
+                    className="w-full h-full"
+                    resizeMode="cover"
+                  />
+                </TouchableOpacity>
+              </AppAnimatedView>
+            ))}
       </AppAnimatedScrollView>
 
       {/* More arrow */}

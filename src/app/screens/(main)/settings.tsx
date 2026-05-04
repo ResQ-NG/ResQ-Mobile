@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppAnimatedSafeAreaView, AppAnimatedScrollView } from '@/lib/animation';
 import { useAppColorScheme } from '@/theme/colorMode';
@@ -23,7 +24,9 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <SettingsProfileCard />
-        <SettingsList />
+        <SettingsList
+          onHelpPress={() => router.push('/(modals)/how-to-use-app')}
+        />
       </AppAnimatedScrollView>
     </AppAnimatedSafeAreaView>
   );

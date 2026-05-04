@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { Camera } from 'react-native-vision-camera';
 import { CameraOverlay } from '@/components/evidence/CameraOverlay';
 import { useMainCameraScreen } from '@/hooks/useMainCameraScreen';
+import { useUserLocationStore } from '@/stores/user-location-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { useSosConfirmSheetStore } from '@/stores/sos-confirm-sheet-store';
 import { useAppModalStore } from '@/stores/app-modal-store';
@@ -10,9 +11,13 @@ import { useAppModalStore } from '@/stores/app-modal-store';
 const SOS_LOADING_DURATION_MS = 1200;
 
 export default function MainScreen() {
+  const locationLabel = useUserLocationStore((s) => s.addressLabel);
   const openSosConfirmSheet = useSosConfirmSheetStore((s) => s.open);
   const { showLoading, setProgress, hide: hideAppModal } = useAppModalStore();
   const handleSosPress = usePreventDoublePress(openSosConfirmSheet);
+  const openHowToUseGuide = usePreventDoublePress(() =>
+    router.push('/(modals)/how-to-use-app')
+  );
   const handleSosLongPress = usePreventDoublePress(() => {
     showLoading({ message: 'Starting Watch Me session...', progress: 0 });
     setTimeout(() => setProgress(40), 400);
@@ -47,7 +52,7 @@ export default function MainScreen() {
       )}
 
       <CameraOverlay
-        location="MARYLAND, LAGOS."
+        location={locationLabel}
         onLens={handleToggleCameraPosition}
         onCapture={handleCapture}
         onAddMedia={handleAddFromGallery}
@@ -55,6 +60,7 @@ export default function MainScreen() {
         onGalleryItemPress={handleGalleryItemPress}
         onSosPress={handleSosPress}
         onSosLongPress={handleSosLongPress}
+        onInfoPress={openHowToUseGuide}
       />
     </View>
   );

@@ -29,7 +29,7 @@ interface CameraOverlayHeaderProps {
 }
 
 export function CameraOverlayHeader({
-  location = 'MARYLAND, LAGOS.',
+  location = 'GETTING LOCATION…',
   avatarUri,
   onBack,
   onSosPress,

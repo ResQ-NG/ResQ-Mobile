@@ -12,6 +12,7 @@ export default function ModalsLayout() {
       <Stack.Screen name="enable-location" />
       <Stack.Screen name="image-preview" />
       <Stack.Screen name="watch-me-onboarding" />
+      <Stack.Screen name="how-to-use-app" />
       <Stack.Screen name="watch-me-status" />
       <Stack.Screen name="in-call" options={{ presentation: 'modal' }} />
       <Stack.Screen name="chat" options={{ presentation: 'modal' }} />

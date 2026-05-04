@@ -17,6 +17,8 @@ interface CameraOverlayProps {
   onLocationPress?: () => void;
   onSosPress?: () => void;
   onSosLongPress?: () => void;
+  /** Right control on bottom bar when there’s no media yet (info icon). */
+  onInfoPress?: () => void;
   onFlash?: () => void;
   onVideoToggle?: () => void;
   onFlip?: () => void;
@@ -42,6 +44,7 @@ export function CameraOverlay({
   onAddFile,
   onSosPress,
   onSosLongPress,
+  onInfoPress,
   onFlash,
   onVideoToggle,
   onFlip,
@@ -99,6 +102,7 @@ export function CameraOverlay({
         <CameraOverlayBottomBar
           onCapture={onCapture}
           onAddMedia={onAddMedia}
+          onInfoPress={onInfoPress}
           shutterOnly={shutterOnly}
         />
       </View>
