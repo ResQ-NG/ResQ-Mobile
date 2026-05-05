@@ -3,7 +3,7 @@ import { View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppAnimatedView, brandFadeInDown } from '@/lib/animation';
 import { AppText } from '@/components/ui/AppText';
-import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
+import { Avatar, AVATAR_BACKGROUNDS, avatarRemoteSource } from '@/components/ui';
 import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
 import SolarSirenRoundedBoldIcon from '@/components/icons/solar/siren-rounded-bold';
 import Animated, {
@@ -92,7 +92,7 @@ export function CameraOverlayHeader({
             <Avatar
               size={52}
               altText={avatarAltText}
-              source={avatarUri ? { uri: avatarUri } : undefined}
+              source={avatarRemoteSource(avatarUri)}
               backgroundColor={AVATAR_BACKGROUNDS[1]}
             />
           </AppAnimatedView>

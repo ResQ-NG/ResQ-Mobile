@@ -6,6 +6,7 @@ import {
   formatEmergencyContactReachabilityLine,
   type UiEmergencyContact,
 } from '@/network/modules/emergency-contacts/utils';
+import { avatarRemoteSource } from '@/components/ui/Avatar';
 
 const OTHER_GROUP_ID = 'relationship-other';
 const OTHER_GROUP_NAME = 'Other contacts';
@@ -47,7 +48,7 @@ export function useWatchMeContactGroups(): WatchMeContactGroup[] {
         id: c.id,
         name: c.name,
         maskedPhone: formatEmergencyContactReachabilityLine(c),
-        avatarSource: c.avatarUrl ? { uri: c.avatarUrl } : null,
+        avatarSource: avatarRemoteSource(c.avatarUrl) ?? null,
         avatarBgIndex: index,
         isAppUser: c.isAppUser,
       };

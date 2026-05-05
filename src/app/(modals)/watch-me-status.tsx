@@ -9,7 +9,7 @@ import {
 import { RoundedButton } from '@/components/ui/RoundedButton';
 import SolarArrowLeftBrokenIcon from '@/components/icons/solar/arrow-left-broken';
 import { useAppColorScheme } from '@/theme/colorMode';
-import { useActiveWatches } from '@/hooks/useActiveWatches';
+import { useWatchMeActiveWatches } from '@/network/modules/watch-me/hooks/useWatchMeActiveWatches';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { WatchMeProfileCard } from '@/components/watchme/WatchMeProfileCard';
 import { ContactLocationMapView } from '@/components/maps/ContactLocationMapView';
@@ -20,7 +20,7 @@ export default function WatchMeStatusModalScreen() {
   const insets = useSafeAreaInsets();
   const params = useLocalSearchParams<{ id: string }>();
   const watchId = typeof params.id === 'string' ? params.id : null;
-  const watches = useActiveWatches();
+  const { watches } = useWatchMeActiveWatches();
   const watch = watchId ? watches.find((w) => w.id === watchId) : null;
 
   const handleCancel = usePreventDoublePress(() => router.back());

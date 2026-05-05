@@ -4,13 +4,10 @@ import { router } from 'expo-router';
 import { AppAnimatedSafeAreaView } from '@/lib/animation';
 import { useAppColorScheme } from '@/theme/colorMode';
 import { WatchMeHeader } from '@/components/watchme';
-import {
-  StartWatchMeStep,
-  type TransportationMode,
-} from './components';
+import { StartWatchMeStep, type TransportationMode } from './components';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
-import { useWatchMeContactGroups } from '@/hooks/useWatchMeContactGroups';
+import { useWatchMeContactGroups } from '@/network/modules/watch-me/hooks/useWatchMeContactGroups';
 import { useRouteSafetyCheck } from '@/hooks/useRouteSafetyCheck';
 import { useUnsafeRouteSheetStore } from '@/stores/unsafe-route-sheet-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
@@ -21,16 +18,13 @@ export default function StartWatchMeScreen() {
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
   const groups = useWatchMeContactGroups();
-  const openAddContactSheet = useWatchMeContactsSheetStore(
-    (s) => s.openForAdd
-  );
+  const openAddContactSheet = useWatchMeContactsSheetStore((s) => s.openForAdd);
   const { checkRouteSafety, hideModal } = useRouteSafetyCheck();
   const openRouteSafetyStatusSheet = useUnsafeRouteSheetStore((s) => s.open);
 
   const [destination, setDestination] = useState('');
-  const [transportation, setTransportation] = useState<TransportationMode | null>(
-    null
-  );
+  const [transportation, setTransportation] =
+    useState<TransportationMode | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isChecking, setIsChecking] = useState(false);
 
@@ -61,8 +55,9 @@ export default function StartWatchMeScreen() {
     [groups]
   );
 
-  const handleToggleRelationshipGroup =
-    usePreventDoublePress(toggleRelationshipGroup);
+  const handleToggleRelationshipGroup = usePreventDoublePress(
+    toggleRelationshipGroup
+  );
 
   const setSessionActive = useWatchMeContactsStore((s) => s.setSessionActive);
 

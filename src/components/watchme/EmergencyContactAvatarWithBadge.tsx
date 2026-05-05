@@ -1,6 +1,10 @@
 import { View } from 'react-native';
 import { AppText } from '@/components/ui/AppText';
-import { Avatar, type AvatarProps } from '@/components/ui/Avatar';
+import {
+  Avatar,
+  avatarRemoteSource,
+  type AvatarProps,
+} from '@/components/ui/Avatar';
 import { useAppColorScheme } from '@/theme/colorMode';
 
 type Props = {
@@ -32,8 +36,7 @@ export function EmergencyContactAvatarWithBadge({
   dimNonAppAvatar = false,
 }: Props) {
   const { isDark, theme } = useAppColorScheme();
-  const source =
-    avatarUrl != null && avatarUrl.length > 0 ? { uri: avatarUrl } : undefined;
+  const source = avatarRemoteSource(avatarUrl);
   const badgeScale = typeof size === 'number' ? Math.max(0.75, size / 44) : 1;
   const fontSize = Math.round(8.5 * badgeScale);
   const padX = Math.round(6 * badgeScale);

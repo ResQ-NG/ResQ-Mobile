@@ -2,12 +2,10 @@ import { View } from 'react-native';
 import { BaseBottomSheet } from '@/components/bottom-sheet';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppText } from '@/components/ui/AppText';
-import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui/Avatar';
+import { Avatar, AVATAR_BACKGROUNDS, avatarRemoteSource } from '@/components/ui/Avatar';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { useDeleteEmergencyContact } from '@/network/modules/emergency-contacts/queries';
 import { useDeleteEmergencyContactConfirmStore } from '@/stores/delete-emergency-contact-confirm-store';
-import { dicebearUriToRasterImageUri } from '@/lib/third-party/dicebear';
-
 export default function DeleteEmergencyContactConfirmBottomSheet() {
   const { isOpen, contact, close } = useDeleteEmergencyContactConfirmStore();
   const { mutate, isPending } = useDeleteEmergencyContact();
@@ -50,10 +48,7 @@ export default function DeleteEmergencyContactConfirmBottomSheet() {
   );
 
   const displayName = contact?.name?.trim() ?? 'Contact';
-  const avatarSource =
-    contact?.avatarUrl != null && contact.avatarUrl.length > 0
-      ? { uri: dicebearUriToRasterImageUri(contact.avatarUrl.trim()) }
-      : undefined;
+  const avatarSource = avatarRemoteSource(contact?.avatarUrl);
 
   return (
     <BaseBottomSheet

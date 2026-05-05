@@ -16,8 +16,12 @@ interface WatchMeOverlayProps {
   location?: string;
   /** When location is unavailable, tap opens enable-location modal. */
   onLocationPress?: () => void;
-  /** List of active watches (from useActiveWatches or API). */
+  /** Travelers you’re watching (sessions from API). */
   watches: ActiveWatch[];
+  /** Whether the user has any emergency contacts (for Add vs Start CTA). */
+  hasEmergencyContacts: boolean;
+  /** Initial fetch for active sessions (bottom strip skeleton). */
+  watchesLoading?: boolean;
   /** Controlled: which contact is selected (profile open + map focused on them when availableOnMap) */
   selectedWatchId?: string | null;
   onSelectContact: (id: string) => void;
@@ -35,6 +39,8 @@ export function WatchMeOverlay({
   location = 'Getting location…',
   onLocationPress,
   watches,
+  hasEmergencyContacts,
+  watchesLoading = false,
   selectedWatchId: _selectedWatchId = null,
   onSelectContact,
   onCloseProfile: _onCloseProfile,
@@ -95,7 +101,7 @@ export function WatchMeOverlay({
           If there are no contacts, show "Add Contact"; if session active show session card; else Start Watch Me.
           Contact profile is shown in the watch-me-status modal, not inline.
         */}
-        {watches.length === 0 ? (
+        {!hasEmergencyContacts ? (
             <AppAnimatedView
               entering={brandFadeInUp.delay(80)}
               className="px-4"
@@ -130,6 +136,8 @@ export function WatchMeOverlay({
 
         <WatchMeContactList
           watches={watches}
+          loading={watchesLoading}
+          hasEmergencyContacts={hasEmergencyContacts}
           onSelectContact={onSelectContact}
           onExpandPress={onExpandPress}
         />

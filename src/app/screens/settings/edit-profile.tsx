@@ -12,7 +12,11 @@ import { WatchMeHeader } from '@/components/watchme';
 import { AppText } from '@/components/ui/AppText';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppButton } from '@/components/ui/AppButton';
-import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui/Avatar';
+import {
+  Avatar,
+  AVATAR_BACKGROUNDS,
+  avatarRemoteSource,
+} from '@/components/ui/Avatar';
 import SolarCameraBoldIcon from '@/components/icons/solar/camera-bold';
 import {
   useGetProfileInformation,
@@ -20,8 +24,6 @@ import {
 } from '@/network/modules/auth/queries';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { useAvatarPresetPickerStore } from '@/stores/avatar-preset-picker-store';
-import { dicebearUriToRasterImageUri } from '@/lib/third-party/dicebear';
-
 export default function EditProfileScreen() {
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
@@ -48,10 +50,7 @@ export default function EditProfileScreen() {
   }, []);
 
   const displayName = [firstName, lastName].filter(Boolean).join(' ') || 'You';
-  const avatarSource =
-    avatarUrl.length > 0
-      ? { uri: dicebearUriToRasterImageUri(avatarUrl) }
-      : undefined;
+  const avatarSource = avatarRemoteSource(avatarUrl);
 
   const canSave =
     firstName.trim().length > 0 &&

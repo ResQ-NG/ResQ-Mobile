@@ -5,7 +5,7 @@ import SolarMapPointBoldIcon from '@/components/icons/solar/map-point-bold';
 import SolarClockCircleBoldIcon from '@/components/icons/solar/clock-circle-bold';
 import SolarBoltBoldIcon from '@/components/icons/solar/bolt-bold';
 import SolarSmartphoneRotateAngleBoldIcon from '@/components/icons/solar/smartphone-rotate-angle-bold';
-import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
+import { Avatar, AVATAR_BACKGROUNDS, avatarRemoteSource } from '@/components/ui';
 import type { ActiveWatch } from './types';
 import { getWatchBadgeBg, getWatchBadgeLabel } from './types';
 
@@ -17,12 +17,14 @@ export function WatchMeProfileCard({ watch }: WatchMeProfileCardProps) {
   const { theme } = useAppColorScheme();
   const badgeBg = getWatchBadgeBg(watch);
   const badgeLabel = getWatchBadgeLabel(watch);
+  const avatarSource = avatarRemoteSource(watch.avatarUrl);
 
   return (
     <View className="pb-1">
       <View className="flex-row items-center gap-3 mb-4">
         <Avatar
           size={52}
+          source={avatarSource}
           backgroundColor={
             AVATAR_BACKGROUNDS[(watch.avatarBgIndex ?? 0) % AVATAR_BACKGROUNDS.length]
           }

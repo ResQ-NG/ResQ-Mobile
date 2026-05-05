@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import MapboxGL from '@rnmapbox/maps';
 import { GlobalMapboxConfig } from '@/lib/third-party/mapbox/constants';
 import { AppConfig } from '@/lib/app-config';
-import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui';
+import { Avatar, AVATAR_BACKGROUNDS, avatarRemoteSource } from '@/components/ui';
 import { useCurrentUserProfileAvatar } from '@/hooks/useCurrentUserProfileAvatar';
 import { useFetchCoordinates } from '@/hooks/useFetchCoordinates';
 import { useTheme } from '@/context/ThemeContext';
@@ -107,7 +107,7 @@ export const ExpandedMapView: React.FC<ExpandedMapViewProps> = ({
               <Avatar
                 altText={userDisplayName}
                 size={40}
-                source={userAvatarUri ? { uri: userAvatarUri } : undefined}
+                source={avatarRemoteSource(userAvatarUri)}
                 backgroundColor={AVATAR_BACKGROUNDS[0]}
               />
             </View>

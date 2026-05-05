@@ -2,12 +2,14 @@ import { View, Share } from 'react-native';
 import { BaseBottomSheet } from '@/components/bottom-sheet';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppText } from '@/components/ui/AppText';
-import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui/Avatar';
+import {
+  Avatar,
+  AVATAR_BACKGROUNDS,
+  avatarRemoteSource,
+} from '@/components/ui/Avatar';
 import { useInviteContactSheetStore } from '@/stores/invite-contact-sheet-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { showToast } from '@/lib/utils/app-toast';
-import { dicebearUriToRasterImageUri } from '@/lib/third-party/dicebear';
-
 const INVITE_STORE_URL = 'https://resq.app';
 
 function buildInviteMessage(contactName: string): string {
@@ -54,10 +56,7 @@ export default function InviteContactBottomSheet() {
   );
 
   const name = contact?.name?.trim() ?? 'Contact';
-  const source =
-    contact?.avatarUrl != null && contact.avatarUrl.length > 0
-      ? { uri: dicebearUriToRasterImageUri(contact.avatarUrl.trim()) }
-      : undefined;
+  const source = avatarRemoteSource(contact?.avatarUrl);
 
   return (
     <BaseBottomSheet

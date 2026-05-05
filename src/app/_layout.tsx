@@ -15,7 +15,7 @@ import { setupOnlineManager } from '@/lib/utils/react-query/onlineManager';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { StatusBar } from 'expo-status-bar';
 import { useFocusManager } from '@/lib/utils/react-query/focusManager';
-import { useWatchMeSessionBanner } from '@/hooks/useWatchMeSessionBanner';
+import { useWatchMeSessionBanner } from '@/network/modules/watch-me/hooks/useWatchMeSessionBanner';
 import { useSosBanner } from '@/hooks/useSosBanner';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';

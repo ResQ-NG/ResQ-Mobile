@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { ExpandedMapView } from '@/components/maps/ExpandedMapView';
 import { WatchMeOverlay } from '@/components/watchme/WatchMeOverlay';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
-import { useActiveWatches } from '@/hooks/useActiveWatches';
+import { useWatchMeActiveWatches } from '@/network/modules/watch-me/hooks/useWatchMeActiveWatches';
 import { useSosConfirmSheetStore } from '@/stores/sos-confirm-sheet-store';
 import { useAppModalStore } from '@/stores/app-modal-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
@@ -45,7 +45,8 @@ export default function WatchMeScreen() {
       hideAppModal();
     }, SOS_LOADING_DURATION_MS);
   });
-  const activeWatches = useActiveWatches();
+  const { watches: activeWatches, isLoading: activeWatchesLoading } =
+    useWatchMeActiveWatches();
 
   const shouldShowOnboarding =
     contacts.length === 0 && !onboardingDismissedByUser;
@@ -103,9 +104,9 @@ export default function WatchMeScreen() {
       />
       <WatchMeOverlay
         location={locationLabel}
-        onLocationPress={
-          locationNeedsRecovery ? openLocationModal : undefined
-        }
+        onLocationPress={locationNeedsRecovery ? openLocationModal : undefined}
+        hasEmergencyContacts={contacts.length > 0}
+        watchesLoading={activeWatchesLoading}
         watches={activeWatches}
         selectedWatchId={selectedWatchId}
         onSelectContact={handleSelectContact}

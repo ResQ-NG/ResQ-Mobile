@@ -19,6 +19,18 @@ export const AVATAR_BACKGROUNDS = [
   '#CCFBF1',
 ] as const;
 
+/**
+ * Non-empty remote avatar URL → `{ uri }` suitable for {@link Avatar}.
+ * Returns `undefined` when missing/blank. Trims whitespace. DiceBear URLs are
+ * rasterized inside Avatar (see `normalizeImageSource` in this file).
+ */
+export function avatarRemoteSource(
+  url: string | null | undefined
+): { uri: string } | undefined {
+  const t = typeof url === 'string' ? url.trim() : '';
+  return t.length > 0 ? { uri: t } : undefined;
+}
+
 export type AvatarSize = number;
 
 export type AvatarProps = {

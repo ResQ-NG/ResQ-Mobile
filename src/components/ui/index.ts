@@ -19,7 +19,12 @@ export type { InlineSelectProps, InlineSelectOption } from './InlineSelect';
 export { RoundedButton } from './RoundedButton';
 export type { RoundedButtonProps } from './RoundedButton';
 
-export { Avatar, AVATAR_BACKGROUNDS, DEFAULT_AVATAR_SOURCE } from './Avatar';
+export {
+  Avatar,
+  AVATAR_BACKGROUNDS,
+  DEFAULT_AVATAR_SOURCE,
+  avatarRemoteSource,
+} from './Avatar';
 export type { AvatarProps, AvatarSize } from './Avatar';
 
 export { AppInfoCallout } from './AppInfoCallout';

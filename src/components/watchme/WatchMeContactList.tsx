@@ -1,6 +1,11 @@
 import { View, ScrollView, TouchableOpacity } from 'react-native';
 import { AppText } from '@/components/ui/AppText';
-import { Avatar, AppButton, AVATAR_BACKGROUNDS } from '@/components/ui';
+import {
+  Avatar,
+  AppButton,
+  AVATAR_BACKGROUNDS,
+  avatarRemoteSource,
+} from '@/components/ui';
 import type { ActiveWatch } from './types';
 import { getWatchBadgeBg, getWatchBadgeLabel } from './types';
 import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
@@ -10,12 +15,18 @@ const PLACEHOLDER_SLOTS = 4;
 
 interface WatchMeContactListProps {
   watches: ActiveWatch[];
+  /** True while the first load of active sessions is in progress. */
+  loading?: boolean;
+  /** Dashed “add contacts” empty strip only when false and there are no sessions. */
+  hasEmergencyContacts: boolean;
   onSelectContact: (id: string) => void;
   onExpandPress?: () => void;
 }
 
 export function WatchMeContactList({
   watches,
+  loading = false,
+  hasEmergencyContacts,
   onSelectContact,
   onExpandPress,
 }: WatchMeContactListProps) {
@@ -23,7 +34,7 @@ export function WatchMeContactList({
 
   return (
     <>
-      {watches.length > 0 ? (
+      {watches.length > 0 || loading ? (
         <AppAnimatedView
           entering={brandFadeInUp.delay(80)}
           className="bg-[rgba(255,255,255,0.96)] dark:bg-[rgba(18,18,18,0.95)] border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.16)] px-5 rounded-[3rem]"
@@ -48,10 +59,7 @@ export function WatchMeContactList({
               const bgIndex = watch.avatarBgIndex ?? index;
               const badgeBg = getWatchBadgeBg(watch);
               const badgeLabel = getWatchBadgeLabel(watch);
-              const avatarSource =
-                watch.avatarUrl != null && watch.avatarUrl.length > 0
-                  ? { uri: watch.avatarUrl }
-                  : undefined;
+              const avatarSource = avatarRemoteSource(watch.avatarUrl);
               const isNonAppUser = watch.isAppUser === false;
 
               return (
@@ -103,15 +111,41 @@ export function WatchMeContactList({
                       className="text-[10px] text-captionDark dark:text-captionDark-dark"
                       numberOfLines={1}
                     >
-                      Last safe: {watch.lastOkayAt ?? watch.lastCheckLabel}
+                      Last signal: {watch.lastOkayAt ?? watch.lastCheckLabel}
                     </AppText>
                   </View>
                 </TouchableOpacity>
               );
             })}
+            {loading && watches.length === 0
+              ? Array.from({ length: PLACEHOLDER_SLOTS }).map((_, i) => (
+                  <View
+                    key={`watch-loading-${i}`}
+                    className="items-center mx-1"
+                  >
+                    <View
+                      className="rounded-full bg-gray-200 dark:bg-gray-700"
+                      style={{ width: 44, height: 44, opacity: 0.7 }}
+                    />
+                    <View
+                      className="h-2.5 w-16 rounded bg-gray-200 dark:bg-gray-700 mt-2"
+                      style={{ opacity: 0.6 }}
+                    />
+                  </View>
+                ))
+              : null}
           </ScrollView>
 
-          {watches.length >= 5 && (
+          {loading && watches.length === 0 ? (
+            <AppText
+              variant="caption"
+              className="text-center text-captionDark dark:text-captionDark-dark mt-2 px-2"
+            >
+              Loading active Watch Me sessions…
+            </AppText>
+          ) : null}
+
+          {watches.length >= 5 && !loading && (
             <View className="w-full items-end mt-2">
               <AppButton
                 variant="outline"
@@ -124,7 +158,7 @@ export function WatchMeContactList({
             </View>
           )}
         </AppAnimatedView>
-      ) : (
+      ) : !loading && !hasEmergencyContacts ? (
         <AppAnimatedView
           entering={brandFadeInUp.delay(80)}
           className="bg-[rgba(255,255,255,0.96)] dark:bg-[rgba(18,18,18,0.95)] border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.16)] px-5 rounded-[3rem]"
@@ -174,7 +208,7 @@ export function WatchMeContactList({
             started.
           </AppText>
         </AppAnimatedView>
-      )}
+      ) : null}
     </>
   );
 }
