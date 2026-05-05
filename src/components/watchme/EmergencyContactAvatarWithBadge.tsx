@@ -11,6 +11,10 @@ type Props = {
   isAppUser: boolean;
   /** Softer grey pill instead of amber “Invite” (e.g. Start Watch Me picker). */
   inviteBadgeMuted?: boolean;
+  /** Hide the “Invite” pill entirely (e.g. Watch Me map / sheet list). */
+  hideInviteBadge?: boolean;
+  /** De-emphasize avatar for contacts not on the app yet (Watch Me map mode). */
+  dimNonAppAvatar?: boolean;
 };
 
 /**
@@ -24,6 +28,8 @@ export function EmergencyContactAvatarWithBadge({
   avatarUrl,
   isAppUser,
   inviteBadgeMuted = false,
+  hideInviteBadge = false,
+  dimNonAppAvatar = false,
 }: Props) {
   const { isDark, theme } = useAppColorScheme();
   const source =
@@ -53,15 +59,20 @@ export function EmergencyContactAvatarWithBadge({
           shadowOpacity: 0.08,
         };
 
+  const showInvitePill = !isAppUser && !hideInviteBadge;
+  const dimAvatar = dimNonAppAvatar && !isAppUser;
+
   return (
     <View className="relative items-center justify-center">
-      <Avatar
-        size={size}
-        source={source}
-        backgroundColor={backgroundColor}
-        altText={altText}
-      />
-      {isAppUser ? null : (
+      <View style={dimAvatar ? { opacity: 0.5 } : undefined}>
+        <Avatar
+          size={size}
+          source={source}
+          backgroundColor={backgroundColor}
+          altText={altText}
+        />
+      </View>
+      {showInvitePill ? (
         <View
           className="absolute -top-1 -right-0.5 rounded-full overflow-hidden border-2 border-white dark:border-[#1a1a1a]"
           style={{
@@ -87,7 +98,7 @@ export function EmergencyContactAvatarWithBadge({
             Invite
           </AppText>
         </View>
-      )}
+      ) : null}
     </View>
   );
 }

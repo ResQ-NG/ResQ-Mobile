@@ -48,6 +48,12 @@ export function WatchMeContactList({
               const bgIndex = watch.avatarBgIndex ?? index;
               const badgeBg = getWatchBadgeBg(watch);
               const badgeLabel = getWatchBadgeLabel(watch);
+              const avatarSource =
+                watch.avatarUrl != null && watch.avatarUrl.length > 0
+                  ? { uri: watch.avatarUrl }
+                  : undefined;
+              const isNonAppUser = watch.isAppUser === false;
+
               return (
                 <TouchableOpacity
                   key={watch.id}
@@ -55,9 +61,15 @@ export function WatchMeContactList({
                   onPress={() => onSelectContact(watch.id)}
                 >
                   <View className="items-center mx-1">
-                    <View style={{ marginBottom: 8 }}>
+                    <View
+                      style={{
+                        marginBottom: 8,
+                        opacity: isNonAppUser ? 0.5 : 1,
+                      }}
+                    >
                       <Avatar
                         size={44}
+                        source={avatarSource}
                         backgroundColor={
                           AVATAR_BACKGROUNDS[
                             bgIndex % AVATAR_BACKGROUNDS.length

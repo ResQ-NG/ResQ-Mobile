@@ -43,23 +43,26 @@ export default function StartWatchMeScreen() {
     });
   };
 
-  const selectRelationshipGroup = useCallback(
+  const toggleRelationshipGroup = useCallback(
     (groupId: string) => {
       const group = groups.find((g) => g.id === groupId);
       if (!group || group.contacts.length === 0) return;
       setSelectedIds((prev) => {
-        const allInThisGroup =
-          prev.size === group.contacts.length &&
-          group.contacts.every((c) => prev.has(c.id));
-        if (allInThisGroup) return new Set<string>();
-        return new Set(group.contacts.map((c) => c.id));
+        const next = new Set(prev);
+        const allInGroup = group.contacts.every((c) => next.has(c.id));
+        if (allInGroup) {
+          for (const c of group.contacts) next.delete(c.id);
+        } else {
+          for (const c of group.contacts) next.add(c.id);
+        }
+        return next;
       });
     },
     [groups]
   );
 
-  const handleSelectRelationshipGroup =
-    usePreventDoublePress(selectRelationshipGroup);
+  const handleToggleRelationshipGroup =
+    usePreventDoublePress(toggleRelationshipGroup);
 
   const setSessionActive = useWatchMeContactsStore((s) => s.setSessionActive);
 
@@ -103,7 +106,7 @@ export default function StartWatchMeScreen() {
         groups={groups}
         selectedIds={selectedIds}
         onToggleContact={toggleContact}
-        onSelectRelationshipGroup={handleSelectRelationshipGroup}
+        onToggleRelationshipGroup={handleToggleRelationshipGroup}
         onAddContactPress={handleAddContactPress}
         onStartPress={handleStartWatchMe}
         isStarting={isChecking}

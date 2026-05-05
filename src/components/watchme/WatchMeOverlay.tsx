@@ -14,6 +14,8 @@ import { WatchMeSessionCard } from './WatchMeSessionCard';
 
 interface WatchMeOverlayProps {
   location?: string;
+  /** When location is unavailable, tap opens enable-location modal. */
+  onLocationPress?: () => void;
   /** List of active watches (from useActiveWatches or API). */
   watches: ActiveWatch[];
   /** Controlled: which contact is selected (profile open + map focused on them when availableOnMap) */
@@ -31,6 +33,7 @@ interface WatchMeOverlayProps {
 
 export function WatchMeOverlay({
   location = 'Getting location…',
+  onLocationPress,
   watches,
   selectedWatchId: _selectedWatchId = null,
   onSelectContact,
@@ -50,7 +53,10 @@ export function WatchMeOverlay({
 
   return (
     <View className="absolute inset-0" pointerEvents="box-none">
-      <WatchMeLocationPill location={location} />
+      <WatchMeLocationPill
+        location={location}
+        onLocationPress={onLocationPress}
+      />
 
       <AppAnimatedView
         entering={brandFadeInUp.delay(40)}

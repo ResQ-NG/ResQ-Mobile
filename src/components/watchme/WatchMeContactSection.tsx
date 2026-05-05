@@ -1,4 +1,5 @@
 import { View, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import {
   AppAnimatedView,
   brandFadeInUp,
@@ -17,23 +18,33 @@ export interface WatchMeContactGroup {
   contacts: WatchMeContact[];
 }
 
-function isRelationshipGroupRadioSelected(
+function isRelationshipGroupFullySelected(
   group: WatchMeContactGroup,
   selectedIds: Set<string>
 ): boolean {
   if (group.contacts.length === 0) return false;
-  if (selectedIds.size !== group.contacts.length) return false;
   return group.contacts.every((c) => selectedIds.has(c.id));
+}
+
+function isRelationshipGroupIndeterminate(
+  group: WatchMeContactGroup,
+  selectedIds: Set<string>
+): boolean {
+  let n = 0;
+  for (const c of group.contacts) {
+    if (selectedIds.has(c.id)) n += 1;
+  }
+  return n > 0 && n < group.contacts.length;
 }
 
 interface WatchMeContactSectionProps {
   groups: WatchMeContactGroup[];
   selectedIds: Set<string>;
   onToggleContact: (id: string) => void;
-  /** Selects exactly the contacts in this relationship group (radio behavior). */
-  onSelectRelationshipGroup: (groupId: string) => void;
+  /** Selects or clears all contacts in this relationship (multi-group selection). */
+  onToggleRelationshipGroup: (groupId: string) => void;
   onAddContactPress: () => void;
-  /** Grey “Invite” pills on non–app-user avatars (Start Watch Me). */
+  /** Start Watch Me: hide invite pill and dim non–app-user avatars. */
   inviteBadgeMuted?: boolean;
   /** Delay (ms) for section entrance animation. */
   enteringDelay?: number;
@@ -43,7 +54,7 @@ export function WatchMeContactSection({
   groups,
   selectedIds,
   onToggleContact,
-  onSelectRelationshipGroup,
+  onToggleRelationshipGroup,
   onAddContactPress,
   inviteBadgeMuted = false,
   enteringDelay = 240,
@@ -66,79 +77,79 @@ export function WatchMeContactSection({
         </AppText>
       </View>
 
-      <View accessibilityRole="radiogroup">
-        {groups.map((group) => (
-          <View key={group.id} className="mb-5">
-            <TouchableOpacity
-              activeOpacity={0.75}
-              onPress={() => onSelectRelationshipGroup(group.id)}
-              className="flex-row items-center gap-3 mb-2 min-h-[44px]"
-              accessibilityRole="radio"
-              accessibilityState={{
-                selected: isRelationshipGroupRadioSelected(
-                  group,
-                  selectedIds
-                ),
-              }}
-              accessibilityLabel={`${group.name}, select all contacts in this group`}
-            >
-              <View
-                className="items-center justify-center"
-                style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: 11,
-                  borderWidth: 2,
-                  borderColor: isRelationshipGroupRadioSelected(
-                    group,
-                    selectedIds
-                  )
-                    ? theme.primaryBlue
-                    : theme.avatarBorder,
-                }}
+      <View>
+        {groups.map((group) => {
+          const fully = isRelationshipGroupFullySelected(group, selectedIds);
+          const mixed = isRelationshipGroupIndeterminate(group, selectedIds);
+          const checkedState = fully ? true : mixed ? 'mixed' : false;
+
+          return (
+            <View key={group.id} className="mb-5">
+              <TouchableOpacity
+                activeOpacity={0.75}
+                onPress={() => onToggleRelationshipGroup(group.id)}
+                className="flex-row items-center gap-3 mb-2 min-h-[44px]"
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: checkedState }}
+                accessibilityLabel={`${group.name}, select all contacts in this group`}
               >
-                {isRelationshipGroupRadioSelected(group, selectedIds) ? (
-                  <View
-                    style={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 6,
-                      backgroundColor: theme.primaryBlue,
-                    }}
-                  />
-                ) : null}
-              </View>
-              <AppText className="font-metropolis-semibold text-primaryDark dark:text-primaryDark-dark text-sm flex-1">
-                {group.name}
-              </AppText>
-            </TouchableOpacity>
-            <View className="flex-row flex-wrap gap-3">
-              {group.contacts.map((contact) => (
-                <AppAnimatedView
-                  key={contact.id}
-                  entering={brandFadeInUp.delay(cardDelay)}
+                <View
+                  className="items-center justify-center"
                   style={{
-                    flex: 1,
-                    minWidth: '45%',
-                    maxWidth: '48%',
-                    height: CARD_HEIGHT,
+                    width: 17,
+                    height: 17,
+                    borderRadius: 3,
+                    borderWidth: 1.5,
+                    borderColor:
+                      fully || mixed ? theme.primaryBlue : theme.avatarBorder,
+                    backgroundColor: fully ? theme.primaryBlue : 'transparent',
                   }}
                 >
-                  <WatchMeContactCard
-                    contact={contact}
-                    selected={selectedIds.has(contact.id)}
-                    onPress={() => onToggleContact(contact.id)}
-                    inviteBadgeMuted={inviteBadgeMuted}
-                  />
-                </AppAnimatedView>
-              ))}
+                  {fully ? (
+                    <Ionicons name="checkmark" size={11} color="#fff" />
+                  ) : mixed ? (
+                    <View
+                      style={{
+                        width: 7,
+                        height: 1.5,
+                        borderRadius: 0.75,
+                        backgroundColor: theme.primaryBlue,
+                      }}
+                    />
+                  ) : null}
+                </View>
+                <AppText className="font-metropolis-semibold text-primaryDark dark:text-primaryDark-dark text-sm flex-1">
+                  {group.name}
+                </AppText>
+              </TouchableOpacity>
+              <View className="flex-row flex-wrap gap-3">
+                {group.contacts.map((contact) => (
+                  <AppAnimatedView
+                    key={contact.id}
+                    entering={brandFadeInUp.delay(cardDelay)}
+                    style={{
+                      flex: 1,
+                      minWidth: '45%',
+                      maxWidth: '48%',
+                      height: CARD_HEIGHT,
+                    }}
+                  >
+                    <WatchMeContactCard
+                      contact={contact}
+                      selected={selectedIds.has(contact.id)}
+                      onPress={() => onToggleContact(contact.id)}
+                      inviteBadgeMuted={inviteBadgeMuted}
+                    />
+                  </AppAnimatedView>
+                ))}
+              </View>
+              {(() => {
+                cardDelay += group.contacts.length * 50 + 10;
+                return null;
+              })()}
             </View>
-            {(() => {
-              cardDelay += group.contacts.length * 50 + 10;
-              return null;
-            })()}
-          </View>
-        ))}
+          );
+        })}
       </View>
 
       <AppAnimatedView entering={brandFadeInUp.delay(cardDelay)}>

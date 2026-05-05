@@ -17,7 +17,7 @@ interface WatchMeContactCardProps {
   contact: WatchMeContact;
   selected: boolean;
   onPress: () => void;
-  /** Grey “Invite” pill instead of amber (Start Watch Me). */
+  /** Watch Me flows: no invite pill, dim avatar when contact is not on the app. */
   inviteBadgeMuted?: boolean;
 }
 
@@ -53,7 +53,8 @@ export function WatchMeContactCard({
           backgroundColor={AVATAR_BACKGROUNDS[bg % AVATAR_BACKGROUNDS.length]}
           avatarUrl={uri}
           isAppUser={contact.isAppUser ?? false}
-          inviteBadgeMuted={inviteBadgeMuted}
+          hideInviteBadge={inviteBadgeMuted}
+          dimNonAppAvatar={inviteBadgeMuted}
         />
         <AppText
           className="mt-2 font-metropolis-semibold text-primaryDark dark:text-primaryDark-dark text-center"

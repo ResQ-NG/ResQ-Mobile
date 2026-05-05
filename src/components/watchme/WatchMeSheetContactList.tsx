@@ -9,8 +9,9 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useAppColorScheme } from '@/theme/colorMode';
 import { AppText } from '@/components/ui/AppText';
+import { AppInfoCallout } from '@/components/ui/AppInfoCallout';
 import { AVATAR_BACKGROUNDS } from '@/components/ui/Avatar';
-import SolarInfoCircleBoldIcon from '@/components/icons/solar/info-circle-bold';
+import { emergencyContactsReachabilityCopy } from '@/lib/content/emergency-contacts-reachability-info';
 import {
   formatEmergencyContactReachabilityLine,
   type UiEmergencyContact,
@@ -25,6 +26,8 @@ type Props = {
   /** When set, tapping a non–app-user row opens invite (avatar + name area). */
   onInviteContact?: (contact: UiEmergencyContact) => void;
   onRequestEdit?: (contact: UiEmergencyContact) => void;
+  /** Watch Me map tab: hide invite pill and dim non–app avatars. */
+  listAppearance?: 'default' | 'watchMap';
 };
 
 function RelationshipBadge({
@@ -62,8 +65,10 @@ export function WatchMeSheetContactList({
   onRequestRemove,
   onInviteContact,
   onRequestEdit,
+  listAppearance = 'default',
 }: Props) {
   const { theme, isDark } = useAppColorScheme();
+  const isWatchMapList = listAppearance === 'watchMap';
   const canEdit = typeof onRequestEdit === 'function';
 
   const openRowMenu = useCallback(
@@ -118,25 +123,25 @@ export function WatchMeSheetContactList({
     [canEdit, onRequestEdit, onRequestRemove]
   );
 
+  const copy = emergencyContactsReachabilityCopy;
+
   return (
     <View>
-      {contacts.length === 0 && (
-        <View
-          className="mx-4 mb-4 p-4 rounded-2xl flex-row gap-3"
-          style={{
-            backgroundColor: isDark ? '#153356' : '#E6F0FF',
-          }}
-        >
-          <SolarInfoCircleBoldIcon width={24} height={24} color="#2563eb" />
-          <View className="flex-1">
-            <AppText className="font-metropolis-bold text-primaryDark dark:text-primaryDark-dark">
-              Why do I need emergency contacts?
-            </AppText>
-            <AppText className="text-sm text-captionDark dark:text-captionDark-dark mt-1">
-              {`They'll be notified immediately when you report an emergency or activate Watch Me.`}
-            </AppText>
-          </View>
-        </View>
+      {contacts.length === 0 ? (
+        <AppInfoCallout title={copy.emptyWhyTitle} className="mx-4 mb-4">
+          <AppText className="text-sm text-captionDark dark:text-captionDark-dark">
+            {copy.emptyWhyBody}
+          </AppText>
+          <AppText className="text-sm text-captionDark dark:text-captionDark-dark mt-3">
+            {copy.emptyReachBody}
+          </AppText>
+        </AppInfoCallout>
+      ) : (
+        <AppInfoCallout title={copy.reachTitle} className="mx-4 mb-4">
+          <AppText className="text-sm text-captionDark dark:text-captionDark-dark">
+            {copy.reachBody}
+          </AppText>
+        </AppInfoCallout>
       )}
 
       <View style={{ paddingHorizontal: 16 }}>
@@ -153,6 +158,8 @@ export function WatchMeSheetContactList({
                 }
                 avatarUrl={contact.avatarUrl}
                 isAppUser={contact.isAppUser}
+                hideInviteBadge={isWatchMapList}
+                dimNonAppAvatar={isWatchMapList}
               />
             );
             const textBlock = (

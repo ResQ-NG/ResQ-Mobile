@@ -24,6 +24,8 @@ interface CameraOverlayHeaderProps {
   avatarAltText?: string;
   /** When set, show back button instead of avatar and hide SOS (e.g. SOS evidence screen). */
   onBack?: () => void;
+  /** Opens enable-location modal (e.g. when permission denied). */
+  onLocationPress?: () => void;
   /** Tap: show confirmation sheet. Long-press: dispatch immediately. */
   onSosPress?: () => void;
   onSosLongPress?: () => void;
@@ -34,6 +36,7 @@ export function CameraOverlayHeader({
   avatarUri,
   avatarAltText = 'You',
   onBack,
+  onLocationPress,
   onSosPress,
   onSosLongPress,
 }: CameraOverlayHeaderProps) {
@@ -139,17 +142,31 @@ export function CameraOverlayHeader({
       {/* Row 2: Location + Time (only when not in back mode) */}
       {!onBack && (
         <View className="flex-col gap-2 mt-4 ">
-          <AppAnimatedView
-            entering={brandFadeInDown.delay(160)}
-            className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
+          <Pressable
+            disabled={!onLocationPress}
+            onPress={onLocationPress}
+            accessibilityRole={onLocationPress ? 'button' : undefined}
+            accessibilityLabel={
+              onLocationPress
+                ? 'Location unavailable. Open location settings.'
+                : undefined
+            }
+            style={({ pressed }) => [
+              onLocationPress && pressed ? { opacity: 0.85 } : undefined,
+            ]}
           >
-            <View className="flex-row items-center gap-[6px]">
-              <SolarMapPointBoldIcon width={14} height={14} color={iconColor} />
-              <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
-                {location}
-              </AppText>
-            </View>
-          </AppAnimatedView>
+            <AppAnimatedView
+              entering={brandFadeInDown.delay(160)}
+              className="self-start px-4 py-4 rounded-full bg-[rgba(18,18,18,0.75)] border border-[rgba(255,255,255,0.12)] gap-1"
+            >
+              <View className="flex-row items-center gap-[6px]">
+                <SolarMapPointBoldIcon width={14} height={14} color={iconColor} />
+                <AppText className="text-white text-[13px] font-metropolis-bold tracking-wide">
+                  {location}
+                </AppText>
+              </View>
+            </AppAnimatedView>
+          </Pressable>
 
           <AppAnimatedView
             entering={brandFadeInDown.delay(160)}

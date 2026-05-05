@@ -14,7 +14,7 @@ import type { AvatarPreset } from '@/network/modules/auth/types';
 import { dicebearUriToRasterImageUri } from '@/lib/third-party/dicebear';
 import { useAvatarPresetPickerStore } from '@/stores/avatar-preset-picker-store';
 
-const SNAP_POINTS = ['72%', '92%'];
+const SNAP_POINTS = ['72%', '100%'];
 const GAP = 12;
 const COLUMNS = 3;
 
@@ -47,6 +47,7 @@ export default function AvatarPresetPickerBottomSheet() {
       snapPoints={SNAP_POINTS}
       isOpen={isOpen}
       onClose={close}
+      enableDynamicSizing={true}
       title="Choose avatar"
       description="Pick a preset. You can change it anytime in profile settings."
       contentPadding={{ horizontal: horizontalPadding, top: 8, bottom: 16 }}

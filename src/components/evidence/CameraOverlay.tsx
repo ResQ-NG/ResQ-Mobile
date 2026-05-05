@@ -45,6 +45,7 @@ export function CameraOverlay({
   onCapture,
   onAddMedia,
   onAddFile,
+  onLocationPress,
   onSosPress,
   onSosLongPress,
   onInfoPress,
@@ -73,6 +74,7 @@ export function CameraOverlay({
         avatarUri={avatarUri}
         avatarAltText={avatarAltText}
         onBack={onBack}
+        onLocationPress={onLocationPress}
         onSosPress={onSosPress}
         onSosLongPress={onSosLongPress}
       />

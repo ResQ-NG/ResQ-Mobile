@@ -63,5 +63,6 @@ export const useDeleteEmergencyContact = createApiMutation<number, unknown>({
   endpoint: (contactId) => EmergencyContactsRoutes.Delete(String(contactId)),
   operationName: 'Delete Emergency Contact',
   method: 'delete',
+  successMessage: 'Contact removed',
   invalidateQueries: [[EmergencyContactsKeys.List]],
 });

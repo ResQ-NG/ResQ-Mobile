@@ -21,3 +21,6 @@ export type { RoundedButtonProps } from './RoundedButton';
 
 export { Avatar, AVATAR_BACKGROUNDS, DEFAULT_AVATAR_SOURCE } from './Avatar';
 export type { AvatarProps, AvatarSize } from './Avatar';
+
+export { AppInfoCallout } from './AppInfoCallout';
+export type { AppInfoCalloutProps } from './AppInfoCallout';

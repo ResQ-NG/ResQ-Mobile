@@ -50,7 +50,13 @@ export default function GetStartedScreen() {
     submitLogin,
     submitSignup,
     submitOtp,
+    signupFieldErrors,
   } = flow;
+
+  const signupContactError =
+    phase === 'signup'
+      ? (signupFieldErrors.email ?? signupFieldErrors.phone_number ?? '')
+      : '';
 
   const mailIcon = (
     <Ionicons name="mail-outline" size={22} color={theme.textMuted} />
@@ -150,7 +156,14 @@ export default function GetStartedScreen() {
               textContentType={textContentType}
               leftIcon={leftIcon}
             />
-            {showPhoneHint ? (
+            {signupContactError ? (
+              <AppText
+                variant="caption"
+                className="text-accent-red dark:text-accent-red-dark mt-2"
+              >
+                {signupContactError}
+              </AppText>
+            ) : showPhoneHint ? (
               <AppText
                 variant="caption"
                 className="text-accent-red dark:text-accent-red-dark mt-2"
@@ -177,7 +190,10 @@ export default function GetStartedScreen() {
 
           {phase === 'signup' ? (
             <>
-              <FormField label="First name">
+              <FormField
+                label="First name"
+                errorMessage={signupFieldErrors.first_name}
+              >
                 <AppInput
                   value={firstName}
                   onChangeText={setFirstName}
@@ -187,7 +203,10 @@ export default function GetStartedScreen() {
                   leftIcon={personIcon}
                 />
               </FormField>
-              <FormField label="Last name (optional)">
+              <FormField
+                label="Last name (optional)"
+                errorMessage={signupFieldErrors.last_name}
+              >
                 <AppInput
                   value={lastName}
                   onChangeText={setLastName}
@@ -197,7 +216,10 @@ export default function GetStartedScreen() {
                   leftIcon={personIcon}
                 />
               </FormField>
-              <FormField label="Password">
+              <FormField
+                label="Password"
+                errorMessage={signupFieldErrors.password}
+              >
                 <AppInput
                   value={signupPassword}
                   onChangeText={setSignupPassword}
@@ -250,9 +272,11 @@ export default function GetStartedScreen() {
 function FormField({
   label,
   children,
+  errorMessage,
 }: {
   label: string;
   children: React.ReactNode;
+  errorMessage?: string;
 }) {
   return (
     <View>
@@ -260,6 +284,14 @@ function FormField({
         {label}
       </AppText>
       {children}
+      {errorMessage ? (
+        <AppText
+          variant="caption"
+          className="text-accent-red dark:text-accent-red-dark mt-2"
+        >
+          {errorMessage}
+        </AppText>
+      ) : null}
     </View>
   );
 }

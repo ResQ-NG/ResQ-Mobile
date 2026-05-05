@@ -11,17 +11,22 @@ import { useAppColorScheme } from '@/theme/colorMode';
 const ICON_SIZE = 22;
 
 interface SettingsListProps {
+  /** Shown to the right of the title (e.g. count or "…" while loading). */
+  emergencyContactsSubtitle?: string;
   onEmergencyPress?: () => void;
   onPrivacyPress?: () => void;
   onNotificationsPress?: () => void;
   onHelpPress?: () => void;
+  onLogoutPress?: () => void;
 }
 
 export function SettingsList({
+  emergencyContactsSubtitle,
   onEmergencyPress,
   onPrivacyPress,
   onNotificationsPress,
   onHelpPress,
+  onLogoutPress,
 }: SettingsListProps) {
   const { theme } = useAppColorScheme();
 
@@ -37,6 +42,7 @@ export function SettingsList({
       <TouchableOpacity
         onPress={onEmergencyPress}
         activeOpacity={0.7}
+        disabled={!onEmergencyPress}
         className="flex-row items-center gap-3 px-4 py-3.5"
         accessibilityRole="button"
         accessibilityLabel="Emergency contacts"
@@ -51,9 +57,15 @@ export function SettingsList({
         <AppText variant="body" className="flex-1 font-metropolis-medium">
           Emergency contacts
         </AppText>
-        <AppText variant="caption" className="text-sm">
-          5 people
-        </AppText>
+        {emergencyContactsSubtitle != null && emergencyContactsSubtitle !== '' ? (
+          <AppText
+            variant="caption"
+            className="text-sm text-captionDark dark:text-captionDark-dark mr-1"
+          >
+            {emergencyContactsSubtitle}
+          </AppText>
+        ) : null}
+        <HugeiconsArrowRight01Icon width={18} height={18} color={iconMuted} />
       </TouchableOpacity>
 
       {/* Privacy & security */}
@@ -118,6 +130,26 @@ export function SettingsList({
         </AppText>
         <HugeiconsArrowRight01Icon width={18} height={18} color={iconMuted} />
       </TouchableOpacity>
+
+      {onLogoutPress ? (
+        <>
+          <View className="h-px bg-black/8 dark:bg-white/10" />
+          <TouchableOpacity
+            onPress={onLogoutPress}
+            activeOpacity={0.7}
+            className="flex-row items-center gap-3 px-4 py-3.5"
+            accessibilityRole="button"
+            accessibilityLabel="Log out"
+          >
+            <AppText
+              variant="body"
+              className="flex-1 font-metropolis-medium text-accent-red dark:text-accent-red-dark"
+            >
+              Log out
+            </AppText>
+          </TouchableOpacity>
+        </>
+      ) : null}
     </AppAnimatedView>
   );
 }

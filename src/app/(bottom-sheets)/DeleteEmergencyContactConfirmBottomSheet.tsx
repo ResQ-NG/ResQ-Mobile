@@ -3,7 +3,6 @@ import { BaseBottomSheet } from '@/components/bottom-sheet';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppText } from '@/components/ui/AppText';
 import { Avatar, AVATAR_BACKGROUNDS } from '@/components/ui/Avatar';
-import { showToast } from '@/lib/utils/app-toast';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { useDeleteEmergencyContact } from '@/network/modules/emergency-contacts/queries';
 import { useDeleteEmergencyContactConfirmStore } from '@/stores/delete-emergency-contact-confirm-store';
@@ -23,7 +22,6 @@ export default function DeleteEmergencyContactConfirmBottomSheet() {
     mutate(idNum, {
       onSuccess: () => {
         close();
-        showToast({ message: 'Contact removed', variant: 'success' });
       },
     });
   });

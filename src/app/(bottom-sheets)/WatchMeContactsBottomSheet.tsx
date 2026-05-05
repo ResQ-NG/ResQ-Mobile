@@ -40,6 +40,10 @@ const SNAP_POINTS = ['65%', '95%'];
 export function WatchMeContactsBottomSheet() {
   const { theme } = useAppColorScheme();
   const pathname = usePathname();
+  const contactListAppearance = useMemo(
+    () => (pathname === '/screens/watchme' ? 'watchMap' : 'default'),
+    [pathname]
+  );
   const {
     isOpen,
     close,
@@ -388,6 +392,7 @@ export function WatchMeContactsBottomSheet() {
       {view === 'list' ? (
         <WatchMeSheetContactList
           contacts={contacts}
+          listAppearance={contactListAppearance}
           onRequestEdit={openForEdit}
           onRequestRemove={(c) =>
             openDeleteConfirm({

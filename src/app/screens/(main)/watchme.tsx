@@ -8,13 +8,21 @@ import { useActiveWatches } from '@/hooks/useActiveWatches';
 import { useSosConfirmSheetStore } from '@/stores/sos-confirm-sheet-store';
 import { useAppModalStore } from '@/stores/app-modal-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
-import { useUserLocationStore } from '@/stores/user-location-store';
+import {
+  openEnableLocationModal,
+  useUserLocationStore,
+  userLocationNeedsRecoveryTapAction,
+} from '@/stores/user-location-store';
 import { useGetEmergencyContacts } from '@/network/modules/emergency-contacts/queries';
 
 const SOS_LOADING_DURATION_MS = 1200;
 
 export default function WatchMeScreen() {
   const locationLabel = useUserLocationStore((s) => s.addressLabel);
+  const locationNeedsRecovery = useUserLocationStore(
+    userLocationNeedsRecoveryTapAction
+  );
+  const openLocationModal = usePreventDoublePress(openEnableLocationModal);
   const resetLocation = useRef<(() => void) | null>(null);
   const [selectedWatchId, setSelectedWatchId] = useState<string | null>(null);
   const { data: contacts = [] } = useGetEmergencyContacts();
@@ -95,6 +103,9 @@ export default function WatchMeScreen() {
       />
       <WatchMeOverlay
         location={locationLabel}
+        onLocationPress={
+          locationNeedsRecovery ? openLocationModal : undefined
+        }
         watches={activeWatches}
         selectedWatchId={selectedWatchId}
         onSelectContact={handleSelectContact}

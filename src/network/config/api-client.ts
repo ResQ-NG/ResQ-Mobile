@@ -32,6 +32,7 @@ import {
   QueryConfig,
 } from './types';
 import { isPlainRecord } from './type-guards';
+import { formatFieldErrorsForToast } from './api-field-errors';
 
 /** =====================================================
  * Utility Helpers
@@ -100,8 +101,15 @@ async function executeApiCall<T>(
   return result.data;
 }
 
-function getApiErrorMessage(error: unknown): string {
-  if (error instanceof ApiError) return error.original.message;
+export function getApiErrorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    const orig = error.original;
+    if (!orig.success) {
+      const fields = formatFieldErrorsForToast(orig.error);
+      if (fields) return fields;
+    }
+    return orig.message;
+  }
   if (error instanceof Error) return error.message;
   return 'Something went wrong';
 }
@@ -261,9 +269,7 @@ export function useApiMutation<TVariables = unknown, TData = unknown>(
       if (config.suppressErrorMessage) {
         return;
       }
-      const message =
-        error instanceof ApiError ? error.original.message : error.message;
-      showError(message);
+      showError(getApiErrorMessage(error));
     },
   });
 }

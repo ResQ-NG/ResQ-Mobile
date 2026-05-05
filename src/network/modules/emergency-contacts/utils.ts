@@ -1,6 +1,8 @@
 import type { EmergencyContact as ApiEmergencyContact } from './types';
-import { maskPhoneDigits } from '@/lib/utils/mask-phone';
-import { maskEmailForListDisplay } from '@/lib/utils/mask-email';
+import {
+  maskEmailForListDisplay,
+  maskPhoneDigits,
+} from '@/network/modules/auth/utils';
 import {
   formatNgMobileDisplayForInput,
   nationalFromStoredPhone,

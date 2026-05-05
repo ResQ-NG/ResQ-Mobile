@@ -4,7 +4,11 @@ import { Camera } from 'react-native-vision-camera';
 import { CameraOverlay } from '@/components/evidence/CameraOverlay';
 import { useCurrentUserProfileAvatar } from '@/hooks/useCurrentUserProfileAvatar';
 import { useMainCameraScreen } from '@/hooks/useMainCameraScreen';
-import { useUserLocationStore } from '@/stores/user-location-store';
+import {
+  openEnableLocationModal,
+  useUserLocationStore,
+  userLocationNeedsRecoveryTapAction,
+} from '@/stores/user-location-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { useSosConfirmSheetStore } from '@/stores/sos-confirm-sheet-store';
 import { useAppModalStore } from '@/stores/app-modal-store';
@@ -14,6 +18,10 @@ const SOS_LOADING_DURATION_MS = 1200;
 export default function MainScreen() {
   const { avatarUri, displayName } = useCurrentUserProfileAvatar();
   const locationLabel = useUserLocationStore((s) => s.addressLabel);
+  const locationNeedsRecovery = useUserLocationStore(
+    userLocationNeedsRecoveryTapAction
+  );
+  const openLocationModal = usePreventDoublePress(openEnableLocationModal);
   const openSosConfirmSheet = useSosConfirmSheetStore((s) => s.open);
   const { showLoading, setProgress, hide: hideAppModal } = useAppModalStore();
   const handleSosPress = usePreventDoublePress(openSosConfirmSheet);
@@ -55,6 +63,7 @@ export default function MainScreen() {
 
       <CameraOverlay
         location={locationLabel}
+        onLocationPress={locationNeedsRecovery ? openLocationModal : undefined}
         avatarUri={avatarUri}
         avatarAltText={displayName}
         onLens={handleToggleCameraPosition}

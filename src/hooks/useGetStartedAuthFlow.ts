@@ -12,6 +12,11 @@ import {
   useLoginWithIdentifier,
   useVerifyIdentifierOtp,
 } from '@/network/modules/auth/queries';
+import { getApiErrorMessage } from '@/network/config/api-client';
+import {
+  extractApiFieldErrorsFromThrown,
+  fieldErrorsToPartialRecord,
+} from '@/network/config/api-field-errors';
 import { useAuthTokenStore } from '@/stores/auth-token-store';
 import { AuthKeys } from '@/network/modules/auth/keys';
 import { showToast } from '@/lib/utils/app-toast';
@@ -27,7 +32,8 @@ export type GetStartedAuthPhase =
   | 'signup'
   | 'verify_otp';
 
-const MIN_PASSWORD_LEN = 6;
+const MIN_LOGIN_PASSWORD_LEN = 6;
+const MIN_SIGNUP_PASSWORD_LEN = 12;
 const OTP_LEN = 6;
 
 function pickAuthTokenFromAuthResponse(data: unknown): string | null {
@@ -65,6 +71,9 @@ export function useGetStartedAuthFlow() {
   const [lastName, setLastName] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [otp, setOtp] = useState('');
+  const [signupFieldErrors, setSignupFieldErrors] = useState<
+    Record<string, string>
+  >({});
 
   const lockedPayloadRef = useRef<CheckIdentifierRequest | null>(null);
 
@@ -96,6 +105,15 @@ export function useGetStartedAuthFlow() {
       setOtp('');
     }
   }, [checkPayload, phase]);
+
+  useEffect(() => {
+    if (phase !== 'signup') setSignupFieldErrors({});
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== 'signup') return;
+    setSignupFieldErrors({});
+  }, [phase, firstName, lastName, signupPassword, contactApi.contact]);
 
   const finishWithSession = useCallback(
     (data: unknown, successMessage: string) => {
@@ -138,7 +156,19 @@ export function useGetStartedAuthFlow() {
   });
 
   const createMutation = useCreateAccount({
+    onError: (err) => {
+      const items = extractApiFieldErrorsFromThrown(err);
+      if (items.length > 0) {
+        setSignupFieldErrors(fieldErrorsToPartialRecord(items));
+        return;
+      }
+      showToast({
+        message: getApiErrorMessage(err),
+        variant: 'error',
+      });
+    },
     onSuccess: (data) => {
+      setSignupFieldErrors({});
       const token = pickAuthTokenFromAuthResponse(data);
       if (token) {
         setToken(token);
@@ -182,9 +212,9 @@ export function useGetStartedAuthFlow() {
 
   const submitLogin = useCallback(() => {
     const creds = lockedPayloadRef.current;
-    if (!creds || password.length < MIN_PASSWORD_LEN) {
+    if (!creds || password.length < MIN_LOGIN_PASSWORD_LEN) {
       showToast({
-        message: `Enter your password (at least ${MIN_PASSWORD_LEN} characters).`,
+        message: `Enter your password (at least ${MIN_LOGIN_PASSWORD_LEN} characters).`,
         variant: 'error',
       });
       return;
@@ -209,9 +239,9 @@ export function useGetStartedAuthFlow() {
       showToast({ message: 'Enter your first name.', variant: 'error' });
       return;
     }
-    if (signupPassword.length < MIN_PASSWORD_LEN) {
+    if (signupPassword.length < MIN_SIGNUP_PASSWORD_LEN) {
       showToast({
-        message: `Choose a password (at least ${MIN_PASSWORD_LEN} characters).`,
+        message: `Choose a password (at least ${MIN_SIGNUP_PASSWORD_LEN} characters).`,
         variant: 'error',
       });
       return;
@@ -255,12 +285,14 @@ export function useGetStartedAuthFlow() {
       return contactApi.canContinue && !checkMutation.isPending;
     }
     if (phase === 'active_password') {
-      return password.length >= MIN_PASSWORD_LEN && !loginMutation.isPending;
+      return (
+        password.length >= MIN_LOGIN_PASSWORD_LEN && !loginMutation.isPending
+      );
     }
     if (phase === 'signup') {
       return (
         firstName.trim().length >= 1 &&
-        signupPassword.length >= MIN_PASSWORD_LEN &&
+        signupPassword.length >= MIN_SIGNUP_PASSWORD_LEN &&
         !createMutation.isPending
       );
     }
@@ -316,5 +348,6 @@ export function useGetStartedAuthFlow() {
     submitLogin,
     submitSignup,
     submitOtp,
+    signupFieldErrors,
   };
 }

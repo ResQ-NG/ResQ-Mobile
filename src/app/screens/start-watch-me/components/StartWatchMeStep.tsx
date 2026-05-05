@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import {
   AppAnimatedScrollView,
@@ -5,6 +6,7 @@ import {
   brandFadeInUp,
 } from '@/lib/animation';
 import { AppText } from '@/components/ui/AppText';
+import { AppInfoCallout } from '@/components/ui/AppInfoCallout';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { AppButton } from '@/components/ui/AppButton';
 import SolarClockCircleBoldIcon from '@/components/icons/solar/clock-circle-bold';
@@ -18,6 +20,10 @@ import type { WatchMeContactGroup } from '@/components/watchme/WatchMeContactSec
 import { DestinationSearchInput } from '@/components/watchme/DestinationSearchInput';
 import MingcuteCar3FillIcon from '@/components/icons/mingcute/car-3-fill';
 import formatArrivalTime from './formatArrivalTime';
+import { emergencyContactsReachabilityCopy } from '@/lib/content/emergency-contacts-reachability-info';
+import { useStartWatchMeReachabilityInfoDismissStore } from '@/stores/start-watch-me-reachability-info-dismiss-store';
+
+const reachCopy = emergencyContactsReachabilityCopy;
 
 export type TransportationMode =
   | 'walking'
@@ -53,7 +59,7 @@ export interface StartWatchMeStepProps {
   groups: WatchMeContactGroup[];
   selectedIds: Set<string>;
   onToggleContact: (id: string) => void;
-  onSelectRelationshipGroup: (groupId: string) => void;
+  onToggleRelationshipGroup: (groupId: string) => void;
   onAddContactPress: () => void;
   onStartPress: () => void;
   isStarting?: boolean;
@@ -68,7 +74,7 @@ export default function StartWatchMeStep({
   groups,
   selectedIds,
   onToggleContact,
-  onSelectRelationshipGroup,
+  onToggleRelationshipGroup,
   onAddContactPress,
   onStartPress,
   isStarting = false,
@@ -76,6 +82,31 @@ export default function StartWatchMeStep({
 }: StartWatchMeStepProps) {
   const { theme } = useAppColorScheme();
   const arrivalTime = formatArrivalTime(DEFAULT_ARRIVAL_MINUTES);
+
+  const reachabilityInfoDismissed = useStartWatchMeReachabilityInfoDismissStore(
+    (s) => s.dismissed
+  );
+  const dismissReachabilityInfo = useStartWatchMeReachabilityInfoDismissStore(
+    (s) => s.dismiss
+  );
+  const [reachabilityInfoHydrated, setReachabilityInfoHydrated] = useState(
+    () => useStartWatchMeReachabilityInfoDismissStore.persist.hasHydrated()
+  );
+
+  useEffect(() => {
+    const store = useStartWatchMeReachabilityInfoDismissStore;
+    if (store.persist.hasHydrated()) {
+      setReachabilityInfoHydrated(true);
+      return;
+    }
+    const unsub = store.persist.onFinishHydration(() => {
+      setReachabilityInfoHydrated(true);
+    });
+    return unsub;
+  }, []);
+
+  const showReachabilityInfoCallout =
+    reachabilityInfoHydrated && !reachabilityInfoDismissed;
 
   return (
     <>
@@ -169,11 +200,24 @@ export default function StartWatchMeStep({
           </View>
         </AppAnimatedView>
 
+        {showReachabilityInfoCallout ? (
+          <AppAnimatedView entering={brandFadeInUp.delay(180)} className="mb-1">
+            <AppInfoCallout
+              title={reachCopy.reachTitle}
+              onDismiss={dismissReachabilityInfo}
+            >
+              <AppText className="text-sm text-captionDark dark:text-captionDark-dark">
+                {reachCopy.reachBody}
+              </AppText>
+            </AppInfoCallout>
+          </AppAnimatedView>
+        ) : null}
+
         <WatchMeContactSection
           groups={groups}
           selectedIds={selectedIds}
           onToggleContact={onToggleContact}
-          onSelectRelationshipGroup={onSelectRelationshipGroup}
+          onToggleRelationshipGroup={onToggleRelationshipGroup}
           onAddContactPress={onAddContactPress}
           inviteBadgeMuted
           enteringDelay={200}

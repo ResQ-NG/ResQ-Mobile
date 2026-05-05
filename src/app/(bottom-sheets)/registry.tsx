@@ -9,6 +9,7 @@ import ChatAgencyPickerBottomSheet from './ChatAgencyPickerBottomSheet';
 import DeleteEmergencyContactConfirmBottomSheet from './DeleteEmergencyContactConfirmBottomSheet';
 import AvatarPresetPickerBottomSheet from './AvatarPresetPickerBottomSheet';
 import InviteContactBottomSheet from './InviteContactBottomSheet';
+import LogoutConfirmBottomSheet from './LogoutConfirmBottomSheet';
 
 export default function BottomSheetRegistry() {
   return (
@@ -24,6 +25,7 @@ export default function BottomSheetRegistry() {
       <DeleteEmergencyContactConfirmBottomSheet />
       <AvatarPresetPickerBottomSheet />
       <InviteContactBottomSheet />
+      <LogoutConfirmBottomSheet />
     </>
   );
 }

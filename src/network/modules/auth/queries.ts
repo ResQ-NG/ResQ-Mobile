@@ -44,6 +44,7 @@ export const useCreateAccount = createApiMutation<
   operationName: 'CreateAccount',
   method: 'post',
   suppressSuccessMessage: true,
+  suppressErrorMessage: true,
   invalidateQueries: [[AuthKeys.UserProfile]],
 });
 
@@ -75,7 +76,7 @@ export const useUpdateProfileInformation = createApiMutation<
 >({
   endpoint: AuthRoutes.UpdateProfileInformation,
   operationName: 'Update Profile Information',
-  method: 'put',
+  method: 'patch',
   successMessage: 'Profile updated',
   invalidateQueries: [[AuthKeys.UserProfile]],
 });

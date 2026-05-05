@@ -13,6 +13,24 @@ export type UserLocationSnapshot = {
   isFallback: boolean;
 };
 
+/** Shown while the first (or in-flight) refresh has not finished. */
+export const USER_LOCATION_LOADING_LABEL = 'Getting location…';
+
+/**
+ * When true, location UI text refers to denial/error (not GPS loading) —
+ * taps should offer {@link openEnableLocationModal}.
+ */
+export function userLocationNeedsRecoveryTapAction(
+  s: Pick<UserLocationSnapshot, 'addressLabel' | 'isFallback'>
+): boolean {
+  return s.isFallback && s.addressLabel !== USER_LOCATION_LOADING_LABEL;
+}
+
+export function openEnableLocationModal(): void {
+  useLocationStore.getState().setLocationEnabled({ isLocationModalVisible: true });
+  router.push('/(modals)/enable-location');
+}
+
 type RefreshOptions = {
   /** When true, do not open the enable-location modal (e.g. after user dismissed it). */
   silentIfDenied?: boolean;
@@ -48,7 +66,7 @@ async function reverseGeocodeLabel(latitude: number, longitude: number): Promise
 
 export const useUserLocationStore = create<UserLocationStore>((set) => ({
   coordinates: DEFAULT_USA_COORDINATES,
-  addressLabel: 'Getting location…',
+  addressLabel: USER_LOCATION_LOADING_LABEL,
   isFallback: true,
 
   refresh: async (options?: RefreshOptions) => {
