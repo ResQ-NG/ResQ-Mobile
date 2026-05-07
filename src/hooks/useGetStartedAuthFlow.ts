@@ -5,11 +5,15 @@ import type {
   CheckIdentifierRequest,
   CreateAccountRequest,
   LoginWithIdentifierRequest,
+  ResendVerificationTokenRequest,
+  VerifyEmailRequest,
 } from '@/network/modules/auth/types';
 import {
   useCheckIdentifier,
   useCreateAccount,
   useLoginWithIdentifier,
+  useResendVerificationToken,
+  useVerifyEmail,
   useVerifyIdentifierOtp,
 } from '@/network/modules/auth/queries';
 import { getApiErrorMessage } from '@/network/config/api-client';
@@ -35,6 +39,7 @@ export type GetStartedAuthPhase =
 const MIN_LOGIN_PASSWORD_LEN = 6;
 const MIN_SIGNUP_PASSWORD_LEN = 12;
 const OTP_LEN = 6;
+const RESEND_COOLDOWN_SEC = 30;
 
 function pickAuthTokenFromAuthResponse(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null;
@@ -71,6 +76,7 @@ export function useGetStartedAuthFlow() {
   const [lastName, setLastName] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
   const [otp, setOtp] = useState('');
+  const [resendCooldownSec, setResendCooldownSec] = useState(0);
   const [signupFieldErrors, setSignupFieldErrors] = useState<
     Record<string, string>
   >({});
@@ -103,6 +109,7 @@ export function useGetStartedAuthFlow() {
       setLastName('');
       setSignupPassword('');
       setOtp('');
+      setResendCooldownSec(0);
     }
   }, [checkPayload, phase]);
 
@@ -147,6 +154,7 @@ export function useGetStartedAuthFlow() {
       } else {
         setPhase('verify_otp');
         setOtp('');
+        setResendCooldownSec(0);
       }
     },
   });
@@ -167,29 +175,42 @@ export function useGetStartedAuthFlow() {
         variant: 'error',
       });
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       setSignupFieldErrors({});
-      const token = pickAuthTokenFromAuthResponse(data);
-      if (token) {
-        setToken(token);
-        void queryClient.invalidateQueries({ queryKey: [AuthKeys.UserProfile] });
-        showToast({ message: 'Account created.', variant: 'success' });
-        router.replace('/screens/main');
-        return;
-      }
+      setSignupPassword('');
+      setOtp('');
+      setPhase('verify_otp');
+      setResendCooldownSec(RESEND_COOLDOWN_SEC);
       showToast({
-        message: 'Account created. Sign in with your password.',
+        message: 'Account created. Enter the verification code we sent you.',
         variant: 'success',
       });
-      setSignupPassword('');
-      setPhase('active_password');
-      setPassword('');
     },
   });
 
   const verifyMutation = useVerifyIdentifierOtp({
     onSuccess: (data) => finishWithSession(data, 'You’re verified. Welcome!'),
   });
+
+  const verifyEmailMutation = useVerifyEmail({
+    onSuccess: (data) => finishWithSession(data, 'You’re verified. Welcome!'),
+  });
+
+  const resendVerificationTokenMutation = useResendVerificationToken({
+    onSuccess: () => {
+      setResendCooldownSec(RESEND_COOLDOWN_SEC);
+      showToast({ message: 'Verification code resent.', variant: 'success' });
+    },
+  });
+
+  useEffect(() => {
+    if (phase !== 'verify_otp') return;
+    if (resendCooldownSec <= 0) return;
+    const id = setInterval(() => {
+      setResendCooldownSec((s) => (s <= 1 ? 0 : s - 1));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [phase, resendCooldownSec]);
 
   const goBackToIdentifier = useCallback(() => {
     lockedPayloadRef.current = null;
@@ -199,6 +220,7 @@ export function useGetStartedAuthFlow() {
     setLastName('');
     setSignupPassword('');
     setOtp('');
+    setResendCooldownSec(0);
   }, []);
 
   const submitCheckIdentifier = useCallback(() => {
@@ -271,14 +293,38 @@ export function useGetStartedAuthFlow() {
       });
       return;
     }
+    if (creds.identifier === 'email') {
+      const body: VerifyEmailRequest = { email: creds.value, code };
+      verifyEmailMutation.mutate(body);
+      return;
+    }
     verifyMutation.mutate({ ...creds, code });
-  }, [otp, verifyMutation]);
+  }, [otp, verifyEmailMutation, verifyMutation]);
+
+  const submitResendOtp = useCallback(() => {
+    const creds = lockedPayloadRef.current;
+    if (!creds) return;
+    if (resendCooldownSec > 0) return;
+    if (creds.identifier === 'email') {
+      const body: ResendVerificationTokenRequest = { email: creds.value };
+      resendVerificationTokenMutation.mutate(body);
+      return;
+    }
+    // TODO: Add phone resend endpoint when backend supports it.
+    showToast({
+      message:
+        'Resend for phone is not available yet. Try again in a moment or use a different phone number.',
+      variant: 'default',
+    });
+  }, [resendCooldownSec, resendVerificationTokenMutation]);
 
   const primaryBusy =
     checkMutation.isPending ||
     loginMutation.isPending ||
     createMutation.isPending ||
-    verifyMutation.isPending;
+    verifyMutation.isPending ||
+    verifyEmailMutation.isPending ||
+    resendVerificationTokenMutation.isPending;
 
   const canPrimary = useMemo(() => {
     if (phase === 'identifier') {
@@ -297,7 +343,9 @@ export function useGetStartedAuthFlow() {
       );
     }
     return (
-      otp.replace(/\D/g, '').length >= OTP_LEN && !verifyMutation.isPending
+      otp.replace(/\D/g, '').length >= OTP_LEN &&
+      !verifyMutation.isPending &&
+      !verifyEmailMutation.isPending
     );
   }, [
     phase,
@@ -310,6 +358,7 @@ export function useGetStartedAuthFlow() {
     createMutation.isPending,
     otp,
     verifyMutation.isPending,
+    verifyEmailMutation.isPending,
   ]);
 
   const primaryLabel = useMemo(() => {
@@ -348,6 +397,8 @@ export function useGetStartedAuthFlow() {
     submitLogin,
     submitSignup,
     submitOtp,
+    submitResendOtp,
+    resendCooldownSec,
     signupFieldErrors,
   };
 }

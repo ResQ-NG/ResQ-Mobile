@@ -1,4 +1,5 @@
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useMemo } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -50,6 +51,8 @@ export default function GetStartedScreen() {
     submitLogin,
     submitSignup,
     submitOtp,
+    submitResendOtp,
+    resendCooldownSec,
     signupFieldErrors,
   } = flow;
 
@@ -103,6 +106,35 @@ export default function GetStartedScreen() {
         : phase === 'signup'
           ? 'Tell us a bit about you to create your account.'
           : otpHint;
+
+  const passwordStrength = useMemo(() => {
+    const p = signupPassword;
+    if (!p) return null;
+    const len = p.length;
+    const hasLower = /[a-z]/.test(p);
+    const hasUpper = /[A-Z]/.test(p);
+    const hasNum = /\d/.test(p);
+    const hasSym = /[^a-zA-Z0-9]/.test(p);
+    let score = 0;
+    if (len >= 12) score++;
+    if (len >= 16) score++;
+    if (hasLower && hasUpper) score++;
+    if (hasNum) score++;
+    if (hasSym) score++;
+    score = Math.min(4, Math.max(0, score - 1)); // normalize to 0..4
+
+    const label =
+      score <= 1 ? 'Weak' : score === 2 ? 'Okay' : score === 3 ? 'Good' : 'Strong';
+    const color =
+      score <= 1
+        ? 'bg-accent-red dark:bg-accent-red-dark'
+        : score === 2
+          ? 'bg-[#f59e0b]'
+          : score === 3
+            ? 'bg-success-green dark:bg-success-green-dark'
+            : 'bg-primary-blue dark:bg-primary-blue-dark';
+    return { score, label, color };
+  }, [signupPassword]);
 
   return (
     <AppAnimatedSafeAreaView
@@ -230,6 +262,22 @@ export default function GetStartedScreen() {
                   autoCapitalize="none"
                   leftIcon={lockIcon}
                 />
+                {passwordStrength ? (
+                  <View className="mt-3">
+                    <View className="h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+                      <View
+                        className={`h-2 ${passwordStrength.color}`}
+                        style={{ width: `${((passwordStrength.score + 1) / 5) * 100}%` }}
+                      />
+                    </View>
+                    <AppText
+                      variant="caption"
+                      className="text-captionDark dark:text-captionDark-dark mt-2"
+                    >
+                      Strength: {passwordStrength.label}
+                    </AppText>
+                  </View>
+                ) : null}
               </FormField>
             </>
           ) : null}
@@ -245,6 +293,22 @@ export default function GetStartedScreen() {
                 textContentType="oneTimeCode"
                 leftIcon={keyIcon}
               />
+              <Pressable
+                onPress={submitResendOtp}
+                disabled={resendCooldownSec > 0}
+                className={`self-start mt-3 ${resendCooldownSec > 0 ? 'opacity-50' : 'active:opacity-70'}`}
+                accessibilityRole="button"
+                accessibilityLabel="Resend verification code"
+              >
+                <AppText
+                  variant="body"
+                  className="text-primary-blue dark:text-primary-blue-dark font-metropolis-medium"
+                >
+                  {resendCooldownSec > 0
+                    ? `Resend in 0:${String(resendCooldownSec).padStart(2, '0')}`
+                    : 'Resend code'}
+                </AppText>
+              </Pressable>
             </FormField>
           ) : null}
 

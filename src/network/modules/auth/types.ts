@@ -43,6 +43,14 @@ export interface LoginWithIdentifierResponse {
   user: AuthUserProfile;
 }
 
+export interface ResendVerificationTokenRequest {
+    email: string;
+}
+
+export interface VerifyEmailRequest {
+    code: string;
+    email: string;
+}
 /**
  * Create-account body. Either `email` or `phone_number` is required (not both).
  * `nin` is optional.

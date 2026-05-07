@@ -5,6 +5,8 @@ export const AuthRoutes = {
   Login: `${VersionAlias}/auth/login`,
   CreateAccount: `${VersionAlias}/${AuthAlias}/create`,
   VerifyIdentifierOtp: `${VersionAlias}/auth/verify-otp`,
+  VerifyEmail: `${VersionAlias}/auth/verify-email`,
+  ResendVerificationToken: `${VersionAlias}/auth/resend-verification-token`,
   ProfileInformation: `${VersionAlias}/${AuthAlias}/profile`,
   UpdateProfileInformation: `${VersionAlias}/${AuthAlias}/profile`,
   ViewAvatarPresets: `${VersionAlias}/${AuthAlias}/avatars/presets`,

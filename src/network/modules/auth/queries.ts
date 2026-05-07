@@ -9,7 +9,9 @@ import type {
   CreateAccountResponse,
   LoginWithIdentifierRequest,
   LoginWithIdentifierResponse,
+  ResendVerificationTokenRequest,
   UpdateProfileInformationRequest,
+  VerifyEmailRequest,
   VerifyIdentifierOtpRequest,
   VerifyIdentifierOtpResponse,
 } from './types';
@@ -69,6 +71,26 @@ export const useGetProfileInformation = createApiQuery<void, AuthUserProfile>(
   false,
   { staleTime: 60_000 }
 );
+
+export const useVerifyEmail = createApiMutation<
+  VerifyEmailRequest,
+  LoginWithIdentifierResponse
+>({
+  endpoint: AuthRoutes.VerifyEmail,
+  operationName: 'Verify Email',
+  method: 'post',
+  suppressSuccessMessage: true,
+});
+
+export const useResendVerificationToken = createApiMutation<
+  ResendVerificationTokenRequest,
+  void
+>({
+  endpoint: AuthRoutes.ResendVerificationToken,
+  operationName: 'Resend Verification Token',
+  method: 'post',
+  suppressSuccessMessage: true,
+});
 
 export const useUpdateProfileInformation = createApiMutation<
   UpdateProfileInformationRequest,
