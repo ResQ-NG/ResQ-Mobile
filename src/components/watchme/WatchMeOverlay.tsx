@@ -6,6 +6,7 @@ import { TAB_BAR_HEIGHT } from '@/theme/constants';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import { useAppColorScheme } from '@/theme/colorMode';
 import SolarBellBoldIcon from '@/components/icons/solar/bell-bold';
+import { useTabBadgesStore } from '@/stores/tab-badges-store';
 import type { ActiveWatch } from './types';
 import { WatchMeContactList } from './WatchMeContactList';
 import { WatchMeSidebar } from './WatchMeSidebar';
@@ -56,6 +57,9 @@ export function WatchMeOverlay({
   const { theme } = useAppColorScheme();
   const bottomOffset = TAB_BAR_HEIGHT + insets.bottom + 16;
   const isSessionActive = useWatchMeContactsStore((s) => s.isSessionActive);
+  const badgesEnabled = useTabBadgesStore((s) => s.badgesEnabled);
+  const watchMeHasUnread = useTabBadgesStore((s) => s.watchMeHasUnread);
+  const notificationsHasUnread = useTabBadgesStore((s) => s.notificationsHasUnread);
 
   return (
     <View className="absolute inset-0" pointerEvents="box-none">
@@ -81,6 +85,21 @@ export function WatchMeOverlay({
             height={22}
             color={theme.iconOnAccent}
           />
+          {badgesEnabled && (watchMeHasUnread || notificationsHasUnread) ? (
+            <View
+              style={{
+                position: 'absolute',
+                top: 8,
+                right: 8,
+                width: 9,
+                height: 9,
+                borderRadius: 5,
+                backgroundColor: '#ef4444',
+                borderWidth: 1.5,
+                borderColor: 'rgba(18,18,18,0.75)',
+              }}
+            />
+          ) : null}
         </TouchableOpacity>
       </AppAnimatedView>
 

@@ -3,6 +3,7 @@ import type { WebsocketMessage } from '@/stores/websocket-store';
 import { useAppToastStore } from '@/stores/app-toast-store';
 import { useAuthTokenStore } from '@/stores/auth-token-store';
 import { logger } from '@/lib/utils/logger';
+import { useTabBadgesStore } from '@/stores/tab-badges-store';
 
 export function runCoreSideEffects(msg: WebsocketMessage): void {
   // Prefer `event` when present; fall back to `type`.
@@ -18,6 +19,15 @@ export function runCoreSideEffects(msg: WebsocketMessage): void {
   }
 
   switch (eventName) {
+    case 'watch_me': {
+      // Example:
+      // { type: "notification", event: "watch_me", data: { scope: "watch_me", watch_me_id }, ... }
+      if (msg.type === 'notification') {
+        useTabBadgesStore.getState().markWatchMeUnread();
+      }
+      return;
+    }
+
     case 'FORCE_LOGOUT': {
       useAuthTokenStore.getState().setToken(null);
       useAppToastStore
@@ -30,7 +40,9 @@ export function runCoreSideEffects(msg: WebsocketMessage): void {
 
     case 'TOAST': {
       const message =
-        typeof msg.data?.message === 'string' ? (msg.data.message as string) : null;
+        typeof msg.data?.message === 'string'
+          ? (msg.data.message as string)
+          : null;
       if (message) {
         useAppToastStore.getState().showToast({ message });
       }
@@ -42,4 +54,3 @@ export function runCoreSideEffects(msg: WebsocketMessage): void {
     }
   }
 }
-

@@ -49,6 +49,7 @@ export default {
     'solar:trash-bin-2-bold-duotone',
     'solar:alt-arrow-down-bold',
     'solar:file-bold',
+    'solar:bell-bing-bold',
 
     'solar:share-bold',
     'solar:download-bold',

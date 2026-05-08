@@ -4,6 +4,7 @@ import {
 } from '@/stores/auth-token-store';
 import type { QueryKey } from '@tanstack/react-query';
 import {
+  InfiniteData,
   UseInfiniteQueryOptions,
   UseQueryOptions,
   useInfiniteQuery,
@@ -26,6 +27,7 @@ import { logError } from '@/lib/utils/logger';
 import {
   ApiEnvelope,
   ApiFailure,
+  CursorPaginatedResult,
   InfiniteQueryConfig,
   MutationConfig,
   PaginatedResult,
@@ -467,6 +469,109 @@ export function useInfiniteApiQuery<
 }
 
 /** =====================================================
+ * Infinite Query (Cursor Pagination)
+ * ===================================================== */
+export function useCursorInfiniteApiQuery<
+  TParams extends Record<string, unknown>,
+  TItem = unknown,
+>(
+  config: Omit<InfiniteQueryConfig<TParams, TItem>, 'pageParamKey' | 'dataField'> & {
+    /** Request param name for cursor. Defaults to `cursor`. */
+    cursorParamKey?: string;
+  },
+  params?: TParams,
+  options?: Omit<
+    UseInfiniteQueryOptions<
+      CursorPaginatedResult<TItem>,
+      Error,
+      InfiniteData<CursorPaginatedResult<TItem>, string | null>,
+      QueryKey,
+      string | null
+    >,
+    'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+  >,
+  shouldShowError: boolean = DEFAULT_USE_QUERY_SHOW_ERROR
+) {
+  const cursorParamKey = config.cursorParamKey || 'cursor';
+  const finalQueryKey = normalizeQueryKey(config.queryKey, params);
+  const isEnabled = config.enabled
+    ? config.enabled(params ?? ({} as TParams))
+    : true;
+
+  return useInfiniteQuery<
+    CursorPaginatedResult<TItem>,
+    Error,
+    InfiniteData<CursorPaginatedResult<TItem>, string | null>,
+    QueryKey,
+    string | null
+  >({
+    queryKey: finalQueryKey,
+    enabled: isEnabled && options?.enabled !== false,
+    initialPageParam: null,
+    ...options,
+
+    queryFn: async ({ pageParam, signal }) => {
+      const url =
+        typeof config.endpoint === 'function'
+          ? config.endpoint(params ?? ({} as TParams))
+          : config.endpoint;
+
+      const headers = config.getHeaders?.(params ?? ({} as TParams)) || {};
+
+      const requestParams: Record<string, unknown> = { ...(params || {}) };
+      if (typeof pageParam === 'string' && pageParam.length > 0) {
+        requestParams[cursorParamKey] = pageParam;
+      }
+
+      try {
+        const response = await executeApiCall(() =>
+          apiGet<Record<string, unknown>>(url, {
+            headers: toAxiosHeaders(headers),
+            params: requestParams,
+            signal,
+          })
+        );
+
+        const root = isPlainRecord(response) ? response : {};
+        const itemsRaw = root.items;
+        const items = Array.isArray(itemsRaw) ? itemsRaw : [];
+        const nextCursorRaw = root.next_cursor;
+        const nextCursor =
+          typeof nextCursorRaw === 'string' && nextCursorRaw.trim().length > 0
+            ? nextCursorRaw
+            : undefined;
+
+        const transformedItems: TItem[] = config.transformResponse
+          ? items.map((item) => config.transformResponse!(item) as TItem)
+          : (items as TItem[]);
+
+        return { items: transformedItems, nextCursor };
+      } catch (error: unknown) {
+        const isCancelledRequest =
+          error instanceof ApiError && isCancelled(error.original);
+
+        if (!isCancelledRequest) {
+          logError(
+            error,
+            config.operationName,
+            config.getContextData?.(params ?? ({} as TParams)) || {}
+          );
+          if (shouldShowError) {
+            showToast({
+              message: getApiErrorMessage(error),
+              variant: 'error',
+            });
+          }
+        }
+        throw error;
+      }
+    },
+
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+  });
+}
+
+/** =====================================================
  * Factory Hook Creators
  * ===================================================== */
 
@@ -525,6 +630,30 @@ export function createInfiniteApiQuery<
     >,
     shouldShowError: boolean = DEFAULT_USE_QUERY_SHOW_ERROR
   ) => useInfiniteApiQuery(config, params, options, shouldShowError);
+}
+
+export function createCursorInfiniteApiQuery<
+  TParams extends Record<string, unknown> = Record<string, unknown>,
+  TItem = unknown,
+>(
+  config: Omit<InfiniteQueryConfig<TParams, TItem>, 'pageParamKey' | 'dataField'> & {
+    cursorParamKey?: string;
+  }
+) {
+  return (
+    params?: TParams,
+    options?: Omit<
+      UseInfiniteQueryOptions<
+        CursorPaginatedResult<TItem>,
+        Error,
+        InfiniteData<CursorPaginatedResult<TItem>, string | null>,
+        QueryKey,
+        string | null
+      >,
+      'queryKey' | 'queryFn' | 'getNextPageParam' | 'initialPageParam'
+    >,
+    shouldShowError: boolean = DEFAULT_USE_QUERY_SHOW_ERROR
+  ) => useCursorInfiniteApiQuery(config, params, options, shouldShowError);
 }
 
 export function createPaginatedApiResponse<TParams = unknown, TData = unknown>(

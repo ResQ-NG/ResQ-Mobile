@@ -323,6 +323,11 @@ export interface PaginatedResult<TData> {
   pageSize?: number;
 }
 
+export interface CursorPaginatedResult<TData> {
+  items: TData[];
+  nextCursor?: string;
+}
+
 export interface DefaultQueryParamsDTO {
   query?: string[] | string;
   page_size?: string | number;

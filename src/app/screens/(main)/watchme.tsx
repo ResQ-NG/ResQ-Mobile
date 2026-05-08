@@ -105,6 +105,10 @@ export default function WatchMeScreen() {
     router.push({ pathname: '/(modals)/watch-me-status', params: { id } });
   });
 
+  const openNotifications = usePreventDoublePress(() =>
+    router.push('/screens/notifications')
+  );
+
   if (shouldShowOnboarding) {
     return null;
   }
@@ -131,6 +135,7 @@ export default function WatchMeScreen() {
         onSosPress={handleSosPress}
         onSosLongPress={handleSosLongPress}
         onSearchPress={handleSearchSafety}
+        onNotificationPress={openNotifications}
       />
     </View>
   );

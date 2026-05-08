@@ -93,7 +93,12 @@ export default function RootLayout() {
                     headerShown: false,
                     animation: 'fade',
                   }}
-                />
+                >
+                  <Stack.Screen
+                    name="screens/notifications"
+                    options={{ animation: 'slide_from_bottom' }}
+                  />
+                </Stack>
               </KeyboardProvider>
             </QueryClientProvider>
           </BottomSheetModalProvider>

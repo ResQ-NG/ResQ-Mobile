@@ -1,4 +1,4 @@
-import { View, Share } from 'react-native';
+import { View } from 'react-native';
 import { BaseBottomSheet } from '@/components/bottom-sheet';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppText } from '@/components/ui/AppText';
@@ -9,34 +9,16 @@ import {
 } from '@/components/ui/Avatar';
 import { useInviteContactSheetStore } from '@/stores/invite-contact-sheet-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
-import { showToast } from '@/lib/utils/app-toast';
-const INVITE_STORE_URL = 'https://resq.app';
-
-function buildInviteMessage(contactName: string): string {
-  return `Hi ${contactName},\n\nJoin me on ResQ for safety check-ins and emergency alerts when it matters.\n\n${INVITE_STORE_URL}`;
-}
+import { useInviteUser } from '@/network/modules/emergency-contacts/queries';
 
 export default function InviteContactBottomSheet() {
   const { isOpen, contact, close } = useInviteContactSheetStore();
+  const inviteUser = useInviteUser();
 
   const handleInvite = usePreventDoublePress(async () => {
-    if (!contact?.name) return;
-    const message = buildInviteMessage(contact.name.trim());
-    try {
-      const result = await Share.share({
-        message,
-        title: `Invite ${contact.name}`,
-      });
-      if (result.action === Share.sharedAction) {
-        showToast({ message: 'Invite sent', variant: 'success' });
-        close();
-      }
-    } catch {
-      showToast({
-        message: 'Could not open share sheet. Try again.',
-        variant: 'error',
-      });
-    }
+    if (!contact?.id) return;
+    await inviteUser.mutateAsync(contact.id);
+    close();
   });
 
   const footer = (
@@ -46,8 +28,9 @@ export default function InviteContactBottomSheet() {
         size="lg"
         className="w-full"
         onPress={handleInvite}
+        disabled={inviteUser.isPending}
       >
-        Invite
+        {inviteUser.isPending ? 'Inviting…' : 'Invite'}
       </AppButton>
       <AppButton variant="outline" size="lg" className="w-full" onPress={close}>
         Not now

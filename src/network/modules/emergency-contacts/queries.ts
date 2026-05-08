@@ -66,3 +66,12 @@ export const useDeleteEmergencyContact = createApiMutation<number, unknown>({
   successMessage: 'Contact removed',
   invalidateQueries: [[EmergencyContactsKeys.List]],
 });
+
+export const useInviteUser = createApiMutation<string, unknown>({
+  endpoint: (contactId) =>
+    EmergencyContactsRoutes.InviteUser(String(contactId)),
+  operationName: 'Invite User',
+  method: 'post',
+  successMessage: 'User invited',
+  invalidateQueries: [[EmergencyContactsKeys.List]],
+});

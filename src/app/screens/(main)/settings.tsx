@@ -28,6 +28,10 @@ export default function SettingsScreen() {
     router.push('/screens/settings/edit-profile')
   );
 
+  const openNotifications = usePreventDoublePress(() =>
+    router.push('/screens/notifications')
+  );
+
   const openEmergencyContacts = usePreventDoublePress(() =>
     router.push('/screens/start-watch-me/contacts')
   );
@@ -44,7 +48,7 @@ export default function SettingsScreen() {
     <AppAnimatedSafeAreaView
       className={`flex-1 ${theme.background}`}
       edges={['top', 'left', 'right']}
-      header={<SettingsHeader />}
+      header={<SettingsHeader onNotificationsPress={openNotifications} />}
     >
       <AppAnimatedScrollView
         className="flex-1 px-6 pt-8"

@@ -9,4 +9,5 @@ export const EmergencyContactsRoutes = {
   AvailableRelationships: `${VersionAlias}/${EmergencyContactsAlias}/relationships`,
   Update: (contactId: string) => `${VersionAlias}/${EmergencyContactsAlias}/${contactId}`,
   Delete: (contactId: string) => `${VersionAlias}/${EmergencyContactsAlias}/${contactId}`,
+  InviteUser: (contactId: string) => `${VersionAlias}/${EmergencyContactsAlias}/${contactId}/invite`,
 } as const;
