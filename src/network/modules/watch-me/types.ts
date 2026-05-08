@@ -18,6 +18,7 @@ export interface WatchMeSessionForUserWatching {
     avatar_url: string;
   };
   watch_me: {
+    id: number;
     status: string;
     transport_mode_name: string;
     last_signal_at: string;

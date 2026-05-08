@@ -14,6 +14,8 @@ import {
   userLocationNeedsRecoveryTapAction,
 } from '@/stores/user-location-store';
 import { useGetEmergencyContacts } from '@/network/modules/emergency-contacts/queries';
+import { WatchMeLocationRoom } from '@/network/modules/watch-me/ws_rooms';
+import { useWebsocketStore } from '@/stores/websocket-store';
 
 const SOS_LOADING_DURATION_MS = 1200;
 
@@ -47,6 +49,8 @@ export default function WatchMeScreen() {
   });
   const { watches: activeWatches, isLoading: activeWatchesLoading } =
     useWatchMeActiveWatches();
+  const subscribeToGroup = useWebsocketStore((s) => s.subscribeToGroup);
+  const unsubscribeFromGroup = useWebsocketStore((s) => s.unsubscribeFromGroup);
 
   const shouldShowOnboarding =
     contacts.length === 0 && !onboardingDismissedByUser;
@@ -56,6 +60,16 @@ export default function WatchMeScreen() {
       router.push('/(modals)/watch-me-onboarding');
     }
   }, [shouldShowOnboarding]);
+
+  useEffect(() => {
+    // Subscribe once we have watch sessions to follow.
+    const groups = activeWatches.map((w) => WatchMeLocationRoom(w.id));
+    for (const g of groups) subscribeToGroup(g);
+
+    return () => {
+      for (const g of groups) unsubscribeFromGroup(g);
+    };
+  }, [activeWatches, subscribeToGroup, unsubscribeFromGroup]);
 
   const handleStartWatchMe = usePreventDoublePress(() => {
     if (shouldShowOnboarding) {

@@ -123,12 +123,12 @@ export function useGetStartedAuthFlow() {
   }, [phase, firstName, lastName, signupPassword, contactApi.contact]);
 
   const finishWithSession = useCallback(
-    (data: unknown, successMessage: string) => {
+    (data: unknown,) => {
       const token = pickAuthTokenFromAuthResponse(data);
       if (token) {
         setToken(token);
         void queryClient.invalidateQueries({ queryKey: [AuthKeys.UserProfile] });
-        showToast({ message: successMessage, variant: 'success' });
+        // showToast({ message: successMessage, variant: 'success' });
         router.replace('/screens/main');
         return;
       }
@@ -160,7 +160,7 @@ export function useGetStartedAuthFlow() {
   });
 
   const loginMutation = useLoginWithIdentifier({
-    onSuccess: (data) => finishWithSession(data, 'Welcome back.'),
+    onSuccess: (data) => finishWithSession(data),
   });
 
   const createMutation = useCreateAccount({
@@ -189,11 +189,11 @@ export function useGetStartedAuthFlow() {
   });
 
   const verifyMutation = useVerifyIdentifierOtp({
-    onSuccess: (data) => finishWithSession(data, 'You’re verified. Welcome!'),
+    onSuccess: (data) => finishWithSession(data),
   });
 
   const verifyEmailMutation = useVerifyEmail({
-    onSuccess: (data) => finishWithSession(data, 'You’re verified. Welcome!'),
+    onSuccess: (data) => finishWithSession(data),
   });
 
   const resendVerificationTokenMutation = useResendVerificationToken({

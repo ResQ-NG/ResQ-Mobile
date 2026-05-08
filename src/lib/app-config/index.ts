@@ -9,6 +9,14 @@ function normalizeApiBaseUrl(raw: string | undefined): string | undefined {
   return t.length > 0 ? t : undefined;
 }
 
+function rewriteAndroidEmulatorLoopback(url: string): string {
+  // Android emulator can't reach the host machine via localhost; use 10.0.2.2 instead.
+  if (!__DEV__) return url;
+  if (Platform.OS !== "android") return url;
+  if (Device.isDevice) return url; // physical device should use LAN IP, not emulator alias
+  return url.replace(/\/\/(localhost|127\.0\.0\.1)(?=[:/]|$)/i, "//10.0.2.2");
+}
+
 /**
  * Expo only inlines env vars prefixed with EXPO_PUBLIC_ into the JS bundle.
  * A plain `BASE_URL` in .env is ignored unless you also set EXPO_PUBLIC_BASE_URL.
@@ -20,8 +28,9 @@ const rawBaseUrl =
 
 // In EAS builds, environment variables are available via process.env
 // Fallback to Constants.expoConfig.extra for local development
+const normalizedBaseUrl = normalizeApiBaseUrl(rawBaseUrl);
 export const AppConfig = {
-  BASE_URL: normalizeApiBaseUrl(rawBaseUrl),
+  BASE_URL: normalizedBaseUrl ? rewriteAndroidEmulatorLoopback(normalizedBaseUrl) : undefined,
   GOOGLE_CLIENT_ID:
     process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
     Constants.expoConfig?.extra?.GOOGLE_CLIENT_ID,

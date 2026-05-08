@@ -46,7 +46,7 @@ export function mapWatchMeSessionsToActiveWatches(
   sessions: WatchMeSessionForUserWatching[]
 ): ActiveWatch[] {
   return sessions.map((session, index) => {
-    const id = watchMeSessionStableId(session, index);
+    const id = String(session.watch_me.id);
     const name =
       session.contact.full_name?.trim() ||
       session.contact.email?.trim() ||

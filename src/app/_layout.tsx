@@ -25,6 +25,7 @@ import { AppToastHost } from '@/components/app-toast/AppToastHost';
 import { AppModalHost } from '@/components/app-modal/AppModalHost';
 import { InCallHost } from '@/components/in-call';
 import { registerGlobals } from '@livekit/react-native';
+import { WebsocketEventHandler } from '@/network/websocket/EventHandler';
 
 registerGlobals();
 // We use only react-native-safe-area-context; this warning comes from a dependency.
@@ -85,6 +86,7 @@ export default function RootLayout() {
                 <AppToastHost />
                 <AppModalHost />
                 <InCallHost />
+                <WebsocketEventHandler />
                 <BottomSheetRegistry />
                 <Stack
                   screenOptions={{
