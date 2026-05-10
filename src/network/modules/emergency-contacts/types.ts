@@ -34,3 +34,18 @@ export interface EmergencyContact {
   created_at: string;
   updated_at: string;
 }
+
+/** Someone on ResQ who added this user before they joined (pending inbound). */
+export interface InboundPeer {
+  user_id: number;
+  full_name: string;
+  avatar_url: string;
+}
+
+export interface PendingInboundPeerResponse {
+  peers: InboundPeer[];
+}
+
+export interface AcceptInboundPeerRequest {
+  user_ids: number[];
+}

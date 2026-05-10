@@ -4,11 +4,11 @@ import {
 } from '@/network/config/api-client';
 import { NotificationsRoutes } from '@/network/modules/notifications/routes';
 import { NotificationsKeys } from '@/network/modules/notifications/keys';
-import type { InAppNotificationResponse } from '@/network/modules/notifications/types';
-
-export type ListNotificationsParams = {
-  page_size?: number;
-};
+import type {
+  InAppNotificationResponse,
+  ListNotificationsParams,
+} from '@/network/modules/notifications/types';
+import { DefaultServerResponse } from '@/network/config/types';
 
 export const useInAppNotificationsInfinite = createCursorInfiniteApiQuery<
   ListNotificationsParams,
@@ -23,7 +23,7 @@ export const useInAppNotificationsInfinite = createCursorInfiniteApiQuery<
 
 export const useMarkAsRead = createApiMutation<
   { delivery_id: string },
-  unknown
+  DefaultServerResponse
 >({
   endpoint: (vars) => NotificationsRoutes.MarkAsRead(String(vars.delivery_id)),
   operationName: 'Mark As Read',

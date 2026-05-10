@@ -1,9 +1,11 @@
 import { Tabs } from 'expo-router';
 import { AppTabBar } from '@/components/navigation/AppTabBar';
+import { useAutoShowAppHelpIntro } from '@/hooks/useAutoShowAppHelpIntro';
 import { useSyncUserLocation } from '@/hooks/useSyncUserLocation';
 
 export default function MainLayout() {
   useSyncUserLocation();
+  useAutoShowAppHelpIntro();
 
   return (
     <Tabs

@@ -314,6 +314,11 @@ export type ServerWrappedResponse<T = unknown> = {
   message: string;
 };
 
+// this is for post requests that is not requiring any data type 
+export type DefaultServerRequest = void
+
+export type DefaultServerResponse = ServerWrappedResponse
+
 export interface PaginatedResult<TData> {
   items?: TData[];
   nextPage?: number;

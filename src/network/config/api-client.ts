@@ -600,16 +600,26 @@ export function createApiMutation<TVariables = unknown, TData = unknown>(
     );
 }
 
+/** Factory defaults merged into hooks produced by `createApiQuery`. */
+export type CreateApiQueryHookOptions<TData = unknown> = Omit<
+  UseQueryOptions<TData, Error, TData>,
+  'queryKey' | 'queryFn'
+> & {
+  /** When false, failed queries do not show the global error toast. */
+  shouldShowError?: boolean;
+};
+
 export function createApiQuery<TParams = unknown, TData = unknown>(
   config: QueryConfig<TParams, TData>,
-  shouldShowError?: boolean,
-  options: Omit<
-    UseQueryOptions<TData, Error, TData>,
-    'queryKey' | 'queryFn'
-  > = {}
+  hookOptions?: CreateApiQueryHookOptions<TData>
 ) {
-  return (params?: TParams) =>
-    useApiQuery(config, params, options, shouldShowError);
+  return (params?: TParams) => {
+    const {
+      shouldShowError = DEFAULT_USE_QUERY_SHOW_ERROR,
+      ...queryOptions
+    } = hookOptions ?? {};
+    return useApiQuery(config, params, queryOptions, shouldShowError);
+  };
 }
 
 export function createInfiniteApiQuery<

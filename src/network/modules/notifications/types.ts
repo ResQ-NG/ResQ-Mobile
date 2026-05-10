@@ -1,5 +1,9 @@
 import type { InAppNotificationTypeName } from '@/network/modules/notifications/constants';
 
+export type ListNotificationsParams = {
+  page_size?: number;
+};
+
 export type InAppNotificationResponse = {
   delivery_id: number;
   notification_id: number;

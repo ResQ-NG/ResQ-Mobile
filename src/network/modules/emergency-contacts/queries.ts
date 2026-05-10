@@ -3,14 +3,20 @@ import { EmergencyContactsKeys } from './keys';
 import { EmergencyContactsRoutes } from './routes';
 import { mapApiEmergencyContactToUi, type UiEmergencyContact } from './utils';
 import {
+  AcceptInboundPeerRequest,
   ContactRelationshipResponse,
   CreateEmergencyContactRequest,
   EmergencyContact,
+  PendingInboundPeerResponse,
   UpdateEmergencyContactVariables,
 } from './types';
+import {
+  DefaultServerRequest,
+  DefaultServerResponse,
+} from '@/network/config/types';
 
 export const useGetEmergencyContacts = createApiQuery<
-  void,
+  DefaultServerRequest,
   UiEmergencyContact[]
 >({
   endpoint: EmergencyContactsRoutes.List,
@@ -25,7 +31,7 @@ export const useGetEmergencyContacts = createApiQuery<
 });
 
 export const useGetAvailableRelationships = createApiQuery<
-  void,
+  DefaultServerRequest,
   ContactRelationshipResponse[]
 >({
   endpoint: EmergencyContactsRoutes.AvailableRelationships,
@@ -59,19 +65,50 @@ export const useUpdateEmergencyContact = createApiMutation<
   invalidateQueries: [[EmergencyContactsKeys.List]],
 });
 
-export const useDeleteEmergencyContact = createApiMutation<number, unknown>({
-  endpoint: (contactId) => EmergencyContactsRoutes.Delete(String(contactId)),
+export const useDeleteEmergencyContact = createApiMutation<
+  { contactId: string },
+  DefaultServerResponse
+>({
+  endpoint: (vars) => EmergencyContactsRoutes.Delete(String(vars.contactId)),
   operationName: 'Delete Emergency Contact',
   method: 'delete',
   successMessage: 'Contact removed',
   invalidateQueries: [[EmergencyContactsKeys.List]],
 });
 
-export const useInviteUser = createApiMutation<string, unknown>({
-  endpoint: (contactId) =>
-    EmergencyContactsRoutes.InviteUser(String(contactId)),
+export const useInviteUser = createApiMutation<
+  { contactId: string },
+  DefaultServerResponse
+>({
+  endpoint: (vars) =>
+    EmergencyContactsRoutes.InviteUser(String(vars.contactId)),
   operationName: 'Invite User',
   method: 'post',
   successMessage: 'User invited',
   invalidateQueries: [[EmergencyContactsKeys.List]],
+});
+
+export const useAcceptInboundPeer = createApiMutation<
+  AcceptInboundPeerRequest,
+  DefaultServerResponse
+>({
+  endpoint: EmergencyContactsRoutes.AcceptInboundPeer,
+  operationName: 'Accept Inbound Peer',
+  method: 'post',
+  successMessage: 'Contacts added',
+  invalidateQueries: [
+    [EmergencyContactsKeys.List],
+    [EmergencyContactsKeys.ViewInboundPeers],
+  ],
+});
+
+
+export const useViewInboundPeers = createApiQuery<
+  DefaultServerRequest,
+  PendingInboundPeerResponse
+>({
+  endpoint: EmergencyContactsRoutes.ViewInboundPeers,
+  operationName: 'View Inbound Peers',
+  queryKey: [EmergencyContactsKeys.ViewInboundPeers],
+  terminateIfNotAuthenticated: true,
 });

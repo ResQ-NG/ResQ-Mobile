@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import type {
   LayoutChangeEvent,
   NativeScrollEvent,
@@ -25,12 +26,17 @@ import {
 import type { HowToUseStep } from '@/components/help/howToUseAppData';
 import { HOW_TO_USE_APP_STEPS } from '@/components/help/howToUseAppData';
 import SolarPlayStreamBoldIcon from '@/components/icons/solar/play-stream-bold';
+import { useAppHelpIntroStore } from '@/stores/app-help-intro-store';
 // import { HowToUseSlideHero } from '@/components/help/HowToUseSlideHero';
 import { cn } from '@/lib/cn';
 
 const TOTAL = HOW_TO_USE_APP_STEPS.length;
 
 export default function HowToUseAppModal() {
+  const navigation = useNavigation();
+  const markAppHelpIntroCompleted = useAppHelpIntroStore(
+    (s) => s.markAppHelpIntroCompleted
+  );
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
   const [index, setIndex] = useState(0);
@@ -85,6 +91,13 @@ export default function HowToUseAppModal() {
       router.back();
     }
   });
+
+  useEffect(() => {
+    const unsub = navigation.addListener('beforeRemove', () => {
+      markAppHelpIntroCompleted();
+    });
+    return unsub;
+  }, [navigation, markAppHelpIntroCompleted]);
 
   const continueLabel = useMemo(
     () => (index < TOTAL - 1 ? 'Next' : 'Done'),

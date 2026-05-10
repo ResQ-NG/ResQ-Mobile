@@ -4,16 +4,8 @@ import type {
   FetchUserActiveWatchResponse,
   WatchMeSessionForUserWatching,
 } from '@/network/modules/watch-me/types';
+import { pickNumber } from '@/lib/utils/numbers';
 import type { WebsocketMessage } from '@/stores/websocket-store';
-
-function isNumber(v: unknown): v is number {
-  return typeof v === 'number' && Number.isFinite(v);
-}
-
-function pickNumber(o: Record<string, unknown>, key: string): number | null {
-  const v = o[key];
-  return isNumber(v) ? v : null;
-}
 
 function patchSessionLocation(
   session: WatchMeSessionForUserWatching,

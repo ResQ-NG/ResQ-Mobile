@@ -68,8 +68,10 @@ export const useGetProfileInformation = createApiQuery<void, AuthUserProfile>(
     terminateIfNotAuthenticated: true,
     transformResponse: (response) => normalizeProfileApiResponse(response),
   },
-  false,
-  { staleTime: 60_000 }
+  {
+    shouldShowError: false,
+    staleTime: 60_000,
+  }
 );
 
 export const useVerifyEmail = createApiMutation<

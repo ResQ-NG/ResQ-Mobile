@@ -2,11 +2,12 @@ import { createApiQuery } from '@/network/config/api-client';
 import { WatchMeRoutes } from './routes';
 import type { FetchUserActiveWatchResponse } from './types';
 import { WatchMeKeys } from './keys';
+import { DefaultServerRequest } from '@/network/config/types';
 
 const ACTIVE_WATCH_POLL_MS = 30_000;
 
 export const useFetchUserActiveWatch = createApiQuery<
-  void,
+  DefaultServerRequest,
   FetchUserActiveWatchResponse
 >(
   {
@@ -15,8 +16,8 @@ export const useFetchUserActiveWatch = createApiQuery<
     queryKey: [WatchMeKeys.FetchUserActiveWatch],
     terminateIfNotAuthenticated: true,
   },
-  false,
   {
+    shouldShowError: false,
     refetchInterval: ACTIVE_WATCH_POLL_MS,
     refetchIntervalInBackground: true,
   }
