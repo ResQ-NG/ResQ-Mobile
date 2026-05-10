@@ -6,7 +6,7 @@ import { showToast } from '@/lib/utils/app-toast';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { useAuthTokenStore } from '@/stores/auth-token-store';
 import { useLogoutConfirmStore } from '@/stores/logout-confirm-store';
-import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
+import { resetPersistedSessionState } from '@/stores/reset-persisted-session-state';
 
 export default function LogoutConfirmBottomSheet() {
   const queryClient = useQueryClient();
@@ -16,7 +16,7 @@ export default function LogoutConfirmBottomSheet() {
   const handleCancel = () => close();
 
   const handleLogout = usePreventDoublePress(() => {
-    useWatchMeContactsStore.getState().setSessionActive(false);
+    resetPersistedSessionState();
     queryClient.clear();
     setToken(null);
     close();

@@ -6,14 +6,19 @@ import type { InAppNotificationTypeName } from '@/network/modules/notifications/
 
 type IconComponent = ComponentType<{ width: number; height: number; color: string }>;
 
-export function getNotificationTypeIcon(type: InAppNotificationTypeName): IconComponent {
+export function getNotificationTypeIcon(
+  type: InAppNotificationTypeName | string
+): IconComponent {
   switch (type) {
     case 'contact_joined':
+    case 'contact_added':
       return SolarUsersGroupRoundedBoldIcon;
     case 'report_update':
       return SolarBellBingBoldIcon;
     case 'watch_me_created':
       return SolarMapPointBoldIcon;
+    default:
+      return SolarBellBingBoldIcon;
   }
 }
 

@@ -1,8 +1,7 @@
-import { View } from 'react-native';
 import { AppAnimatedView, brandFadeInUp } from '@/lib/animation';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { AppText } from '@/components/ui/AppText';
-import SolarBellBingBoldIcon from '@/components/icons/solar/bell-bing-bold';
+import LottieView from 'lottie-react-native';
 
 export function NotificationsEmptyState() {
   return (
@@ -10,9 +9,12 @@ export function NotificationsEmptyState() {
       entering={brandFadeInUp.delay(120)}
       className="items-center pt-12 px-6"
     >
-      <View className="w-16 h-16 rounded-full bg-surface-light dark:bg-surface-dark items-center justify-center border border-[rgba(0,0,0,0.06)] dark:border-[rgba(255,255,255,0.12)]">
-        <SolarBellBingBoldIcon width={26} height={26} color="#6b7280" />
-      </View>
+      <LottieView
+        source={require('@assets/lottie/empty.json')}
+        autoPlay
+        loop={false}
+        style={{ width: 300, height: 300 }}
+      />
       <AppHeading
         level={4}
         className="text-center text-primaryDark dark:text-primaryDark-dark mt-4"
@@ -28,4 +30,3 @@ export function NotificationsEmptyState() {
     </AppAnimatedView>
   );
 }
-

@@ -242,27 +242,21 @@ export const BaseBottomSheet = forwardRef<
         }
         footerComponent={footer ? renderFooter : undefined}
       >
-        <BottomSheetView style={styles.bottomSheetView}>
-          {shouldShowHeader && (
-            <View
-              style={[
-                styles.headerContainer,
-                {
-                  paddingHorizontal: horizontalPadding,
-                  paddingTop: topPadding,
-                },
-              ]}
-            >
-              {renderHeader()}
-            </View>
-          )}
-
-          <View
-            style={[
-              styles.scrollViewWrapper,
-              footer ? { marginBottom: footerHeight } : undefined,
-            ]}
-          >
+        {enableDynamicSizing ? (
+          <BottomSheetView style={styles.bottomSheetView}>
+            {shouldShowHeader && (
+              <View
+                style={[
+                  styles.headerContainer,
+                  {
+                    paddingHorizontal: horizontalPadding,
+                    paddingTop: topPadding,
+                  },
+                ]}
+              >
+                {renderHeader()}
+              </View>
+            )}
             <BottomSheetScrollView
               style={styles.scrollView}
               contentContainerStyle={[
@@ -282,8 +276,50 @@ export const BaseBottomSheet = forwardRef<
             >
               {children}
             </BottomSheetScrollView>
+          </BottomSheetView>
+        ) : (
+          <View style={styles.snapContainer}>
+            {shouldShowHeader && (
+              <View
+                style={[
+                  styles.headerContainer,
+                  {
+                    paddingHorizontal: horizontalPadding,
+                    paddingTop: topPadding,
+                  },
+                ]}
+              >
+                {renderHeader()}
+              </View>
+            )}
+            <View
+              style={[
+                styles.scrollViewWrapper,
+                footer ? { marginBottom: footerHeight } : undefined,
+              ]}
+            >
+              <BottomSheetScrollView
+                style={styles.scrollView}
+                contentContainerStyle={[
+                  styles.scrollContent,
+                  {
+                    paddingHorizontal: horizontalPadding,
+                    paddingTop: shouldShowHeader ? 0 : topPadding,
+                    paddingBottom: bottomPadding,
+                  },
+                  contentContainerStyle,
+                ]}
+                showsVerticalScrollIndicator={false}
+                nestedScrollEnabled={true}
+                keyboardShouldPersistTaps="handled"
+                bounces={true}
+                overScrollMode="auto"
+              >
+                {children}
+              </BottomSheetScrollView>
+            </View>
           </View>
-        </BottomSheetView>
+        )}
       </BottomSheetModal>
     );
   }
@@ -296,6 +332,9 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: 'visible',
   },
+  snapContainer: {
+    flex: 1,
+  },
   headerContainer: {
     marginBottom: 0,
   },
@@ -306,8 +345,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    flexGrow: 1,
-    minHeight: '100%',
     overflow: 'visible',
   },
   footerContainer: {

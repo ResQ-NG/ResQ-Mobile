@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import type { WebsocketMessage } from '@/stores/websocket-store';
 import { useAppToastStore } from '@/stores/app-toast-store';
 import { useAuthTokenStore } from '@/stores/auth-token-store';
+import { resetPersistedSessionState } from '@/stores/reset-persisted-session-state';
 import { logger } from '@/lib/utils/logger';
 import { useTabBadgesStore } from '@/stores/tab-badges-store';
 
@@ -29,6 +30,7 @@ export function runCoreSideEffects(msg: WebsocketMessage): void {
     }
 
     case 'FORCE_LOGOUT': {
+      resetPersistedSessionState();
       useAuthTokenStore.getState().setToken(null);
       useAppToastStore
         .getState()

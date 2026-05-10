@@ -45,7 +45,7 @@ export default function NotificationsScreen() {
           <NotificationCard
             item={item}
             onPress={() => {
-              if (item.type === 'contact_joined') {
+              if (item.type === 'contact_joined' || item.type === 'contact_added') {
                 router.push('/screens/start-watch-me/contacts');
               }
             }}

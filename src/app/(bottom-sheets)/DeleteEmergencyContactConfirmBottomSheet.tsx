@@ -17,7 +17,7 @@ export default function DeleteEmergencyContactConfirmBottomSheet() {
     const idNum = Number(contact.id);
     if (!Number.isFinite(idNum)) return;
 
-    mutate(idNum, {
+    mutate({ contactId: String(idNum) }, {
       onSuccess: () => {
         close();
       },

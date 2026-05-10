@@ -47,7 +47,7 @@ export default function AvatarPresetPickerBottomSheet() {
       snapPoints={SNAP_POINTS}
       isOpen={isOpen}
       onClose={close}
-      enableDynamicSizing={true}
+      enableDynamicSizing={false}
       title="Choose avatar"
       description="Pick a preset. You can change it anytime in profile settings."
       contentPadding={{ horizontal: horizontalPadding, top: 8, bottom: 16 }}
