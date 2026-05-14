@@ -9,6 +9,10 @@ export interface CheckIdentifierResponse {
   status: CheckIdentifierStatus;
 }
 
+export interface RefreshTokenRequest {
+    refresh_token: string;
+}
+
 /** Login body: set `email` when `identifier` is `email`, or `phone_number` when `phone`. */
 export interface LoginWithIdentifierRequest {
   identifier: 'email' | 'phone';
@@ -40,6 +44,7 @@ export interface AuthUserProfile {
 
 export interface LoginWithIdentifierResponse {
   token: string;
+  refresh_token?: string;
   user: AuthUserProfile;
 }
 

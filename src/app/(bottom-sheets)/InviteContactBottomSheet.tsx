@@ -17,7 +17,7 @@ export default function InviteContactBottomSheet() {
 
   const handleInvite = usePreventDoublePress(async () => {
     if (!contact?.id) return;
-    await inviteUser.mutateAsync(contact.id);
+    await inviteUser.mutateAsync({ contactId: contact.id });
     close();
   });
 
@@ -27,6 +27,7 @@ export default function InviteContactBottomSheet() {
         variant="primary"
         size="lg"
         className="w-full"
+        loading={inviteUser.isPending}
         onPress={handleInvite}
         disabled={inviteUser.isPending}
       >

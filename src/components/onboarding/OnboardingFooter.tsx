@@ -24,7 +24,7 @@ export function OnboardingFooter({
   const { theme } = useAppColorScheme();
 
   return (
-    <View className={`${theme.background} px-6 pb-6 pt-4`}>
+    <View className={`${theme.background} px-6 pt-4`}>
       {!hideLegal && <OnboardingLegal />}
       <AppAnimatedView entering={brandFadeInUp.delay(520)}>
         <AppButton

@@ -3,6 +3,7 @@ import type { WebsocketMessage } from '@/stores/websocket-store';
 import { useAppToastStore } from '@/stores/app-toast-store';
 import { useAuthTokenStore } from '@/stores/auth-token-store';
 import { resetPersistedSessionState } from '@/stores/reset-persisted-session-state';
+import { clearHttpAuthInterceptorState } from '@/network/config/http-auth-interceptor-state';
 import { logger } from '@/lib/utils/logger';
 import { useTabBadgesStore } from '@/stores/tab-badges-store';
 
@@ -30,8 +31,10 @@ export function runCoreSideEffects(msg: WebsocketMessage): void {
     }
 
     case 'FORCE_LOGOUT': {
+      clearHttpAuthInterceptorState();
       resetPersistedSessionState();
       useAuthTokenStore.getState().setToken(null);
+      useAuthTokenStore.getState().setRefreshToken(null);
       useAppToastStore
         .getState()
         .showToast({ message: 'Signed out.', variant: 'success' });

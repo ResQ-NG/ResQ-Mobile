@@ -1,6 +1,7 @@
 const VersionAlias = 'v1';
 const AuthAlias = 'users';
 export const AuthRoutes = {
+  RefreshToken: `${VersionAlias}/auth/refresh`,
   CheckIdentifier: `${VersionAlias}/auth/check-identifier`,
   Login: `${VersionAlias}/auth/login`,
   CreateAccount: `${VersionAlias}/${AuthAlias}/create`,

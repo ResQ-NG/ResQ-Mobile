@@ -5,6 +5,7 @@ import type {
   CheckIdentifierRequest,
   CreateAccountRequest,
   LoginWithIdentifierRequest,
+  LoginWithIdentifierResponse,
   ResendVerificationTokenRequest,
   VerifyEmailRequest,
 } from '@/network/modules/auth/types';
@@ -22,6 +23,7 @@ import {
   fieldErrorsToPartialRecord,
 } from '@/network/config/api-field-errors';
 import { useAuthTokenStore } from '@/stores/auth-token-store';
+import { clearHttpAuthInterceptorState } from '@/network/config/http-auth-interceptor-state';
 import { AuthKeys } from '@/network/modules/auth/keys';
 import { showToast } from '@/lib/utils/app-toast';
 import {
@@ -41,16 +43,6 @@ const MIN_SIGNUP_PASSWORD_LEN = 12;
 const OTP_LEN = 6;
 const RESEND_COOLDOWN_SEC = 30;
 
-function pickAuthTokenFromAuthResponse(data: unknown): string | null {
-  if (!data || typeof data !== 'object') return null;
-  const o = data as Record<string, unknown>;
-  for (const key of ['token', 'accessToken', 'access_token'] as const) {
-    const v = o[key];
-    if (typeof v === 'string' && v.length > 0) return v;
-  }
-  return null;
-}
-
 function buildCheckPayload(
   contact: string,
   mode: ReturnType<typeof useGetStartedContact>['mode'],
@@ -69,7 +61,7 @@ export function useGetStartedAuthFlow() {
   const queryClient = useQueryClient();
   const contactApi = useGetStartedContact();
   const setToken = useAuthTokenStore((s) => s.setToken);
-
+  const setRefreshToken = useAuthTokenStore((s) => s.setRefreshToken);
   const [phase, setPhase] = useState<GetStartedAuthPhase>('identifier');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -77,6 +69,7 @@ export function useGetStartedAuthFlow() {
   const [signupPassword, setSignupPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [resendCooldownSec, setResendCooldownSec] = useState(0);
+  const [rememberMe, setRememberMe] = useState(false);
   const [signupFieldErrors, setSignupFieldErrors] = useState<
     Record<string, string>
   >({});
@@ -110,6 +103,7 @@ export function useGetStartedAuthFlow() {
       setSignupPassword('');
       setOtp('');
       setResendCooldownSec(0);
+      setRememberMe(false);
     }
   }, [checkPayload, phase]);
 
@@ -123,21 +117,15 @@ export function useGetStartedAuthFlow() {
   }, [phase, firstName, lastName, signupPassword, contactApi.contact]);
 
   const finishWithSession = useCallback(
-    (data: unknown,) => {
-      const token = pickAuthTokenFromAuthResponse(data);
-      if (token) {
-        setToken(token);
-        void queryClient.invalidateQueries({ queryKey: [AuthKeys.UserProfile] });
-        // showToast({ message: successMessage, variant: 'success' });
-        router.replace('/screens/main');
-        return;
-      }
-      showToast({
-        message: 'Signed in, but no session token was returned. Check the API response shape.',
-        variant: 'error',
-      });
+    (data: LoginWithIdentifierResponse) => {
+      clearHttpAuthInterceptorState();
+      const { token, refresh_token: refreshToken } = data;
+      setToken(token);
+      setRefreshToken(rememberMe ? (refreshToken ?? null) : null);
+      void queryClient.invalidateQueries({ queryKey: [AuthKeys.UserProfile] });
+      router.replace('/screens/main');
     },
-    [queryClient, setToken]
+    [queryClient, rememberMe, setToken, setRefreshToken]
   );
 
   const checkMutation = useCheckIdentifier({
@@ -221,6 +209,7 @@ export function useGetStartedAuthFlow() {
     setSignupPassword('');
     setOtp('');
     setResendCooldownSec(0);
+    setRememberMe(false);
   }, []);
 
   const submitCheckIdentifier = useCallback(() => {
@@ -400,5 +389,7 @@ export function useGetStartedAuthFlow() {
     submitResendOtp,
     resendCooldownSec,
     signupFieldErrors,
+    rememberMe,
+    setRememberMe,
   };
 }

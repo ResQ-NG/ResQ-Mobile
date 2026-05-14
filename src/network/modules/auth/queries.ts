@@ -9,6 +9,7 @@ import type {
   CreateAccountResponse,
   LoginWithIdentifierRequest,
   LoginWithIdentifierResponse,
+  RefreshTokenRequest,
   ResendVerificationTokenRequest,
   UpdateProfileInformationRequest,
   VerifyEmailRequest,
@@ -24,6 +25,16 @@ export const useCheckIdentifier = createApiMutation<
 >({
   endpoint: AuthRoutes.CheckIdentifier,
   operationName: 'Check Identifier Status',
+  method: 'post',
+  suppressSuccessMessage: true,
+});
+
+export const useRefreshToken = createApiMutation<
+  RefreshTokenRequest,
+  LoginWithIdentifierResponse
+>({
+  endpoint: AuthRoutes.RefreshToken,
+  operationName: 'Refresh Token',
   method: 'post',
   suppressSuccessMessage: true,
 });

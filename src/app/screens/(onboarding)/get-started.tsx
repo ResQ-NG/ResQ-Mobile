@@ -11,7 +11,11 @@ import { AppHeading } from '@/components/ui/AppHeading';
 import { AppText } from '@/components/ui/AppText';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppButton } from '@/components/ui/AppButton';
-import { OnboardingHero } from '@/components/onboarding/OnboardingHero';
+import {
+  GetStartedFormField,
+  GetStartedRememberMeRow,
+  OnboardingHero,
+} from '@/components/onboarding';
 import { useAppColorScheme } from '@/theme/colorMode';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { useGetStartedAuthFlow } from '@/hooks/useGetStartedAuthFlow';
@@ -54,6 +58,8 @@ export default function GetStartedScreen() {
     submitResendOtp,
     resendCooldownSec,
     signupFieldErrors,
+    rememberMe,
+    setRememberMe,
   } = flow;
 
   const signupContactError =
@@ -160,8 +166,8 @@ export default function GetStartedScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="px-6 pt-6">
-          <OnboardingHero showTitle={false} />
+        <View className="px-6 pt-6 items-center">
+          <OnboardingHero showTitle={false} logoClassName="h-14 w-28" />
         </View>
 
         <AppAnimatedView entering={brandFadeIn} className=" mt-2">
@@ -177,7 +183,7 @@ export default function GetStartedScreen() {
         </AppAnimatedView>
 
         <View className="mt-8 gap-4">
-          <FormField label={fieldLabel}>
+          <GetStartedFormField label={fieldLabel}>
             <AppInput
               value={contact}
               onChangeText={handleContactChange}
@@ -203,26 +209,33 @@ export default function GetStartedScreen() {
                 Use 10 digits after +234- (e.g. 803…).
               </AppText>
             ) : null}
-          </FormField>
+          </GetStartedFormField>
 
           {phase === 'active_password' ? (
-            <FormField label="Password">
-              <AppInput
-                value={password}
-                onChangeText={setPassword}
-                placeholder="Your password"
-                secureTextEntry
-                showPasswordToggle
-                textContentType="password"
-                autoCapitalize="none"
-                leftIcon={lockIcon}
+            <>
+              <GetStartedFormField label="Password">
+                <AppInput
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholder="Your password"
+                  secureTextEntry
+                  showPasswordToggle
+                  textContentType="password"
+                  autoCapitalize="none"
+                  leftIcon={lockIcon}
+                />
+              </GetStartedFormField>
+              <GetStartedRememberMeRow
+                value={rememberMe}
+                onValueChange={setRememberMe}
+                theme={theme}
               />
-            </FormField>
+            </>
           ) : null}
 
           {phase === 'signup' ? (
             <>
-              <FormField
+              <GetStartedFormField
                 label="First name"
                 errorMessage={signupFieldErrors.first_name}
               >
@@ -234,8 +247,8 @@ export default function GetStartedScreen() {
                   autoCapitalize="words"
                   leftIcon={personIcon}
                 />
-              </FormField>
-              <FormField
+              </GetStartedFormField>
+              <GetStartedFormField
                 label="Last name (optional)"
                 errorMessage={signupFieldErrors.last_name}
               >
@@ -247,8 +260,8 @@ export default function GetStartedScreen() {
                   autoCapitalize="words"
                   leftIcon={personIcon}
                 />
-              </FormField>
-              <FormField
+              </GetStartedFormField>
+              <GetStartedFormField
                 label="Password"
                 errorMessage={signupFieldErrors.password}
               >
@@ -278,38 +291,45 @@ export default function GetStartedScreen() {
                     </AppText>
                   </View>
                 ) : null}
-              </FormField>
+              </GetStartedFormField>
             </>
           ) : null}
 
           {phase === 'verify_otp' ? (
-            <FormField label="Verification code">
-              <AppInput
-                value={otp}
-                onChangeText={(t) => setOtp(t.replace(/\D/g, '').slice(0, 6))}
-                placeholder="000000"
-                keyboardType="number-pad"
-                maxLength={6}
-                textContentType="oneTimeCode"
-                leftIcon={keyIcon}
-              />
-              <Pressable
-                onPress={submitResendOtp}
-                disabled={resendCooldownSec > 0}
-                className={`self-start mt-3 ${resendCooldownSec > 0 ? 'opacity-50' : 'active:opacity-70'}`}
-                accessibilityRole="button"
-                accessibilityLabel="Resend verification code"
-              >
-                <AppText
-                  variant="body"
-                  className="text-primary-blue dark:text-primary-blue-dark font-metropolis-medium"
+            <>
+              <GetStartedFormField label="Verification code">
+                <AppInput
+                  value={otp}
+                  onChangeText={(t) => setOtp(t.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  textContentType="oneTimeCode"
+                  leftIcon={keyIcon}
+                />
+                <Pressable
+                  onPress={submitResendOtp}
+                  disabled={resendCooldownSec > 0}
+                  className={`self-start mt-3 ${resendCooldownSec > 0 ? 'opacity-50' : 'active:opacity-70'}`}
+                  accessibilityRole="button"
+                  accessibilityLabel="Resend verification code"
                 >
-                  {resendCooldownSec > 0
-                    ? `Resend in 0:${String(resendCooldownSec).padStart(2, '0')}`
-                    : 'Resend code'}
-                </AppText>
-              </Pressable>
-            </FormField>
+                  <AppText
+                    variant="body"
+                    className="text-primary-blue dark:text-primary-blue-dark font-metropolis-medium"
+                  >
+                    {resendCooldownSec > 0
+                      ? `Resend in 0:${String(resendCooldownSec).padStart(2, '0')}`
+                      : 'Resend code'}
+                  </AppText>
+                </Pressable>
+              </GetStartedFormField>
+              <GetStartedRememberMeRow
+                value={rememberMe}
+                onValueChange={setRememberMe}
+                theme={theme}
+              />
+            </>
           ) : null}
 
           {phase !== 'identifier' ? (
@@ -330,32 +350,5 @@ export default function GetStartedScreen() {
         </View>
       </ScrollView>
     </AppAnimatedSafeAreaView>
-  );
-}
-
-function FormField({
-  label,
-  children,
-  errorMessage,
-}: {
-  label: string;
-  children: React.ReactNode;
-  errorMessage?: string;
-}) {
-  return (
-    <View>
-      <AppText className="font-metropolis-medium text-primaryDark dark:text-primaryDark-dark mb-3">
-        {label}
-      </AppText>
-      {children}
-      {errorMessage ? (
-        <AppText
-          variant="caption"
-          className="text-accent-red dark:text-accent-red-dark mt-2"
-        >
-          {errorMessage}
-        </AppText>
-      ) : null}
-    </View>
   );
 }

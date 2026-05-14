@@ -2,10 +2,15 @@ import { View } from 'react-native';
 import { BaseBottomSheet } from '@/components/bottom-sheet';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppText } from '@/components/ui/AppText';
-import { Avatar, AVATAR_BACKGROUNDS, avatarRemoteSource } from '@/components/ui/Avatar';
+import {
+  Avatar,
+  AVATAR_BACKGROUNDS,
+  avatarRemoteSource,
+} from '@/components/ui/Avatar';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
 import { useDeleteEmergencyContact } from '@/network/modules/emergency-contacts/queries';
 import { useDeleteEmergencyContactConfirmStore } from '@/stores/delete-emergency-contact-confirm-store';
+
 export default function DeleteEmergencyContactConfirmBottomSheet() {
   const { isOpen, contact, close } = useDeleteEmergencyContactConfirmStore();
   const { mutate, isPending } = useDeleteEmergencyContact();
@@ -17,11 +22,14 @@ export default function DeleteEmergencyContactConfirmBottomSheet() {
     const idNum = Number(contact.id);
     if (!Number.isFinite(idNum)) return;
 
-    mutate({ contactId: String(idNum) }, {
-      onSuccess: () => {
-        close();
-      },
-    });
+    mutate(
+      { contactId: String(idNum) },
+      {
+        onSuccess: () => {
+          close();
+        },
+      }
+    );
   });
 
   const footer = (

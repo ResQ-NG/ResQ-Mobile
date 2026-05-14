@@ -19,13 +19,29 @@ import { v4 as uuidv4 } from 'uuid';
 import { ApiSuccess, ApiFailure, ApiEnvelope } from '@/network/config/types';
 import { isPlainRecord } from '@/network/config/type-guards';
 import { logError, logger } from '@/lib/utils/logger';
+import { AuthRoutes } from '@/network/modules/auth/routes';
+import { useSessionExpiredStore } from '@/stores/session-expired-store';
+import {
+  isHardSessionAuthFailure,
+  runSingleFlightRefresh,
+  setHardSessionAuthFailure,
+  tryMarkSessionExpiredSheetShown,
+} from '@/network/config/http-auth-interceptor-state';
 
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
     startTime?: number;
     disableLogging?: boolean;
+    /** Do not attach `Authorization` (used for refresh-token requests). */
+    skipAuthToken?: boolean;
+    /** Marks the refresh endpoint so 401 is not retried with another refresh. */
+    isRefreshRequest?: boolean;
+    /** Set after one successful token refresh + retry to avoid refresh loops. */
+    _retryAfterRefresh?: boolean;
   }
 }
+
+export { clearHttpAuthInterceptorState } from '@/network/config/http-auth-interceptor-state';
 
 function readBodyMessage(data: unknown): string | undefined {
   if (!isPlainRecord(data)) return undefined;
@@ -149,6 +165,83 @@ export function setOnUnauthorized(handler: (() => void) | null) {
   onUnauthorized = handler;
 }
 
+function extractSessionFromAuthPayload(data: unknown): {
+  token: string;
+  refresh_token?: string;
+} | null {
+  if (!isPlainRecord(data)) return null;
+  const wrapped =
+    typeof data.code === 'number' &&
+    data.code >= 200 &&
+    data.code < 300 &&
+    'data' in data
+      ? data.data
+      : data;
+  if (!isPlainRecord(wrapped)) return null;
+  const token =
+    typeof wrapped.token === 'string'
+      ? wrapped.token
+      : typeof wrapped.access_token === 'string'
+        ? wrapped.access_token
+        : null;
+  if (!token) return null;
+  const refresh_token =
+    typeof wrapped.refresh_token === 'string'
+      ? wrapped.refresh_token
+      : undefined;
+  return { token, refresh_token };
+}
+
+async function refreshAccessTokenWithStoredRefresh(): Promise<boolean> {
+  try {
+    const refreshToken = useAuthTokenStore.getState().refreshToken;
+    if (!refreshToken) return false;
+
+    const res = await http.post(
+      AuthRoutes.RefreshToken,
+      { refresh_token: refreshToken },
+      {
+        skipAuthToken: true,
+        isRefreshRequest: true,
+      } as InternalAxiosRequestConfig
+    );
+
+    const session = extractSessionFromAuthPayload(res.data);
+    if (!session) return false;
+
+    useAuthTokenStore.getState().setToken(session.token);
+    if (session.refresh_token) {
+      useAuthTokenStore.getState().setRefreshToken(session.refresh_token);
+    }
+    setHardSessionAuthFailure(false);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getRequestHadAuthorizationHeader(
+  config: InternalAxiosRequestConfig | undefined
+): boolean {
+  if (!config?.headers) return false;
+  if (config.headers instanceof AxiosHeaders) {
+    const a = config.headers.get('Authorization');
+    return typeof a === 'string' && a.length > 0;
+  }
+  if (isPlainRecord(config.headers)) {
+    const h = config.headers as Record<string, unknown>;
+    const a = h.Authorization ?? h.authorization;
+    return typeof a === 'string' && a.length > 0;
+  }
+  return false;
+}
+
+function notifySessionExpired(): void {
+  if (!tryMarkSessionExpiredSheetShown()) return;
+  onUnauthorized?.();
+  useSessionExpiredStore.getState().open();
+}
+
 /** Authorization scheme for API requests (`Authorization: Bearer <token>`). */
 export const HTTP_AUTH_SCHEME = 'Bearer';
 
@@ -216,10 +309,6 @@ export const syncAuthToken = async (): Promise<void> => {
  *  =============================== */
 http.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    // Await token retrieval to ensure we have the latest token from storage
-    const storedToken = await getStoredToken();
-    const token =
-      typeof storedToken === 'string' && storedToken ? storedToken : null;
     const requestId = uuidv4();
     config.startTime = Date.now();
 
@@ -229,14 +318,23 @@ http.interceptors.request.use(
     config.headers.set('X-Device-Type', Platform.OS);
     config.headers.set('X-App-Version', AppConfig.APP_VERSION || '1.0.0');
 
-    // Authorization: Bearer <token> (RFC 6750)
-    if (token) {
-      const credentials = normalizeBearerToken(token);
-      if (credentials) {
-        config.headers.set(
-          'Authorization',
-          `${HTTP_AUTH_SCHEME} ${credentials}`
-        );
+    let token: string | null = null;
+    if (config.skipAuthToken) {
+      if (config.headers instanceof AxiosHeaders) {
+        config.headers.delete('Authorization');
+      }
+    } else {
+      const storedToken = await getStoredToken();
+      token =
+        typeof storedToken === 'string' && storedToken ? storedToken : null;
+      if (token) {
+        const credentials = normalizeBearerToken(token);
+        if (credentials) {
+          config.headers.set(
+            'Authorization',
+            `${HTTP_AUTH_SCHEME} ${credentials}`
+          );
+        }
       }
     }
 
@@ -268,10 +366,11 @@ http.interceptors.request.use(
           params: config.params,
           hasBody: !!config.data,
           requestId,
-          isAuthenticated: !!token,
-          tokenPreview: token
-            ? `${token.slice(0, 8)}...${token.slice(-6)}`
-            : 'No token',
+          isAuthenticated: !config.skipAuthToken && !!token,
+          tokenPreview:
+            token && !config.skipAuthToken
+              ? `${token.slice(0, 8)}...${token.slice(-6)}`
+              : 'No token',
           contentType: getContentTypeHeader(config.headers),
         }
       );
@@ -288,7 +387,6 @@ http.interceptors.request.use(
 /** ===============================
  *  Response Interceptor
  *  =============================== */
-// Updated response interceptor to ignore canceled requests
 http.interceptors.response.use(
   (response: AxiosResponse) => {
     const start = response.config.startTime;
@@ -313,7 +411,7 @@ http.interceptors.response.use(
 
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
     // Ignore/log nothing if the request was canceled
     if (isCancel(error)) {
       // Pass along the cancel, mark it with isCanceled
@@ -335,8 +433,40 @@ http.interceptors.response.use(
 
     logError(error, 'API Response Error', context);
 
-    if (isAxiosError(error) && error.response?.status === 401) {
-      onUnauthorized?.();
+    if (isAxiosError(error) && error.response?.status === 401 && config) {
+      if (config.isRefreshRequest) {
+        setHardSessionAuthFailure(true);
+        notifySessionExpired();
+        return Promise.reject(error);
+      }
+
+      const hadAuth = getRequestHadAuthorizationHeader(config);
+      if (!hadAuth) {
+        return Promise.reject(error);
+      }
+
+      if (isHardSessionAuthFailure()) {
+        return Promise.reject(error);
+      }
+
+      if (config._retryAfterRefresh) {
+        setHardSessionAuthFailure(true);
+        notifySessionExpired();
+        return Promise.reject(error);
+      }
+
+      const refreshed = await runSingleFlightRefresh(
+        refreshAccessTokenWithStoredRefresh
+      );
+
+      if (refreshed) {
+        config._retryAfterRefresh = true;
+        return http.request(config);
+      }
+
+      setHardSessionAuthFailure(true);
+      notifySessionExpired();
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);

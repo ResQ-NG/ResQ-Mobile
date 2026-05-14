@@ -10,6 +10,7 @@ import DeleteEmergencyContactConfirmBottomSheet from './DeleteEmergencyContactCo
 import AvatarPresetPickerBottomSheet from './AvatarPresetPickerBottomSheet';
 import InviteContactBottomSheet from './InviteContactBottomSheet';
 import LogoutConfirmBottomSheet from './LogoutConfirmBottomSheet';
+import SessionExpiredBottomSheet from './SessionExpiredBottomSheet';
 
 export default function BottomSheetRegistry() {
   return (
@@ -26,6 +27,7 @@ export default function BottomSheetRegistry() {
       <AvatarPresetPickerBottomSheet />
       <InviteContactBottomSheet />
       <LogoutConfirmBottomSheet />
+      <SessionExpiredBottomSheet />
     </>
   );
 }

@@ -51,6 +51,17 @@ export const AppConfig = {
   MAPBOX_STYLE_URL_DARK:
     process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL_DARK ||
     Constants.expoConfig?.extra?.MAPBOX_STYLE_URL_DARK,
+  /** Maps Platform key with Places Autocomplete + Place Details enabled. */
+  GOOGLE_MAPS_API_KEY:
+    process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ||
+    Constants.expoConfig?.extra?.GOOGLE_MAPS_API_KEY,
+  /**
+   * Destination autocomplete: `google` | `mapbox` | `local` | `auto`.
+   * @see `@/lib/place-search/engine` (`PLACE_SEARCH_ENGINE`).
+   */
+  PLACE_SEARCH_ENGINE:
+    process.env.EXPO_PUBLIC_PLACE_SEARCH_ENGINE ||
+    Constants.expoConfig?.extra?.PLACE_SEARCH_ENGINE,
 };
 
 if (__DEV__) {
