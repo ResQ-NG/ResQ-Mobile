@@ -21,6 +21,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import BottomSheetRegistry from './(bottom-sheets)/registry';
 import { AppBannerHost } from '@/components/app-banner/AppBannerHost';
+import { OfflineModeBadge } from '@/components/offline/OfflineModeBadge';
+import { OfflineModeSync } from '@/components/offline/OfflineModeSync';
 import { AppToastHost } from '@/components/app-toast/AppToastHost';
 import { AppModalHost } from '@/components/app-modal/AppModalHost';
 import { InCallHost } from '@/components/in-call';
@@ -82,7 +84,9 @@ export default function RootLayout() {
           <BottomSheetModalProvider>
             <QueryClientProvider client={queryClient}>
               <KeyboardProvider>
+                <OfflineModeSync />
                 <AppBannerHost />
+                <OfflineModeBadge />
                 <AppToastHost />
                 <AppModalHost />
                 <InCallHost />
