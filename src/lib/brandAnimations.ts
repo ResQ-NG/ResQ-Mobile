@@ -32,3 +32,9 @@ export const brandScaleIn = new Keyframe({
   from: { opacity: 0.8, transform: [{ scale: 0.98 }] },
   to: { opacity: 1, transform: [{ scale: 1 }], easing: EASE },
 }).duration(DURATION);
+
+/** Background watermark — scale only so faded icon fill is not overridden. */
+export const brandBgDecorEnter = new Keyframe({
+  from: { transform: [{ scale: 0.94 }] },
+  to: { transform: [{ scale: 1 }], easing: EASE },
+}).duration(640);

@@ -83,7 +83,7 @@ export default function SosConfirmBottomSheet() {
       footer={footer}
       contentPadding={{ horizontal: 16, top: 0, bottom: 0 }}
     >
-      <AppAnimatedView className="items-center px-2 pb-32">
+      <AppAnimatedView className="items-center px-2 pb-10">
         <AppAnimatedView entering={brandFadeInUp.delay(100)} style={pulseStyle}>
           <LottieView
             source={require('@assets/lottie/alert.json')}

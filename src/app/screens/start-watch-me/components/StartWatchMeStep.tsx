@@ -9,19 +9,20 @@ import { AppText } from '@/components/ui/AppText';
 import { AppInfoCallout } from '@/components/ui/AppInfoCallout';
 import { AppHeading } from '@/components/ui/AppHeading';
 import { AppButton } from '@/components/ui/AppButton';
+import { Ionicons } from '@expo/vector-icons';
 import SolarClockCircleBoldIcon from '@/components/icons/solar/clock-circle-bold';
 import SolarBusBoldIcon from '@/components/icons/solar/bus-bold';
 import SolarScooterBoldIcon from '@/components/icons/solar/scooter-bold';
 import SolarTramBoldIcon from '@/components/icons/solar/tram-bold';
 import SolarWalkingBoldIcon from '@/components/icons/solar/walking-bold';
+import MingcuteCar3FillIcon from '@/components/icons/mingcute/car-3-fill';
 import { useAppColorScheme } from '@/theme/colorMode';
 import { WatchMeContactSection } from '@/components/watchme/WatchMeContactSection';
 import type { WatchMeContactGroup } from '@/components/watchme/WatchMeContactSection';
-import { DestinationSearchInput } from '@/components/watchme/DestinationSearchInput';
-import MingcuteCar3FillIcon from '@/components/icons/mingcute/car-3-fill';
 import formatArrivalTime from './formatArrivalTime';
 import { emergencyContactsReachabilityCopy } from '@/lib/content/emergency-contacts-reachability-info';
 import { useStartWatchMeReachabilityInfoDismissStore } from '@/stores/start-watch-me-reachability-info-dismiss-store';
+import type { MockRoute } from '@/lib/mock/watchMeRouteSafetyMock';
 
 const reachCopy = emergencyContactsReachabilityCopy;
 
@@ -48,12 +49,11 @@ const TRANSPORT_OPTIONS: {
   { value: 'train', label: 'Train', Icon: SolarTramBoldIcon },
 ];
 
-/** Default drive duration in minutes for ETA (can come from routing API later) */
 const DEFAULT_ARRIVAL_MINUTES = 30;
 
 export interface StartWatchMeStepProps {
   destination: string;
-  onDestinationChange: (value: string) => void;
+  selectedRoute: MockRoute | null;
   transportation: TransportationMode | null;
   onTransportationChange: (value: TransportationMode) => void;
   groups: WatchMeContactGroup[];
@@ -68,7 +68,7 @@ export interface StartWatchMeStepProps {
 
 export default function StartWatchMeStep({
   destination,
-  onDestinationChange,
+  selectedRoute,
   transportation,
   onTransportationChange,
   groups,
@@ -81,7 +81,8 @@ export default function StartWatchMeStep({
   bottomInset = 0,
 }: StartWatchMeStepProps) {
   const { theme } = useAppColorScheme();
-  const arrivalTime = formatArrivalTime(DEFAULT_ARRIVAL_MINUTES);
+  const durationMin = selectedRoute?.durationMin ?? DEFAULT_ARRIVAL_MINUTES;
+  const arrivalTime = formatArrivalTime(durationMin);
 
   const reachabilityInfoDismissed = useStartWatchMeReachabilityInfoDismissStore(
     (s) => s.dismissed
@@ -116,22 +117,56 @@ export default function StartWatchMeStep({
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <AppAnimatedView
-          entering={brandFadeInUp.delay(60)}
-          className="mt-5 mb-5"
-        >
-          <AppHeading
-            level={6}
-            className="text-primaryDark font-metropolis-semibold dark:text-primaryDark-dark mb-2"
+        {/* Destination banner — read-only, from route analysis */}
+        {destination ? (
+          <AppAnimatedView
+            entering={brandFadeInUp.delay(60)}
+            className="mt-5 mb-5 rounded-2xl p-4 flex-row items-center gap-3"
+            style={{ backgroundColor: theme.surfaceBackground }}
           >
-            Where are you going?
-          </AppHeading>
-          <DestinationSearchInput
-            value={destination}
-            onChangeText={onDestinationChange}
-            placeholder="Search or type destination"
-          />
-        </AppAnimatedView>
+            <View
+              className="w-9 h-9 rounded-full items-center justify-center"
+              style={{ backgroundColor: theme.primaryBlue + '1A' }}
+            >
+              <Ionicons name="location" size={18} color={theme.primaryBlue} />
+            </View>
+            <View className="flex-1 min-w-0">
+              <AppText
+                variant="caption"
+                className="text-captionDark dark:text-captionDark-dark mb-0.5"
+              >
+                Destination
+              </AppText>
+              <AppText
+                className="font-metropolis-semibold text-primaryDark dark:text-primaryDark-dark"
+                numberOfLines={1}
+              >
+                {destination}
+              </AppText>
+              {selectedRoute ? (
+                <AppText
+                  variant="caption"
+                  className="text-captionDark dark:text-captionDark-dark mt-0.5"
+                >
+                  {selectedRoute.via} · {selectedRoute.distanceKm} km
+                </AppText>
+              ) : null}
+            </View>
+            {selectedRoute ? (
+              <View
+                className="rounded-full px-2.5 py-1"
+                style={{ backgroundColor: selectedRoute.accentColor + '22' }}
+              >
+                <AppText
+                  className="font-metropolis-semibold text-xs"
+                  style={{ color: selectedRoute.accentColor }}
+                >
+                  {selectedRoute.safetyScore}/100
+                </AppText>
+              </View>
+            ) : null}
+          </AppAnimatedView>
+        ) : null}
 
         <AppAnimatedView entering={brandFadeInUp.delay(120)} className="mb-6">
           <AppHeading
@@ -233,10 +268,10 @@ export default function StartWatchMeStep({
           onPress={onStartPress}
           variant="primary"
           size="lg"
-          disabled={isStarting}
+          disabled={isStarting || selectedIds.size === 0}
           className="w-full"
         >
-          {isStarting ? 'Checking route...' : 'Start watch me'}
+          {isStarting ? 'Starting...' : 'Start Watch Me'}
         </AppButton>
       </AppAnimatedView>
     </>

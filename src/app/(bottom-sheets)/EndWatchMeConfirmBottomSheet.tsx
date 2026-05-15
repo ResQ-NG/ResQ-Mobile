@@ -9,12 +9,12 @@ import LottieView from 'lottie-react-native';
 
 export default function EndWatchMeConfirmBottomSheet() {
   const { isOpen, close } = useEndWatchMeConfirmStore();
-  const setSessionActive = useWatchMeContactsStore((s) => s.setSessionActive);
+  const endSession = useWatchMeContactsStore((s) => s.endSession);
 
   const handleCancel = () => close();
 
   const handleEndSession = usePreventDoublePress(() => {
-    setSessionActive(false);
+    endSession();
     close();
     showToast({
       message: 'Watch Me session ended',

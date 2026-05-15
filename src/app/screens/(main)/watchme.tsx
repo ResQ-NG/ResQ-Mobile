@@ -75,7 +75,7 @@ export default function WatchMeScreen() {
     if (shouldShowOnboarding) {
       router.push('/(modals)/watch-me-onboarding');
     } else {
-      router.push('/screens/start-watch-me');
+      router.push('/screens/route-safety');
     }
   });
 
@@ -98,7 +98,7 @@ export default function WatchMeScreen() {
   };
 
   const handleSearchSafety = usePreventDoublePress(() => {
-    router.push('/screens/check-safety');
+    router.push('/screens/route-safety');
   });
 
   const handleSelectContact = usePreventDoublePress((id: string) => {

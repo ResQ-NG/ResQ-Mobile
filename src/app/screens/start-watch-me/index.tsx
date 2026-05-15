@@ -4,29 +4,27 @@ import { router } from 'expo-router';
 import { AppAnimatedSafeAreaView } from '@/lib/animation';
 import { useAppColorScheme } from '@/theme/colorMode';
 import { WatchMeHeader } from '@/components/watchme';
-import { StartWatchMeStep, type TransportationMode } from './components';
 import { useWatchMeContactsStore } from '@/stores/watch-me-contacts-store';
 import { useWatchMeContactsSheetStore } from '@/stores/watch-me-contacts-sheet-store';
 import { useWatchMeContactGroups } from '@/network/modules/watch-me/hooks/useWatchMeContactGroups';
-import { useRouteSafetyCheck } from '@/hooks/useRouteSafetyCheck';
-import { useUnsafeRouteSheetStore } from '@/stores/unsafe-route-sheet-store';
+import { useRouteAnalysisStore } from '@/stores/route-analysis-store';
 import { usePreventDoublePress } from '@/hooks/usePreventDoublePress';
-
-const SUCCESS_MESSAGE_DURATION_MS = 600;
+import { StartWatchMeStep, type TransportationMode } from './components';
 
 export default function StartWatchMeScreen() {
   const { theme } = useAppColorScheme();
   const insets = useSafeAreaInsets();
   const groups = useWatchMeContactGroups();
   const openAddContactSheet = useWatchMeContactsSheetStore((s) => s.openForAdd);
-  const { checkRouteSafety, hideModal } = useRouteSafetyCheck();
-  const openRouteSafetyStatusSheet = useUnsafeRouteSheetStore((s) => s.open);
 
-  const [destination, setDestination] = useState('');
+  const destination = useRouteAnalysisStore((s) => s.destination);
+  const selectedRoute = useRouteAnalysisStore((s) => s.selectedRoute);
+
+  const startSession = useWatchMeContactsStore((s) => s.startSession);
+
   const [transportation, setTransportation] =
-    useState<TransportationMode | null>(null);
+    useState<TransportationMode | null>(selectedRoute ? 'driving' : null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [isChecking, setIsChecking] = useState(false);
 
   const toggleContact = (id: string) => {
     setSelectedIds((prev) => {
@@ -59,31 +57,12 @@ export default function StartWatchMeScreen() {
     toggleRelationshipGroup
   );
 
-  const setSessionActive = useWatchMeContactsStore((s) => s.setSessionActive);
-
   const handleBack = usePreventDoublePress(() => router.back());
   const handleAddContactPress = usePreventDoublePress(openAddContactSheet);
-  const handleStartWatchMe = usePreventDoublePress(async () => {
-    if (isChecking) return;
-    setIsChecking(true);
-    try {
-      const { safe, issues } = await checkRouteSafety(destination);
-      await new Promise((r) => setTimeout(r, SUCCESS_MESSAGE_DURATION_MS));
-      hideModal();
 
-      openRouteSafetyStatusSheet({
-        fromLabel: 'Current location',
-        toLabel: destination || 'Destination',
-        issues: issues ?? [],
-      });
-
-      if (safe) {
-        setSessionActive(true);
-        router.back();
-      }
-    } finally {
-      setIsChecking(false);
-    }
+  const handleStartWatchMe = usePreventDoublePress(() => {
+    startSession([...selectedIds]);
+    router.replace('/screens/watch-me-session');
   });
 
   return (
@@ -91,11 +70,21 @@ export default function StartWatchMeScreen() {
       className={`flex-1 ${theme.background}`}
       edges={['top', 'left', 'right']}
       paddingSize="sm"
-      header={<WatchMeHeader onBack={handleBack} />}
+      header={
+        <WatchMeHeader
+          onBack={handleBack}
+          title="Watch me"
+          subtitle={
+            destination
+              ? `Heading to ${destination}`
+              : 'Let loved ones track your journey'
+          }
+        />
+      }
     >
       <StartWatchMeStep
         destination={destination}
-        onDestinationChange={setDestination}
+        selectedRoute={selectedRoute}
         transportation={transportation}
         onTransportationChange={setTransportation}
         groups={groups}
@@ -104,7 +93,6 @@ export default function StartWatchMeScreen() {
         onToggleRelationshipGroup={handleToggleRelationshipGroup}
         onAddContactPress={handleAddContactPress}
         onStartPress={handleStartWatchMe}
-        isStarting={isChecking}
         bottomInset={insets.bottom}
       />
     </AppAnimatedSafeAreaView>

@@ -19,6 +19,7 @@ export {
   FadeIn,
   FadeInDown,
   FadeInUp,
+  FadeInLeft,
   ZoomIn,
   SlideInDown,
   SlideInUp,
@@ -26,6 +27,7 @@ export {
   useAnimatedStyle,
   withTiming,
   withSpring,
+  withDelay,
   Easing,
 } from 'react-native-reanimated';
 
